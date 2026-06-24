@@ -16,15 +16,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "SETAS",
-                    "type": "Value",
-                    "id": "febeb6b4-4bab-4837-9814-34a67391fb25",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Atirar",
                     "type": "Button",
                     "id": "299d8398-f915-485a-8a24-30e23c9513cc",
@@ -96,61 +87,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Andar",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "2D Vector",
-                    "id": "bce41614-f54b-452b-a040-0c34e92bbfa5",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SETAS",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "up",
-                    "id": "ecb145e7-6a54-457c-8290-ac4074b0bb54",
-                    "path": "<Keyboard>/upArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SETAS",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "down",
-                    "id": "55f50b41-4454-4734-9ce2-0ec8af60d91e",
-                    "path": "<Keyboard>/downArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SETAS",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "left",
-                    "id": "be1ccec2-ac60-4c4b-8627-84ea414ef9f0",
-                    "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SETAS",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "10ab5310-135f-470b-9f59-603a850f1d01",
-                    "path": "<Keyboard>/rightArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SETAS",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
