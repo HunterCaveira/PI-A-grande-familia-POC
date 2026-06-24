@@ -102,15 +102,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""SETAS"",
-                    ""type"": ""Value"",
-                    ""id"": ""febeb6b4-4bab-4837-9814-34a67391fb25"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
                     ""name"": ""Atirar"",
                     ""type"": ""Button"",
                     ""id"": ""299d8398-f915-485a-8a24-30e23c9513cc"",
@@ -186,61 +177,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""2D Vector"",
-                    ""id"": ""bce41614-f54b-452b-a040-0c34e92bbfa5"",
-                    ""path"": ""2DVector"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SETAS"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""ecb145e7-6a54-457c-8290-ac4074b0bb54"",
-                    ""path"": ""<Keyboard>/upArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SETAS"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""55f50b41-4454-4734-9ce2-0ec8af60d91e"",
-                    ""path"": ""<Keyboard>/downArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SETAS"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""be1ccec2-ac60-4c4b-8627-84ea414ef9f0"",
-                    ""path"": ""<Keyboard>/leftArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SETAS"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""10ab5310-135f-470b-9f59-603a850f1d01"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SETAS"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": """",
                     ""id"": ""fb04f4cf-e962-4307-b73f-0d5520488b46"",
                     ""path"": ""<Mouse>/rightButton"",
@@ -270,7 +206,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         // MovimentoPlayer
         m_MovimentoPlayer = asset.FindActionMap("MovimentoPlayer", throwIfNotFound: true);
         m_MovimentoPlayer_Andar = m_MovimentoPlayer.FindAction("Andar", throwIfNotFound: true);
-        m_MovimentoPlayer_SETAS = m_MovimentoPlayer.FindAction("SETAS", throwIfNotFound: true);
         m_MovimentoPlayer_Atirar = m_MovimentoPlayer.FindAction("Atirar", throwIfNotFound: true);
         m_MovimentoPlayer_Pular = m_MovimentoPlayer.FindAction("Pular", throwIfNotFound: true);
     }
@@ -354,7 +289,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_MovimentoPlayer;
     private List<IMovimentoPlayerActions> m_MovimentoPlayerActionsCallbackInterfaces = new List<IMovimentoPlayerActions>();
     private readonly InputAction m_MovimentoPlayer_Andar;
-    private readonly InputAction m_MovimentoPlayer_SETAS;
     private readonly InputAction m_MovimentoPlayer_Atirar;
     private readonly InputAction m_MovimentoPlayer_Pular;
     /// <summary>
@@ -372,10 +306,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "MovimentoPlayer/Andar".
         /// </summary>
         public InputAction @Andar => m_Wrapper.m_MovimentoPlayer_Andar;
-        /// <summary>
-        /// Provides access to the underlying input action "MovimentoPlayer/SETAS".
-        /// </summary>
-        public InputAction @SETAS => m_Wrapper.m_MovimentoPlayer_SETAS;
         /// <summary>
         /// Provides access to the underlying input action "MovimentoPlayer/Atirar".
         /// </summary>
@@ -413,9 +343,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Andar.started += instance.OnAndar;
             @Andar.performed += instance.OnAndar;
             @Andar.canceled += instance.OnAndar;
-            @SETAS.started += instance.OnSETAS;
-            @SETAS.performed += instance.OnSETAS;
-            @SETAS.canceled += instance.OnSETAS;
             @Atirar.started += instance.OnAtirar;
             @Atirar.performed += instance.OnAtirar;
             @Atirar.canceled += instance.OnAtirar;
@@ -436,9 +363,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Andar.started -= instance.OnAndar;
             @Andar.performed -= instance.OnAndar;
             @Andar.canceled -= instance.OnAndar;
-            @SETAS.started -= instance.OnSETAS;
-            @SETAS.performed -= instance.OnSETAS;
-            @SETAS.canceled -= instance.OnSETAS;
             @Atirar.started -= instance.OnAtirar;
             @Atirar.performed -= instance.OnAtirar;
             @Atirar.canceled -= instance.OnAtirar;
@@ -492,13 +416,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAndar(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "SETAS" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSETAS(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Atirar" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
