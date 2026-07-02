@@ -92,6 +92,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d20fb2f9-03f5-4c9d-93a3-5ebbf03dade4",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Andar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "fb04f4cf-e962-4307-b73f-0d5520488b46",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
@@ -105,6 +116,17 @@
                     "name": "",
                     "id": "784a356e-e6e4-49b0-a422-0454853cf050",
                     "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pular",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a89a12dc-d19e-4fb0-a753-ea10e86e002c",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
