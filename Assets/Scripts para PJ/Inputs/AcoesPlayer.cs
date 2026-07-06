@@ -118,6 +118,15 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Recarregar"",
+                    ""type"": ""Button"",
+                    ""id"": ""bc13ddac-0ae5-43e9-a8a2-c00cdf185510"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -219,6 +228,17 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""action"": ""Pular"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""28c4baec-3eb9-4484-b815-29c5a34c7a01"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Recarregar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -230,6 +250,7 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         m_MovimentoPlayer_Andar = m_MovimentoPlayer.FindAction("Andar", throwIfNotFound: true);
         m_MovimentoPlayer_Atirar = m_MovimentoPlayer.FindAction("Atirar", throwIfNotFound: true);
         m_MovimentoPlayer_Pular = m_MovimentoPlayer.FindAction("Pular", throwIfNotFound: true);
+        m_MovimentoPlayer_Recarregar = m_MovimentoPlayer.FindAction("Recarregar", throwIfNotFound: true);
     }
 
     ~@AcoesPlayer()
@@ -313,6 +334,7 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
     private readonly InputAction m_MovimentoPlayer_Andar;
     private readonly InputAction m_MovimentoPlayer_Atirar;
     private readonly InputAction m_MovimentoPlayer_Pular;
+    private readonly InputAction m_MovimentoPlayer_Recarregar;
     /// <summary>
     /// Provides access to input actions defined in input action map "MovimentoPlayer".
     /// </summary>
@@ -336,6 +358,10 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "MovimentoPlayer/Pular".
         /// </summary>
         public InputAction @Pular => m_Wrapper.m_MovimentoPlayer_Pular;
+        /// <summary>
+        /// Provides access to the underlying input action "MovimentoPlayer/Recarregar".
+        /// </summary>
+        public InputAction @Recarregar => m_Wrapper.m_MovimentoPlayer_Recarregar;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -371,6 +397,9 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Pular.started += instance.OnPular;
             @Pular.performed += instance.OnPular;
             @Pular.canceled += instance.OnPular;
+            @Recarregar.started += instance.OnRecarregar;
+            @Recarregar.performed += instance.OnRecarregar;
+            @Recarregar.canceled += instance.OnRecarregar;
         }
 
         /// <summary>
@@ -391,6 +420,9 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Pular.started -= instance.OnPular;
             @Pular.performed -= instance.OnPular;
             @Pular.canceled -= instance.OnPular;
+            @Recarregar.started -= instance.OnRecarregar;
+            @Recarregar.performed -= instance.OnRecarregar;
+            @Recarregar.canceled -= instance.OnRecarregar;
         }
 
         /// <summary>
@@ -452,5 +484,12 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPular(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Recarregar" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRecarregar(InputAction.CallbackContext context);
     }
 }
