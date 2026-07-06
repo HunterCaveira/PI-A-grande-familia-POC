@@ -18631,6 +18631,8 @@ GameObject:
   - component: {fileID: 1949026794}
   - component: {fileID: 1949026799}
   - component: {fileID: 1949026800}
+  - component: {fileID: 1949026801}
+  - component: {fileID: 1949026802}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -18784,6 +18786,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidadeRotacao: 2
+--- !u!114 &1949026801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949026793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1949026802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949026793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vidaMaxima: 0
+  vidaAtual: 0
+  danoSofrido: 0
 --- !u!1 &1953999714
 GameObject:
   m_ObjectHideFlags: 0
