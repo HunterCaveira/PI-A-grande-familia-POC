@@ -16,9 +16,9 @@ public class Sitemadevida : MonoBehaviour
         vidaAtual = vidaMaxima;
 
     }
-    public void ReceberDano()
+    public void ReceberDano(float quantidadeDano)
     { 
-    
+       
         
         
 
