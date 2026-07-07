@@ -91,6 +91,7 @@ public class tiropistola : MonoBehaviour
     }
     private void atirar()
     {
+        Debug.Log("Atirando");
         preparadoParaAtirar = false;
 
         //encontrar o ponto exato do acerto do raycast

@@ -198,17 +198,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""fb04f4cf-e962-4307-b73f-0d5520488b46"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Atirar"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""784a356e-e6e4-49b0-a422-0454853cf050"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
@@ -237,6 +226,17 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Recarregar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""70bca126-8e95-4c66-89ec-d9e15817fa25"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Atirar"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
