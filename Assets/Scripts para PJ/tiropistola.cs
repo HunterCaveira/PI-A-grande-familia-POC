@@ -143,7 +143,19 @@ public class tiropistola : MonoBehaviour
     }
     private void Reload()
     {
+        // 1. Avisa o sistema que a arma está recarregando (bloqueia novos tiros no Update)
+        recarregando = true;
+
+        // 2. Chama a função "TerminarRecarga" apenas DEPOIS que o 'tempoRecarga' passar
+        Invoke("TerminarRecarga", tempoRecarga);
+    }
+
+    private void TerminarRecarga()
+    {
+        // 3. Enche o carregador de fato
         balasSobrando = tamanhoCarregador;
+
+        // 4. Libera a arma para atirar novamente
         recarregando = false;
     }
 }
