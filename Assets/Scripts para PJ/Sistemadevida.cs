@@ -11,7 +11,7 @@ public class Sitemadevida : MonoBehaviour
 
     private void Awake()
     {
-        vidaAtual = dadosDoHeroi.vidaMaxima;
+        
 
     }
     public void ReceberDano(InformacaoDano dano)
@@ -20,7 +20,7 @@ public class Sitemadevida : MonoBehaviour
         { 
          if (dano.atacante.CompareTag("Inimigo"))
             {
-
+                vidaAtual = dadosDoHeroi.vidaMaxima;
             }
         
         }
