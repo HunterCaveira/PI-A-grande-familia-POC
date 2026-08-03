@@ -1,4 +1,4 @@
-using System;
+using System; // Importante para usar o Action!
 using UnityEngine;
 
 public class Sistemadevida : MonoBehaviour
@@ -13,6 +13,7 @@ public class Sistemadevida : MonoBehaviour
 
     public int TimeID => timeID;
 
+    // EVENTO: Envia (vidaAtual, vidaMaxima) para quem estiver ouvindo
     public event Action<float, float> OnVidaMudou;
 
     private void Awake()
@@ -21,84 +22,66 @@ public class Sistemadevida : MonoBehaviour
         {
             vidaAtual = dadosDoHeroi.vidaMaxima;
         }
-        else
-        {
-            Debug.LogError($"[SistemaDeVida] A ficha de dados não foi atribuída em {gameObject.name}!");
-        }
+    }
+
+    private void Start()
+    {
+        // Dispara o evento no início para a UI começar com o valor correto
+        NotificarMudancaDeVida();
     }
 
     public void ReceberDano(InformacaoDano dano)
     {
-        // 1. Se já estiver morto, ignora qualquer novo dano
         if (vidaAtual <= 0) return;
 
-        // 2. Validação de Fogo Amigo (Somente se existir um atacante)
-        if (dano.atacante != null)
+        // Fogo amigo
+        if (dano.atacante != null && dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
         {
-            if (dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
+            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject)
             {
-                // Se for do mesmo time e NÃO for você mesmo
-                if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject)
-                {
-                    Debug.Log("Ataque ignorado: Fogo amigo desativado!");
-                    return; // Cancela a aplicação do dano
-                }
+                return;
             }
         }
 
-        // 3. Aplica a redução da vida PRIMEIRO
+        // Aplica o dano
         vidaAtual -= dano.quantidade;
         vidaAtual = Mathf.Max(vidaAtual, 0f);
 
-        // 4. Efeitos visuais/Lógica secundária por tipo de dano
-        switch (dano.tipo)
-        {
-            case TipoDano.Fogo:
-                // Ex: Iniciar efeito de queimadura
-                break;
-            case TipoDano.Veneno:
-                break;
-            case TipoDano.Fisico:
-                break;
-        }
+        // AVISA A UI QUE A VIDA MUDOU!
+        NotificarMudancaDeVida();
 
-        // 5. Exibe no log o estado ATUALIZADO da vida
-        Debug.Log($"{gameObject.name} (Time {timeID}) recebeu {dano.quantidade} de dano! Vida restante: {vidaAtual}");
-
-        // 6. Testa se morreu DEPOIS de ter reduzido a vida
         if (vidaAtual <= 0)
         {
             Morrer();
         }
     }
+
     public void Renascer()
     {
-
         if (dadosDoHeroi != null)
         {
             vidaAtual = dadosDoHeroi.vidaMaxima;
-            NotificarMudancaDevida();
-
-
+            NotificarMudancaDeVida(); // Avisa a UI no respawn
         }
-
     }
 
-    private void NotificarMudancaDevida()
-    { 
+    private void NotificarMudancaDeVida()
+    {
+        // O ?.Invoke garante que só dispara se houver algum script escutando esse evento
         if (dadosDoHeroi != null)
         {
-
             OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
-
         }
-    
-
     }
-
 
     private void Morrer()
     {
         Debug.Log($"{gameObject.name} foi eliminado!");
     }
+
+   
+    
+
+
+
 }
