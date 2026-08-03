@@ -1,161 +1,146 @@
 using UnityEngine;
 using TMPro;
+
 public class tiropistola : MonoBehaviour
 {
+    [Header("Configurações de Dano da Arma")]
+    [SerializeField] private float danoPorTiro = 20f;
+    [SerializeField] private TipoDano tipoDeDano = TipoDano.Fisico;
+    [SerializeField] private string nomeDaArma = "Pistola";
 
-    //bala da arma 
+    [Header("Configurações do Projétil")]
     public GameObject bala;
-
-    //força da bala
     public float forçaTiro, forçaCima;
-    //status de arma
-    public float tempoEntreAtirar, Espalhar, tempoRecarga, tempoEntreTiros;
 
+    [Header("Status da Arma")]
+    public float tempoEntreAtirar, Espalhar, tempoRecarga;
     public int tamanhoCarregador, tiroPorClick;
-
     public bool permetirSegurarBotão;
 
-    int balasSobrando, balasAtiradas;
-
-    //chamando input CHAMDNO INPUTSSSS!!!!
-
+    private int balasSobrando;
     private AcoesPlayer acoesPlayer;
+    private bool atirando, preparadoParaAtirar, recarregando;
 
-    //bools
-
-    bool atirando, preparadoParaAtirar, recarregando;
-
-    //referencia
-
+    [Header("Referências")]
     public Camera fpsCam;
     public Transform pontoAtaque;
-
-    //graficos
     public GameObject muzzleFlash;
     public TextMeshProUGUI ammunitionDisplay;
 
-    //se houver bug
-    public bool allowInvoke = true;
+    // Referência do jogador que segura a arma (para validação de PvP)
+    private GameObject donoDaArma;
 
     private void Awake()
     {
-        //ativando inputs
         acoesPlayer = new AcoesPlayer();
-        //garantir que carregador esteja cheio
         balasSobrando = tamanhoCarregador;
         preparadoParaAtirar = true;
+
+        // Pega a raiz do objeto (Player) que está segurando a arma
+        donoDaArma = transform.root.gameObject;
     }
 
     public void Update()
     {
         MyInput();
-        //display da munição se está presente
+
         if (ammunitionDisplay != null)
             ammunitionDisplay.SetText(balasSobrando / tiroPorClick + " / " + tamanhoCarregador / tiroPorClick);
     }
+
     private void OnEnable()
     {
-        //TROQUE O NOME FIO
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
         acoesPlayer.MovimentoPlayer.Recarregar.Enable();
     }
+
     private void OnDisable()
     {
-        //ESSE TBM ENTÃO FICA ESPERTO TROCO NO FUTURO
         acoesPlayer.MovimentoPlayer.Atirar.Disable();
         acoesPlayer.MovimentoPlayer.Recarregar.Disable();
     }
+
     private void MyInput()
     {
-        //input TROCAR INPUT NO FUTURO
-        //checar se permite segura botão e pegar o input certo
-        if (permetirSegurarBotão && acoesPlayer.MovimentoPlayer.Atirar.IsPressed()) atirando = true;
-        else atirando = false;
+        if (permetirSegurarBotão)
+            atirando = acoesPlayer.MovimentoPlayer.Atirar.IsPressed();
+        else
+            atirando = acoesPlayer.MovimentoPlayer.Atirar.WasPressedThisFrame();
 
-        //recarregar
-        if (acoesPlayer.MovimentoPlayer.Recarregar.IsInProgress() && balasSobrando < tamanhoCarregador && !recarregando) Reload();
+        if (acoesPlayer.MovimentoPlayer.Recarregar.WasPressedThisFrame() && balasSobrando < tamanhoCarregador && !recarregando)
+            Reload();
 
-
-        //recarregar automaticamente ao atirar sem munição
-        if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0) Reload();
-
-        //atirando
+        if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0)
+            Reload();
 
         if (preparadoParaAtirar && atirando && !recarregando && balasSobrando > 0)
         {
-            balasAtiradas = 0;
             atirar();
         }
-
-
     }
+
     private void atirar()
     {
-        Debug.Log("Atirando");
         preparadoParaAtirar = false;
 
-        //encontrar o ponto exato do acerto do raycast
-        Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));//meio da camera
+        Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit acerto;
-
-        //checar se acertou alguma coisa
         Vector3 pontoAcerto;
+
         if (Physics.Raycast(ray, out acerto))
-        {
             pontoAcerto = acerto.point;
-        }
         else
-        {
-            pontoAcerto = ray.GetPoint(75);//apena o ponto longe do player
-        }
-        //calcular dreção do ponto de ataque pro ponto de mira
+            pontoAcerto = ray.GetPoint(75);
+
         Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
 
-        float x = Random.Range(-Espalhar, Espalhar);
-        float y = Random.Range(-Espalhar, Espalhar);
-
-        Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
-
-        GameObject balaAtual = Instantiate(bala, pontoAtaque.position, Quaternion.identity);//armazena as intancias dentro dele
-                                                                                            //rotacionar a bala
-        balaAtual.transform.forward = direçãoComEspalhar.normalized;
-
-        //adicionar a força a bala
-        balaAtual.GetComponent<Rigidbody>().AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
-        balaAtual.GetComponent<Rigidbody>().AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
-
-        balasSobrando--;
-        balasAtiradas++;
-        if (allowInvoke)
+        for (int i = 0; i < tiroPorClick; i++)
         {
-            Invoke("ResetShot", tempoEntreAtirar);
-            allowInvoke = false;
+            if (balasSobrando <= 0) break;
+
+            float x = Random.Range(-Espalhar, Espalhar);
+            float y = Random.Range(-Espalhar, Espalhar);
+
+            Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
+
+            // 1. Cria a bala
+            GameObject balaAtual = Instantiate(bala, pontoAtaque.position, Quaternion.identity);
+            balaAtual.transform.forward = direçãoComEspalhar.normalized;
+
+            // 2. PASSAGEM DE DADOS: Configura os dados de dano na bala!
+            if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
+            {
+                scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
+            }
+
+            // 3. Aplica forças físicas
+            Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
+                rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
+            }
+
+            balasSobrando--;
         }
 
-        if (balasAtiradas < tiroPorClick && balasSobrando > 0)
-            Invoke("atirar", tempoEntreTiros);
-
+        Invoke("ResetShot", tempoEntreAtirar);
     }
+
     private void ResetShot()
     {
         preparadoParaAtirar = true;
-        allowInvoke = true;
     }
+
     private void Reload()
     {
-        // 1. Avisa o sistema que a arma está recarregando (bloqueia novos tiros no Update)
         recarregando = true;
-
-        // 2. Chama a função "TerminarRecarga" apenas DEPOIS que o 'tempoRecarga' passar
         Invoke("TerminarRecarga", tempoRecarga);
     }
 
     private void TerminarRecarga()
     {
-        // 3. Enche o carregador de fato
         balasSobrando = tamanhoCarregador;
-
-        // 4. Libera a arma para atirar novamente
         recarregando = false;
     }
 }

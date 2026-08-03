@@ -10,4 +10,5 @@ public class AtributosPersonagem : ScriptableObject
     public float velocidadeMovimento = 5f;
     public float forcaPulo = 2f;
     
+
 }
