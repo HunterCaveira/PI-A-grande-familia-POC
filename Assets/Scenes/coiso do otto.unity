@@ -23508,7 +23508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dadosDoHeroi: {fileID: 11400000, guid: 2b16516b88573884dbd1cbbcffa572d3, type: 2}
+  dadosDoHeroi: {fileID: 0}
   timeID: 2
   vidaAtual: 100
 --- !u!1 &2126059002
@@ -24131,6 +24131,10 @@ PrefabInstance:
       objectReference: {fileID: 565531889}
     - target: {fileID: 3196140118854601964, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
       propertyPath: "permetirSegurarBot\xE3o"
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8455920402584218113, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
