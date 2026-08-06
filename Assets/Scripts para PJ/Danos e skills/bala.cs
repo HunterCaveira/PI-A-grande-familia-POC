@@ -16,7 +16,7 @@ public class Bala : MonoBehaviour
         nomeArma = nomeDaArma;
 
         // Autodestrói a bala após 5 segundos se não atingir nada (evita acúmulo na memória)
-        Destroy(gameObject, 5f);
+        // Destroy(gameObject, 5f);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -38,11 +38,12 @@ public class Bala : MonoBehaviour
                 nomeArma
             );
 
+
             // Aplica o dano
             vidaAtingida.ReceberDano(infoDano);
         }
 
         // Destrói a bala ao colidir com qualquer superfície (Personagem, Parede, Chão)
-        Destroy(gameObject);
+       // Destroy(gameObject);
     }
 }
