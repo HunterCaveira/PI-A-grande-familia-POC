@@ -1,8 +1,10 @@
 using UnityEngine;
 using TMPro;
 
+
 public class tiropistola : MonoBehaviour
 {
+    public BalaPool meuPoolDeBalas;
     [Header("Configurações de Dano da Arma")]
     [SerializeField] private float danoPorTiro = 20f;
     [SerializeField] private TipoDano tipoDeDano = TipoDano.Fisico;
@@ -80,52 +82,64 @@ public class tiropistola : MonoBehaviour
     }
 
     private void atirar()
+{
+    preparadoParaAtirar = false;
+
+    Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+    RaycastHit acerto;
+    Vector3 pontoAcerto;
+
+    if (Physics.Raycast(ray, out acerto))
+        pontoAcerto = acerto.point;
+    else
+        pontoAcerto = ray.GetPoint(75);
+
+    Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
+
+    for (int i = 0; i < tiroPorClick; i++)
     {
-        preparadoParaAtirar = false;
+        if (balasSobrando <= 0) break;
 
-        Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit acerto;
-        Vector3 pontoAcerto;
+        float x = Random.Range(-Espalhar, Espalhar);
+        float y = Random.Range(-Espalhar, Espalhar);
 
-        if (Physics.Raycast(ray, out acerto))
-            pontoAcerto = acerto.point;
-        else
-            pontoAcerto = ray.GetPoint(75);
+        Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
 
-        Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
 
-        for (int i = 0; i < tiroPorClick; i++)
+
+        // 1. Pega a bala do Pool ao invés de Instanciar
+        GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
+
+        // Define a posição e a direção da bala recém-pega do pool
+        balaAtual.transform.position = pontoAtaque.position;
+        balaAtual.transform.forward = direçãoComEspalhar.normalized;
+
+        // Ativa o item na cena
+        balaAtual.SetActive(true);
+
+        // 2. PASSAGEM DE DADOS: Configura os dados de dano na bala!
+        if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
         {
-            if (balasSobrando <= 0) break;
-
-            float x = Random.Range(-Espalhar, Espalhar);
-            float y = Random.Range(-Espalhar, Espalhar);
-
-            Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
-
-            // 1. Cria a bala
-            GameObject balaAtual = Instantiate(bala, pontoAtaque.position, Quaternion.identity);
-            balaAtual.transform.forward = direçãoComEspalhar.normalized;
-
-            // 2. PASSAGEM DE DADOS: Configura os dados de dano na bala!
-            if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
-            {
-                scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
-            }
-
-            // 3. Aplica forças físicas
-            Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
-                rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
-            }
-
-            balasSobrando--;
+            scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
         }
 
-        Invoke("ResetShot", tempoEntreAtirar);
+        // 3. Aplica forças físicas
+        Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+                // IMPORTANTE: Zera a velocidade anterior para que o tiro não saia com a física acumulada do uso anterior no pool
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+            rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
+            rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
+        }
+
+        balasSobrando--;
     }
+
+    Invoke("ResetShot", tempoEntreAtirar);
+}
 
     private void ResetShot()
     {
