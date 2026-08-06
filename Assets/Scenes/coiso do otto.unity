@@ -15591,6 +15591,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 524080002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1663824574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1663824575}
+  - component: {fileID: 1663824576}
+  m_Layer: 0
+  m_Name: bala pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1663824575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663824574}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.8999939, y: -4.27, z: 8.140015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1949026798}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1663824576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663824574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf223dc5acba26479a17f8658c0eeac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  balaPrefab: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
+  PooledAmount: 200
+  PoolBalaList: []
 --- !u!1 &1697763346
 GameObject:
   m_ObjectHideFlags: 0
@@ -24026,6 +24073,10 @@ PrefabInstance:
       value: "m\xE3e"
       objectReference: {fileID: 0}
     - target: {fileID: 4427499426221581965, guid: 43b0e3a5b9e301644b6678b366cf32a1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4427499426221581965, guid: 43b0e3a5b9e301644b6678b366cf32a1, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -24126,6 +24177,10 @@ PrefabInstance:
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3196140118854601964, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
+      propertyPath: meuPoolDeBalas
+      value: 
+      objectReference: {fileID: 1663824576}
+    - target: {fileID: 3196140118854601964, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
       propertyPath: ammunitionDisplay
       value: 
       objectReference: {fileID: 565531889}
@@ -24139,7 +24194,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 807063184450502427, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1663824575}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 779242421130396050, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
       insertIndex: 5
@@ -24265,8 +24323,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7617456317423543011}
+      insertIndex: 4
+      addedObject: {fileID: 7617456317423543001}
     - targetCorrespondingSourceObject: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7617456317423542999}
@@ -24303,7 +24361,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &7617456317423543011
+--- !u!114 &7617456317423543001
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

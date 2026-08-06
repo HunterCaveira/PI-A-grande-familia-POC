@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class balacustom : MonoBehaviour
@@ -16,8 +17,8 @@ public class balacustom : MonoBehaviour
 
         // Garante que a bala seja deletada depois de alguns segundos se voar para o infinito
 
-        Destroy(gameObject, tempoVidaMaximo);
-
+        //Destroy(gameObject, tempoVidaMaximo);
+        StartCoroutine(StartDisableObject());
     }
 
 
@@ -42,6 +43,12 @@ public class balacustom : MonoBehaviour
 
       //  Destroy(gameObject);
 
+    }
+
+    IEnumerator StartDisableObject() 
+    {
+        yield return new WaitForSeconds(tempoVidaMaximo);
+        this.gameObject.SetActive(false);
     }
 
 }
