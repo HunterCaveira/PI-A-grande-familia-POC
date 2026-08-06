@@ -54,7 +54,7 @@ public class BalaPool : MonoBehaviour
 
             //Verificando se o objeto acessado esta desativado na cena
             if (PoolBalaList[i].activeInHierarchy == false)
-            {
+           {
 
                 //Retornando o objeto desativado da cena
                 return PoolBalaList[i];
@@ -66,16 +66,16 @@ public class BalaPool : MonoBehaviour
         //Criando e adincionando novos zumbis na lita, caso nao haja mais objetos disponiveis na "piscina"
 
         //Criando um novo Zumbi
-        GameObject newItem = Instantiate(balaPrefab);
+        GameObject newBala = Instantiate(balaPrefab);
 
         // Definindo o zumbi criado com filho do object pooling (game object)
-        newItem.transform.SetParent(this.gameObject.transform);
+        newBala.transform.SetParent(this.gameObject.transform);
 
         //Adicionanod o item na lista
-        PoolBalaList.Add(newItem);
+        PoolBalaList.Add(newBala);
 
         //Retonando o novo item criado
-        return newItem;
+        return newBala;
 
 
     }
