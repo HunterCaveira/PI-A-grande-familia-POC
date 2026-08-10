@@ -6899,6 +6899,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &1213533272 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3196140118854601964, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
+  m_PrefabInstance: {fileID: 2304317163802972539}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac60f38d6245cc7488d6272b5f201cd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1215854895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
@@ -11267,6 +11278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Tiropistola: {fileID: 1213533272}
   pontosDeSpawn:
   - {fileID: 896996988}
   tempoParaRenascer: 3
