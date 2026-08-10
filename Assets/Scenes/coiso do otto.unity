@@ -3089,6 +3089,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2076625644}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2076625645}
     - targetCorrespondingSourceObject: {fileID: -8391222552659086748, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 356039223}
@@ -5989,6 +5992,37 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &896996987
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896996988}
+  m_Layer: 0
+  m_Name: Ponto de Respawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &896996988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896996987}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 251.7, y: 26.5, z: 73.9}
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1895595446}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &916774568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10905,6 +10939,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 896996988}
   - {fileID: 2076625643}
   - {fileID: 1215854895}
   m_Father: {fileID: 929637788}
@@ -11220,6 +11255,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2076625645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076625642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pontosDeSpawn:
+  - {fileID: 896996988}
+  tempoParaRenascer: 3
 --- !u!1 &2123130289 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4427499426221581965, guid: 43b0e3a5b9e301644b6678b366cf32a1, type: 3}
@@ -11438,6 +11488,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 779242421130396050, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2304317163802972541}
+    - targetCorrespondingSourceObject: {fileID: 779242421130396050, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2304317163802972555}
   m_SourcePrefab: {fileID: 100100000, guid: 856157b38c39aa745b7c9452a578ef5a, type: 3}
 --- !u!1 &2304317163802972540 stripped
 GameObject:
@@ -11475,6 +11528,22 @@ MonoBehaviour:
   gravidade: -9.81
   forcaPulo: 2
   velocidadeVertical: 3
+--- !u!114 &2304317163802972555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2304317163802972540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f4832feae4d7304e88eea6d0ac9fe7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pontosSpawnTime1:
+  - {fileID: 896996988}
+  pontosSpawnTime2: []
+  tempoParaRespawn: 3
 --- !u!1001 &7617456317423542997
 PrefabInstance:
   m_ObjectHideFlags: 0

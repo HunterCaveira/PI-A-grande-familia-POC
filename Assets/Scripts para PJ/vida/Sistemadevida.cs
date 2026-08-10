@@ -77,10 +77,21 @@ public class Sistemadevida : MonoBehaviour
     private void Morrer()
     {
         Debug.Log($"{gameObject.name} foi eliminado!");
+
+        // Procura o gerenciador na cena e envia o objeto para a rotina de respawn
+        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
+
+        if (gerenciador != null)
+        {
+            gerenciador.ProcessarMorte(this.gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("Nenhum GerenciadorRespawn encontrado na cena!");
+        }
     }
 
-   
-    
+
 
 
 
