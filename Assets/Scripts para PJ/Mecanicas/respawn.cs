@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GerenciadorRespawn : MonoBehaviour
+public class Respawn : MonoBehaviour
 {
     // Singleton simples para ser acessado facilmente de qualquer lugar
-    public static GerenciadorRespawn Instancia { get; private set; }
+    public static Respawn Instancia { get; private set; }
 
     [Header("Pontos de Spawn no Mapa")]
     [SerializeField] private List<Transform> pontosSpawnTime1;
