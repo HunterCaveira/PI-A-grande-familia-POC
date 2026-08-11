@@ -9,7 +9,7 @@ public class Sistemadevida : MonoBehaviour
     [Header("PvP e Partida")]
     [SerializeField] private int timeID = 1;
 
-    [SerializeField] private float vidaAtual;
+    [SerializeField] public float vidaAtual;
 
     public int TimeID => timeID;
 
