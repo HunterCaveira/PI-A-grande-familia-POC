@@ -3,9 +3,22 @@ using UnityEngine;
 
 public class GerenciadorRespawn : MonoBehaviour
 {
+    [SerializeField] protected tiropistola  Tiropistola; 
     [Header("Configurações de Respawn")]
     [SerializeField] private Transform[] pontosDeSpawn;
     [SerializeField] private float tempoParaRenascer = 3f;
+
+    private void Start()
+    {
+        if(pontosDeSpawn == null || pontosDeSpawn.Length == 0)
+        {
+            Debug.LogError("[GerenciadorRespawn] Nenhum ponto de spawn atribuído no Inspector!");
+            return;
+        }
+
+
+       Tiropistola.gameObject.SendMessage("Reload");
+    }
 
     public void ProcessarMorte(GameObject jogador)
     {
@@ -34,6 +47,8 @@ public class GerenciadorRespawn : MonoBehaviour
         if (jogador.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
         {
             vida.Renascer();
+           
+
         }
     }
 }

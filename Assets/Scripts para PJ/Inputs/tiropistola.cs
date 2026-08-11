@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 
 public class tiropistola : MonoBehaviour
@@ -54,6 +55,7 @@ public class tiropistola : MonoBehaviour
     {
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
         acoesPlayer.MovimentoPlayer.Recarregar.Enable();
+        balasSobrando = tamanhoCarregador;
     }
 
     private void OnDisable()
