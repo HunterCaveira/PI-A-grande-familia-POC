@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3913318670015535390
+--- !u!1 &3723766394901873434
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,42 +8,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8298556213342929309}
-  - component: {fileID: 5607488129591466739}
+  - component: {fileID: 4293412631215567285}
+  - component: {fileID: 4430442291807232620}
   m_Layer: 0
-  m_Name: bala pool pai
+  m_Name: GAMEMANEGER!
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8298556213342929309
+--- !u!4 &4293412631215567285
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3913318670015535390}
+  m_GameObject: {fileID: 3723766394901873434}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -497.12, y: -2.6599998, z: 339.14}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 238.52078, y: -112.24865, z: 53.72238}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5607488129591466739
+--- !u!114 &4430442291807232620
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3913318670015535390}
+  m_GameObject: {fileID: 3723766394901873434}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddf223dc5acba26479a17f8658c0eeac, type: 3}
+  m_Script: {fileID: 11500000, guid: 2b1e7f418706fbb46ae782b1ae137f87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  balaPrefab: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
-  PooledAmount: 200
-  PoolBalaList: []
+  textoCronometro: {fileID: 0}
+  tempoDePartida: 20
+  tempoTotalTime1: 0
+  tempoTotalTime2: 0
+  areaDeDominacao: {fileID: 0}
