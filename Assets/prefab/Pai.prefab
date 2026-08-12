@@ -517,9 +517,9 @@ MonoBehaviour:
   nomeDaArma: Pistola
   bala: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
   "for\xE7aTiro": 50
-  "for\xE7aCima": 20
+  "for\xE7aCima": 0
   tempoEntreAtirar: 0.2
-  Espalhar: 0.1
+  Espalhar: 10
   tempoRecarga: 1
   tamanhoCarregador: 200
   tiroPorClick: 10
