@@ -127,6 +127,42 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Habilidade 1"",
+                    ""type"": ""Button"",
+                    ""id"": ""45229188-2fc6-4803-a57b-d188d62862cc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Habilidade 2"",
+                    ""type"": ""Button"",
+                    ""id"": ""32caca7d-71ca-43a9-90b0-250fcb480dbc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Habilidade 3"",
+                    ""type"": ""Button"",
+                    ""id"": ""5df06955-f2de-458e-8005-a9b626b9ed2c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Habilidade 4"",
+                    ""type"": ""Button"",
+                    ""id"": ""0f5628cc-09b4-4d04-882f-9e2f041083b8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -239,6 +275,50 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                     ""action"": ""Atirar"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""31228c98-fb72-45e2-a154-0acead32e34a"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Habilidade 1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""25c6fed2-c735-46bf-a38f-faa45a026932"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Habilidade 2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cce4888b-38bd-4647-8303-49a5934f7cb6"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Habilidade 3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""212cf7a7-3aae-44c1-af94-47727bb6e683"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Habilidade 4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -251,6 +331,10 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         m_MovimentoPlayer_Atirar = m_MovimentoPlayer.FindAction("Atirar", throwIfNotFound: true);
         m_MovimentoPlayer_Pular = m_MovimentoPlayer.FindAction("Pular", throwIfNotFound: true);
         m_MovimentoPlayer_Recarregar = m_MovimentoPlayer.FindAction("Recarregar", throwIfNotFound: true);
+        m_MovimentoPlayer_Habilidade1 = m_MovimentoPlayer.FindAction("Habilidade 1", throwIfNotFound: true);
+        m_MovimentoPlayer_Habilidade2 = m_MovimentoPlayer.FindAction("Habilidade 2", throwIfNotFound: true);
+        m_MovimentoPlayer_Habilidade3 = m_MovimentoPlayer.FindAction("Habilidade 3", throwIfNotFound: true);
+        m_MovimentoPlayer_Habilidade4 = m_MovimentoPlayer.FindAction("Habilidade 4", throwIfNotFound: true);
     }
 
     ~@AcoesPlayer()
@@ -335,6 +419,10 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
     private readonly InputAction m_MovimentoPlayer_Atirar;
     private readonly InputAction m_MovimentoPlayer_Pular;
     private readonly InputAction m_MovimentoPlayer_Recarregar;
+    private readonly InputAction m_MovimentoPlayer_Habilidade1;
+    private readonly InputAction m_MovimentoPlayer_Habilidade2;
+    private readonly InputAction m_MovimentoPlayer_Habilidade3;
+    private readonly InputAction m_MovimentoPlayer_Habilidade4;
     /// <summary>
     /// Provides access to input actions defined in input action map "MovimentoPlayer".
     /// </summary>
@@ -362,6 +450,22 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "MovimentoPlayer/Recarregar".
         /// </summary>
         public InputAction @Recarregar => m_Wrapper.m_MovimentoPlayer_Recarregar;
+        /// <summary>
+        /// Provides access to the underlying input action "MovimentoPlayer/Habilidade1".
+        /// </summary>
+        public InputAction @Habilidade1 => m_Wrapper.m_MovimentoPlayer_Habilidade1;
+        /// <summary>
+        /// Provides access to the underlying input action "MovimentoPlayer/Habilidade2".
+        /// </summary>
+        public InputAction @Habilidade2 => m_Wrapper.m_MovimentoPlayer_Habilidade2;
+        /// <summary>
+        /// Provides access to the underlying input action "MovimentoPlayer/Habilidade3".
+        /// </summary>
+        public InputAction @Habilidade3 => m_Wrapper.m_MovimentoPlayer_Habilidade3;
+        /// <summary>
+        /// Provides access to the underlying input action "MovimentoPlayer/Habilidade4".
+        /// </summary>
+        public InputAction @Habilidade4 => m_Wrapper.m_MovimentoPlayer_Habilidade4;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -400,6 +504,18 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Recarregar.started += instance.OnRecarregar;
             @Recarregar.performed += instance.OnRecarregar;
             @Recarregar.canceled += instance.OnRecarregar;
+            @Habilidade1.started += instance.OnHabilidade1;
+            @Habilidade1.performed += instance.OnHabilidade1;
+            @Habilidade1.canceled += instance.OnHabilidade1;
+            @Habilidade2.started += instance.OnHabilidade2;
+            @Habilidade2.performed += instance.OnHabilidade2;
+            @Habilidade2.canceled += instance.OnHabilidade2;
+            @Habilidade3.started += instance.OnHabilidade3;
+            @Habilidade3.performed += instance.OnHabilidade3;
+            @Habilidade3.canceled += instance.OnHabilidade3;
+            @Habilidade4.started += instance.OnHabilidade4;
+            @Habilidade4.performed += instance.OnHabilidade4;
+            @Habilidade4.canceled += instance.OnHabilidade4;
         }
 
         /// <summary>
@@ -423,6 +539,18 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Recarregar.started -= instance.OnRecarregar;
             @Recarregar.performed -= instance.OnRecarregar;
             @Recarregar.canceled -= instance.OnRecarregar;
+            @Habilidade1.started -= instance.OnHabilidade1;
+            @Habilidade1.performed -= instance.OnHabilidade1;
+            @Habilidade1.canceled -= instance.OnHabilidade1;
+            @Habilidade2.started -= instance.OnHabilidade2;
+            @Habilidade2.performed -= instance.OnHabilidade2;
+            @Habilidade2.canceled -= instance.OnHabilidade2;
+            @Habilidade3.started -= instance.OnHabilidade3;
+            @Habilidade3.performed -= instance.OnHabilidade3;
+            @Habilidade3.canceled -= instance.OnHabilidade3;
+            @Habilidade4.started -= instance.OnHabilidade4;
+            @Habilidade4.performed -= instance.OnHabilidade4;
+            @Habilidade4.canceled -= instance.OnHabilidade4;
         }
 
         /// <summary>
@@ -491,5 +619,33 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRecarregar(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Habilidade 1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHabilidade1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Habilidade 2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHabilidade2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Habilidade 3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHabilidade3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Habilidade 4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHabilidade4(InputAction.CallbackContext context);
     }
 }
