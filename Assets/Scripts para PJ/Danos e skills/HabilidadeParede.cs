@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+/*using Unity.VisualScripting;
 using UnityEngine;
 /*
 [SerializeField] private Camera cameraPrincipal; // De onde sai o laser
