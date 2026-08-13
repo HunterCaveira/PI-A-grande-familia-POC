@@ -1,6 +1,7 @@
 /*using Unity.VisualScripting;
 using UnityEngine;
-/*
+
+[Header("Configurações da Câmera e Raio")]
 [SerializeField] private Camera cameraPrincipal; // De onde sai o laser
 [SerializeField] private float distanciaMaximo =  15f;// alcance do laser em metros.
 [SerializeField] private LayerMask camadaChao;// Filtro para detectar APENAS o chão
@@ -18,7 +19,22 @@ public class HabilidadeParede : ScriptableObject
 
     void Update()
     {
+        if (Input.GetKeyDown(teclaHabilidade))
+        {
+            modoPosicionamentoAtivo = true; 
+        }
+       
+
+        if (modoPosicionamentoAtivo)
+        {
+
+            modoPosicionamentoAtivo = !modoPosicionamentoAtivo;
+
+
+        }
+
         
+
 
 
     }
