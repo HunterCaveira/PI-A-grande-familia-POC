@@ -15,7 +15,8 @@ public class MovimentodoPlayer : MonoBehaviour
     [SerializeField] private float gravidade = -9.81f;
     [SerializeField] private float forcaPulo = 2f;
     [SerializeField] private float velocidadeVertical;
-
+    private float velocidadeAtual;
+    [SerializeField] private AtributosPersonagem atributos;
     private void Awake()
     {
         acoesPlay = new AcoesPlayer();
@@ -45,6 +46,7 @@ public class MovimentodoPlayer : MonoBehaviour
     {
         // CORREÇÃO 2: O Update agora apenas CHAMA as funções na ordem certa
         AplicarGravidade();
+        Correr();
         Andar();
     }
 
@@ -61,45 +63,49 @@ public class MovimentodoPlayer : MonoBehaviour
             velocidadeVertical += gravidade * Time.deltaTime;
         }
     }
-
-    void Andar()
-    {
-        Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
-
-        // O eixo Y do Vector3 agora recebe a sua velocidade vertical calculada
-        Vector3 eixos = leituraInput.x * transform.right + leituraInput.y * transform.forward;
-
-        Vector3 movimento = new Vector3(eixos.x, velocidadeVertical, eixos.z);
-
-        characterController.Move(movimento * velocidade * Time.deltaTime);
-    }
-
     // CORREÇÃO 4: Removemos a função Pular() antiga que estava no Update e mantivemos esta
     void SolicitarPulo()
     {
         if (characterController.isGrounded)
         {
-            // CORREÇÃO 3: Mudamos de 'alturaDoPulo' para 'forcaPulo' para bater com sua variável
+            // Obtém a força do pulo direto do ScriptableObject
+            float forcaPulo = (atributos != null) ? atributos.forcaPulo : 2f;
             velocidadeVertical = Mathf.Sqrt(forcaPulo * -2f * gravidade);
         }
     }
+    void Correr()
+    {
+        // Só altera a velocidade horizontal se o jogador estiver pisando no chão
 
-    // Resolução conta: (leituraInput.x * transform.right) + (leituraInput.y * transform.forward);
-    // se eu apertar a tecla D ou a  SETA PARA DIREITA ele retorna um valor positivo em x = 1
-    // leituraInput. = 1
-    // transform.right = vector3 (1, 0, 0)
-    // leituraInput.x (1) x transform.right(1,0,0) = (1,0,0)
+        float velocidadeBase = (atributos != null) ? atributos.velocidadeMovimento : 5f;
+        bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed();
 
-    // se eu aperta a tecla W ou a SETA PARA CIMA ELE retorna um valor positivo em y = 1
-    // leituraInput.y = 1
-    // tranform.forward = Vector3 (0, 0, 1)
-    // leituraInput.y (1) X transdorm.forward (0, 0, 1) = (0, 0, 1)
+        if (botaoCorrerPressionado)
+        {
+            velocidadeAtual = velocidadeBase * 2f;
+        }
+        else
+        {
+            velocidadeAtual = velocidadeBase;
+        }
 
-    //soma as duas partes
-    // (1, 0, 0,) + (0, 0, 1) = (1, 0, 1)
+        // Se estiver no ar, ele mantém a velocidade do momento em que pulou (conservação de impulso)
+    }
 
+    void Andar()
+    {
+        Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
 
+        // Calcula a direção no plano horizontal
+        Vector3 direcao = (transform.right * leituraInput.x) + (transform.forward * leituraInput.y);
 
+        // Multiplica a direção pela velocidade (normal ou de corrida)
+        Vector3 movimentoHorizontal = direcao * velocidadeAtual;
 
+        // Junta a velocidade horizontal com a gravidade vertical
+        Vector3 movimentoFinal = new Vector3(movimentoHorizontal.x, velocidadeVertical, movimentoHorizontal.z);
 
+        // Aplica o movimento
+        characterController.Move(movimentoFinal * Time.deltaTime);
+    }
 }

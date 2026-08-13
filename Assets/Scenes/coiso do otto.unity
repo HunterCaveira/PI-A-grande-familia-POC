@@ -237,19 +237,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.99149245
+      value: 0.99140745
       objectReference: {fileID: 0}
     - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.06891308
+      value: 0.06890717
       objectReference: {fileID: 0}
     - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.11015978
+      value: 0.11092173
       objectReference: {fileID: 0}
     - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.007656588
+      value: -0.0077095474
       objectReference: {fileID: 0}
     - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1535,7 +1535,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1047941036}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.068913095, y: 0.11015979, z: -0.00765659, w: 0.99149245}
+  m_LocalRotation: {x: 0.068907164, y: 0.11092173, z: -0.007709547, w: 0.99140745}
   m_LocalPosition: {x: -319.83002, y: 113.41774, z: 294.44427}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2000,14 +2000,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3196140118854601964, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: meuPoolDeBalas
-      value: 
-      objectReference: {fileID: 1663824576}
-    - target: {fileID: 3196140118854601964, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: ammunitionDisplay
-      value: 
-      objectReference: {fileID: 2198816055372756088}
     - target: {fileID: 4984737333827399614, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: 'pontosSpawnTime1.Array.data[0]'
       value: 
@@ -3196,17 +3188,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2123130298}
   m_SourcePrefab: {fileID: 100100000, guid: 43b0e3a5b9e301644b6678b366cf32a1, type: 3}
---- !u!114 &2198816055372756088 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-  m_PrefabInstance: {fileID: 3877522472244019294}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2345583624374795711 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1173759080331113473, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
