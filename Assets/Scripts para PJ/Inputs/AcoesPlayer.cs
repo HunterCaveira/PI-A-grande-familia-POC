@@ -346,14 +346,12 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         m_MovimentoPlayer_Atirar = m_MovimentoPlayer.FindAction("Atirar", throwIfNotFound: true);
         m_MovimentoPlayer_Pular = m_MovimentoPlayer.FindAction("Pular", throwIfNotFound: true);
         m_MovimentoPlayer_Recarregar = m_MovimentoPlayer.FindAction("Recarregar", throwIfNotFound: true);
-<<<<<<< Updated upstream
         m_MovimentoPlayer_Habilidade1 = m_MovimentoPlayer.FindAction("Habilidade 1", throwIfNotFound: true);
         m_MovimentoPlayer_Habilidade2 = m_MovimentoPlayer.FindAction("Habilidade 2", throwIfNotFound: true);
         m_MovimentoPlayer_Habilidade3 = m_MovimentoPlayer.FindAction("Habilidade 3", throwIfNotFound: true);
         m_MovimentoPlayer_Habilidade4 = m_MovimentoPlayer.FindAction("Habilidade 4", throwIfNotFound: true);
-=======
+
         m_MovimentoPlayer_Correr = m_MovimentoPlayer.FindAction("Correr", throwIfNotFound: true);
->>>>>>> Stashed changes
     }
 
     ~@AcoesPlayer()
@@ -438,14 +436,12 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
     private readonly InputAction m_MovimentoPlayer_Atirar;
     private readonly InputAction m_MovimentoPlayer_Pular;
     private readonly InputAction m_MovimentoPlayer_Recarregar;
-<<<<<<< Updated upstream
+
     private readonly InputAction m_MovimentoPlayer_Habilidade1;
     private readonly InputAction m_MovimentoPlayer_Habilidade2;
     private readonly InputAction m_MovimentoPlayer_Habilidade3;
     private readonly InputAction m_MovimentoPlayer_Habilidade4;
-=======
     private readonly InputAction m_MovimentoPlayer_Correr;
->>>>>>> Stashed changes
     /// <summary>
     /// Provides access to input actions defined in input action map "MovimentoPlayer".
     /// </summary>
@@ -474,7 +470,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Recarregar => m_Wrapper.m_MovimentoPlayer_Recarregar;
         /// <summary>
-<<<<<<< Updated upstream
         /// Provides access to the underlying input action "MovimentoPlayer/Habilidade1".
         /// </summary>
         public InputAction @Habilidade1 => m_Wrapper.m_MovimentoPlayer_Habilidade1;
@@ -490,11 +485,9 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "MovimentoPlayer/Habilidade4".
         /// </summary>
         public InputAction @Habilidade4 => m_Wrapper.m_MovimentoPlayer_Habilidade4;
-=======
         /// Provides access to the underlying input action "MovimentoPlayer/Correr".
         /// </summary>
         public InputAction @Correr => m_Wrapper.m_MovimentoPlayer_Correr;
->>>>>>> Stashed changes
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -533,7 +526,6 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Recarregar.started += instance.OnRecarregar;
             @Recarregar.performed += instance.OnRecarregar;
             @Recarregar.canceled += instance.OnRecarregar;
-<<<<<<< Updated upstream
             @Habilidade1.started += instance.OnHabilidade1;
             @Habilidade1.performed += instance.OnHabilidade1;
             @Habilidade1.canceled += instance.OnHabilidade1;
@@ -546,11 +538,11 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Habilidade4.started += instance.OnHabilidade4;
             @Habilidade4.performed += instance.OnHabilidade4;
             @Habilidade4.canceled += instance.OnHabilidade4;
-=======
+
             @Correr.started += instance.OnCorrer;
             @Correr.performed += instance.OnCorrer;
             @Correr.canceled += instance.OnCorrer;
->>>>>>> Stashed changes
+
         }
 
         /// <summary>
@@ -574,7 +566,7 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Recarregar.started -= instance.OnRecarregar;
             @Recarregar.performed -= instance.OnRecarregar;
             @Recarregar.canceled -= instance.OnRecarregar;
-<<<<<<< Updated upstream
+
             @Habilidade1.started -= instance.OnHabilidade1;
             @Habilidade1.performed -= instance.OnHabilidade1;
             @Habilidade1.canceled -= instance.OnHabilidade1;
@@ -587,11 +579,9 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
             @Habilidade4.started -= instance.OnHabilidade4;
             @Habilidade4.performed -= instance.OnHabilidade4;
             @Habilidade4.canceled -= instance.OnHabilidade4;
-=======
             @Correr.started -= instance.OnCorrer;
             @Correr.performed -= instance.OnCorrer;
             @Correr.canceled -= instance.OnCorrer;
->>>>>>> Stashed changes
         }
 
         /// <summary>
@@ -661,16 +651,16 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRecarregar(InputAction.CallbackContext context);
         /// <summary>
-<<<<<<< Updated upstream
+
         /// Method invoked when associated input action "Habilidade 1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-=======
+
         /// Method invoked when associated input action "Correr" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
->>>>>>> Stashed changes
+
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-<<<<<<< Updated upstream
+
         void OnHabilidade1(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Habilidade 2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
@@ -693,8 +683,8 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHabilidade4(InputAction.CallbackContext context);
-=======
+
         void OnCorrer(InputAction.CallbackContext context);
->>>>>>> Stashed changes
+
     }
 }
