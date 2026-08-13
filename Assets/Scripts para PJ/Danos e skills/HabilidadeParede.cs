@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+/*using Unity.VisualScripting;
 using UnityEngine;
 
 [SerializeField] private 
@@ -24,3 +24,4 @@ public class HabilidadeParede : ScriptableObject
 
 
 }
+*/
