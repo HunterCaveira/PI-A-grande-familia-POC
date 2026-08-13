@@ -146,7 +146,7 @@ public class tiropistola : MonoBehaviour
     private void ResetShot()
     {
         preparadoParaAtirar = true;
-    }
+    }   
 
     private void Reload()
     {
