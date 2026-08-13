@@ -160,6 +160,7 @@ MonoBehaviour:
   gravidade: -9.81
   forcaPulo: 2
   velocidadeVertical: 3
+  atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
 --- !u!114 &8004604329465020989
 MonoBehaviour:
   m_ObjectHideFlags: 0

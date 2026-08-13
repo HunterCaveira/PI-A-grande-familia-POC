@@ -43,6 +43,7 @@
                     "initialStateCheck": false
                 },
                 {
+<<<<<<< Updated upstream
                     "name": "Habilidade 1",
                     "type": "Button",
                     "id": "45229188-2fc6-4803-a57b-d188d62862cc",
@@ -73,6 +74,11 @@
                     "name": "Habilidade 4",
                     "type": "Button",
                     "id": "0f5628cc-09b4-4d04-882f-9e2f041083b8",
+=======
+                    "name": "Correr",
+                    "type": "Button",
+                    "id": "4bfae403-58ee-44af-a66f-f6572767b97a",
+>>>>>>> Stashed changes
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -192,6 +198,7 @@
                 },
                 {
                     "name": "",
+<<<<<<< Updated upstream
                     "id": "31228c98-fb72-45e2-a154-0acead32e34a",
                     "path": "<Keyboard>/q",
                     "interactions": "",
@@ -231,6 +238,14 @@
                     "processors": "",
                     "groups": "",
                     "action": "Habilidade 4",
+=======
+                    "id": "9de3b112-3264-4e8a-97cf-04b4fd8ea2bd",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Correr",
+>>>>>>> Stashed changes
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
