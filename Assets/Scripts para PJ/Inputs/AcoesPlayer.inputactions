@@ -43,42 +43,9 @@
                     "initialStateCheck": false
                 },
                 {
-<<<<<<< Updated upstream
-                    "name": "Habilidade 1",
-                    "type": "Button",
-                    "id": "45229188-2fc6-4803-a57b-d188d62862cc",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Habilidade 2",
-                    "type": "Button",
-                    "id": "32caca7d-71ca-43a9-90b0-250fcb480dbc",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Habilidade 3",
-                    "type": "Button",
-                    "id": "5df06955-f2de-458e-8005-a9b626b9ed2c",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Habilidade 4",
-                    "type": "Button",
-                    "id": "0f5628cc-09b4-4d04-882f-9e2f041083b8",
-=======
                     "name": "Correr",
                     "type": "Button",
                     "id": "4bfae403-58ee-44af-a66f-f6572767b97a",
->>>>>>> Stashed changes
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -198,54 +165,12 @@
                 },
                 {
                     "name": "",
-<<<<<<< Updated upstream
-                    "id": "31228c98-fb72-45e2-a154-0acead32e34a",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Habilidade 1",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "25c6fed2-c735-46bf-a38f-faa45a026932",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Habilidade 2",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cce4888b-38bd-4647-8303-49a5934f7cb6",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Habilidade 3",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "212cf7a7-3aae-44c1-af94-47727bb6e683",
-                    "path": "<Keyboard>/g",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Habilidade 4",
-=======
                     "id": "9de3b112-3264-4e8a-97cf-04b4fd8ea2bd",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Correr",
->>>>>>> Stashed changes
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
