@@ -309,6 +309,17 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""09cc49fd-ef3f-4049-98ad-081d446b1fd9"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Habilidade 1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""42dd1b28-9769-4150-951f-0d104aaa0d92"",
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
