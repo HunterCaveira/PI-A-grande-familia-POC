@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8001680583230790812}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Quadras
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 8164069806956133183}
   - component: {fileID: 4000810605892509870}
   - component: {fileID: 1467733594624752410}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Escada time 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1818,7 +1818,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 4490
+  m_VersionIndex: 4502
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -1938,7 +1938,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8875909779413558819}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Brinquedos/Academia
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1971,7 +1971,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1832744711077081650}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2004,7 +2004,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5504852132491897413}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2024,6 +2024,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4365384142314376460}
   - {fileID: 7520450143793211331}
   - {fileID: 3789532179351284672}
   m_Father: {fileID: 1832744711077081650}
@@ -2037,7 +2038,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2315993862369730083}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Coisas do mapa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2078,7 +2079,8 @@ GameObject:
   - component: {fileID: 8677433010786812693}
   - component: {fileID: 3564821859628329104}
   - component: {fileID: 953667699084282849}
-  m_Layer: 0
+  - component: {fileID: 8829175013118843339}
+  m_Layer: 6
   m_Name: Spawn time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2312,7 +2314,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 5096
+  m_VersionIndex: 5108
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2416,6 +2418,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &8829175013118843339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268651631999765013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Tiropistola: {fileID: 0}
+  pontosDeSpawn:
+  - {fileID: 4365384142314376460}
+  tempoParaRenascer: 3
 --- !u!1 &1575061368150936119
 GameObject:
   m_ObjectHideFlags: 0
@@ -2425,7 +2443,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3345278569061345905}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "Area de domina\xE7\xE3o"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2447,6 +2465,7 @@ Transform:
   m_Children:
   - {fileID: 5470554622247999371}
   - {fileID: 8218112889690533349}
+  - {fileID: 1587662268140165224}
   m_Father: {fileID: 2974607446859708715}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1656290411697357563
@@ -2458,7 +2477,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4998274660393359560}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Banheiros
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2491,7 +2510,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2974607446859708715}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mapa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2525,7 +2544,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4838815308357274423}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pontes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2550,6 +2569,37 @@ Transform:
   - {fileID: 3384499241226796050}
   m_Father: {fileID: 2315993862369730083}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2332732877912220682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4365384142314376460}
+  m_Layer: 6
+  m_Name: Ponto de Respawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4365384142314376460
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332732877912220682}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 12.2, y: 58.3, z: 67.8}
+  m_LocalScale: {x: 10, y: 5, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5504852132491897413}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2488229737562072562
 GameObject:
   m_ObjectHideFlags: 0
@@ -2564,7 +2614,7 @@ GameObject:
   - component: {fileID: 819241191428060367}
   - component: {fileID: 918230506635557749}
   - component: {fileID: 2192595929489730799}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Banheiro time
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2798,7 +2848,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 50
+  m_VersionIndex: 62
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2916,7 +2966,7 @@ GameObject:
   - component: {fileID: 2420823779387029884}
   - component: {fileID: 4457538225278547822}
   - component: {fileID: 8681481067075494434}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Brinquedos/Academia time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4132,7 +4182,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 5095
+  m_VersionIndex: 5107
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -4253,7 +4303,7 @@ GameObject:
   - component: {fileID: 5513107838702855023}
   - component: {fileID: 5182677430167338527}
   - component: {fileID: 3864402521214354718}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: escada time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6024,7 +6074,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 4490
+  m_VersionIndex: 4502
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -6149,7 +6199,7 @@ GameObject:
   - component: {fileID: 1518545148900253318}
   - component: {fileID: 5289951919303137046}
   - component: {fileID: 5099200231773514344}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "Area de domina\xE7\xE3o"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8491,7 +8541,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 154
+  m_VersionIndex: 166
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -8598,6 +8648,37 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!1 &6461644179589205569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6884576643899175104}
+  m_Layer: 0
+  m_Name: Ponto de Respawn2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6884576643899175104
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6461644179589205569}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 789.5, y: 65.23935, z: 619.8}
+  m_LocalScale: {x: 10, y: 5, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6470122333196230697}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6665771415130407193
 GameObject:
   m_ObjectHideFlags: 0
@@ -8612,7 +8693,7 @@ GameObject:
   - component: {fileID: 3917194256790368648}
   - component: {fileID: 7867462609909240863}
   - component: {fileID: 3466105753595764651}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ponte time 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8789,7 +8870,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 638
+  m_VersionIndex: 650
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -8904,7 +8985,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7018709590023102089}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Terreno do mapa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8928,6 +9009,81 @@ Transform:
   - {fileID: 5301330575069493423}
   m_Father: {fileID: 2974607446859708715}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7398495503520863053
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1587662268140165224}
+  - component: {fileID: 5225655972443952589}
+  - component: {fileID: 4729419529911471109}
+  m_Layer: 6
+  m_Name: "domina\xE7\xE3o"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1587662268140165224
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398495503520863053}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 96.7, y: 27.4, z: 248.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3345278569061345905}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5225655972443952589
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398495503520863053}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 300, y: 150, z: 250}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4729419529911471109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398495503520863053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f8a6020bd1e4f468ce7367177f473e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeDonoDoTerritorio: 0
+  tempoNecessario: 0
+  uiTime1: {fileID: 0}
+  uiTime2: {fileID: 0}
+  uiConflito: {fileID: 0}
+  progressoTime1: 0
+  progressoTime2: 0
+  timeTentandoDominar: 0
+  emDisputa: 0
 --- !u!1 &7496268815979072045
 GameObject:
   m_ObjectHideFlags: 0
@@ -8942,7 +9098,7 @@ GameObject:
   - component: {fileID: 978258320224337075}
   - component: {fileID: 1784482859957681671}
   - component: {fileID: 5318707577946540786}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Brinquedos/Academia time 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10158,7 +10314,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 5095
+  m_VersionIndex: 5107
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -10279,7 +10435,7 @@ GameObject:
   - component: {fileID: 5505620866410601186}
   - component: {fileID: 23686217928022575}
   - component: {fileID: 3319341412874633863}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawn time 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10513,7 +10669,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 5096
+  m_VersionIndex: 5108
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -10631,7 +10787,7 @@ GameObject:
   - component: {fileID: 1005994053206971250}
   - component: {fileID: 2497113767982565825}
   - component: {fileID: 6741716685675654747}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ponte time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10808,7 +10964,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 638
+  m_VersionIndex: 650
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -10928,7 +11084,7 @@ GameObject:
   - component: {fileID: 366116965435045887}
   - component: {fileID: 7483937818952430722}
   - component: {fileID: 6006377756623090980}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Banheiro time 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11162,7 +11318,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 50
+  m_VersionIndex: 62
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -11275,7 +11431,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6470122333196230697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Time 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11295,6 +11451,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6884576643899175104}
   - {fileID: 6307449667155396669}
   - {fileID: 2109072396673524222}
   m_Father: {fileID: 1832744711077081650}
@@ -11313,7 +11470,7 @@ GameObject:
   - component: {fileID: 778890004762699644}
   - component: {fileID: 6406418817871089751}
   - component: {fileID: 1354358309426176214}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ponte principal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11547,7 +11704,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 50
+  m_VersionIndex: 62
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -11711,9 +11868,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3895400125072841735, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
       propertyPath: m_Name
       value: Quadra parque Grande familia time 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1214576861327457039, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
       propertyPath: m_FadeMode
@@ -11734,6 +11903,10 @@ PrefabInstance:
     - target: {fileID: 4742473837712756890, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
       propertyPath: m_LODs.Array.data[2].screenRelativeHeight
       value: 0.44450837
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796462529679149675, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11808,6 +11981,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 254c8de7bd908c04c9e7166121fb76ec, type: 3}
       propertyPath: m_Name
       value: Mapa parque Grande familia
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 254c8de7bd908c04c9e7166121fb76ec, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11913,6 +12090,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mapa parque Grande familia (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 254c8de7bd908c04c9e7166121fb76ec, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12013,9 +12194,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3895400125072841735, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
       propertyPath: m_Name
       value: Quadra parque Grande familia time 1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1214576861327457039, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4742473837712756890, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
       propertyPath: m_FadeMode
@@ -12037,6 +12230,10 @@ PrefabInstance:
       propertyPath: m_LODs.Array.data[2].screenRelativeHeight
       value: 0.42555273
       objectReference: {fileID: 0}
+    - target: {fileID: 5796462529679149675, guid: b5f698962a0bf2040bdac867a8b8d814, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12057,15 +12254,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 15
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       propertyPath: m_LocalScale.y
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 15
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12107,9 +12304,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2848750821474095517, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       propertyPath: m_Name
       value: Fonte
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4593218173992072814, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5698170769025982084, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12118,12 +12331,73 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 184106757197412098}
+    - targetCorrespondingSourceObject: {fileID: 5698170769025982084, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7910559447971343353}
+    - targetCorrespondingSourceObject: {fileID: -2848750821474095517, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7158333995677245561}
+    - targetCorrespondingSourceObject: {fileID: 4593218173992072814, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7024319279284757534}
   m_SourcePrefab: {fileID: 100100000, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+--- !u!1 &3310452921048654957 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -2848750821474095517, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+  m_PrefabInstance: {fileID: 8468495030660450830}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &7158333995677245561
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3310452921048654957}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.01547815, y: 0.01941963, z: 0.09888919}
+  m_Center: {x: -0.000000029802322, y: -3.5033842e-17, z: 0.039444596}
 --- !u!23 &3367509846052624749 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -2648698221685795997, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
   m_PrefabInstance: {fileID: 8468495030660450830}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4221521306704909450 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5698170769025982084, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+  m_PrefabInstance: {fileID: 8468495030660450830}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &7910559447971343353
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4221521306704909450}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.01547815, y: 0.01941963, z: 0.100552335}
+  m_Center: {x: -4.6566134e-10, y: 0, z: 0.040276185}
 --- !u!23 &4366481046667479509 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -3954450484630518821, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
@@ -12134,6 +12408,32 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 3562510055032901945, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
   m_PrefabInstance: {fileID: 8468495030660450830}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5348095798662347872 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4593218173992072814, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}
+  m_PrefabInstance: {fileID: 8468495030660450830}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &7024319279284757534
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5348095798662347872}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.01547815, y: 0.01941963, z: 0.10237351}
+  m_Center: {x: 0, y: -3.6581196e-17, z: 0.041186746}
 --- !u!4 &8218112889690533349 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fbaf80628a25a3f4184061e8e0d1560e, type: 3}

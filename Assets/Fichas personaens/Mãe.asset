@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee0ba9c09968ffc4d99f992e24fe009b, type: 3}
-  m_Name: mae
+  m_Name: "M\xE3e"
   m_EditorClassIdentifier: 
   vidaMaxima: 100
-  velocidadeMovimento: 5
+  velocidadeMovimento: 10
   forcaPulo: 2

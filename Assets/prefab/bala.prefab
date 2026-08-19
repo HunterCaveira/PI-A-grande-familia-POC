@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 1612063146692738162}
   - component: {fileID: 1256277592763077570}
   - component: {fileID: 7515058385889973598}
-  - component: {fileID: -504379174694166604}
   - component: {fileID: 4975504323352017556}
   - component: {fileID: 3283333875501721431}
+  - component: {fileID: 1489153451067334908}
   m_Layer: 0
   m_Name: bala
   m_TagString: Bala
@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -495.615, y: 1.572, z: 331.333}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.46001, y: 0.398171, z: 0.50723}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -111,7 +111,32 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &-504379174694166604
+--- !u!114 &4975504323352017556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4705233091075458520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24d3d0997fff57b458eb6eb89cc5c62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tempoVidaMaximo: 5
+--- !u!114 &3283333875501721431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4705233091075458520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49037adbadf32d04c93836ece3adfaef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &1489153451067334908
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,28 +163,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &4975504323352017556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4705233091075458520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24d3d0997fff57b458eb6eb89cc5c62f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tempoVidaMaximo: 5
---- !u!114 &3283333875501721431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4705233091075458520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49037adbadf32d04c93836ece3adfaef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

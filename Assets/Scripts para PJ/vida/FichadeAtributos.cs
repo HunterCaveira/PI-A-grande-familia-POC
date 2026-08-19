@@ -7,7 +7,7 @@ public class AtributosPersonagem : ScriptableObject
     public float vidaMaxima = 100f;
 
     [Header("Atributos de Movimento")]
-    public float velocidadeMovimento = 5f;
+    public float velocidadeMovimento = 10f;
     public float forcaPulo = 2f;
     
 
