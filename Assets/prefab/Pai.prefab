@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 5315534956173952980}
   - component: {fileID: 7638679552593939052}
   - component: {fileID: 4984737333827399614}
+  - component: {fileID: 59796249715772404}
   m_Layer: 0
   m_Name: Pai
   m_TagString: Player
@@ -219,6 +220,30 @@ MonoBehaviour:
   pontosSpawnTime2:
   - {fileID: 0}
   tempoParaRespawn: 3
+--- !u!114 &59796249715772404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 779242421130396050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraPrincipal: {fileID: 0}
+  distanciaMaxima: 15
+  camadaChao:
+    serializedVersion: 2
+    m_Bits: 64
+  camadaParedesEObstaculos:
+    serializedVersion: 2
+    m_Bits: 64
+  larguraMaxima: 5
+  larguraMinima: 1
+  prefabParedeFantasma: {fileID: 0}
+  prefabParedeReal: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
 --- !u!1 &893525018362631522
 GameObject:
   m_ObjectHideFlags: 0
