@@ -310,7 +310,7 @@ public partial class @AcoesPlayer: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""09cc49fd-ef3f-4049-98ad-081d446b1fd9"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
