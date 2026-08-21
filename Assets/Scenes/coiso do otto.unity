@@ -12163,21 +12163,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 992684956}
     m_Modifications:
-    - target: {fileID: 1562770661072034603, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1562770661072034603, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_Name
       value: PrefabParedeFantasma
-      objectReference: {fileID: 0}
-    - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7505011776156587176, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_LocalPosition.x
