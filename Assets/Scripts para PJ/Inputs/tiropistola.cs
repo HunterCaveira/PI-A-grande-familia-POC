@@ -50,7 +50,7 @@ public class tiropistola : MonoBehaviour
         if (ammunitionDisplay != null)
             ammunitionDisplay.SetText(balasSobrando / tiroPorClick + " / " + tamanhoCarregador / tiroPorClick);
     }
-
+    //Debug.DrawRay(_camera.transform.position, _camera.transform.TransformDirection(Vector3.forward) , Color.red);
     private void OnEnable()
     {
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
