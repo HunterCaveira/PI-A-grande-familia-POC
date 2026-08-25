@@ -5,6 +5,25 @@ using Unity.VisualScripting;
 
 public class tiropistola : MonoBehaviour
 {
+    [Header("Configurações do Raycast (Física e Espalhamento)")]
+    [Tooltip("Até quantos metros o tiro consegue acertar o alvo? (Comprimento)")]
+    [SerializeField] private float alcanceDoTiro = 100f;
+
+    [Tooltip("Largura do espalhamento da bala (Eixo X)")]
+    [SerializeField] private float espalhamentoHorizontal = 0.5f;
+
+    [Tooltip("Altura do espalhamento da bala (Eixo Y)")]
+    [SerializeField] private float espalhamentoVertical = 0.5f;
+
+    [Header("Configurações de Mira")]
+    [Tooltip("Quais camadas o Raycast pode acertar? (Ex: Cenário, Inimigos)")]
+    public LayerMask mascaraDeTiro;
+
+    [Header("Visual do Tiro")]
+    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private float duracaoLinha = 0.05f;
+
+    [Header("Pool de balas")]
     public BalaPool meuPoolDeBalas;
     [Header("Configurações de Dano da Arma")]
     [SerializeField] private float danoPorTiro = 20f;
@@ -74,8 +93,8 @@ public class tiropistola : MonoBehaviour
         if (acoesPlayer.MovimentoPlayer.Recarregar.WasPressedThisFrame() && balasSobrando < tamanhoCarregador && !recarregando)
             Reload();
 
-        if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0)
-            Reload();
+      //  if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0)
+        //s    Reload();
 
         if (preparadoParaAtirar && atirando && !recarregando && balasSobrando > 0)
         {
@@ -84,64 +103,62 @@ public class tiropistola : MonoBehaviour
     }
 
     private void atirar()
-{
-    preparadoParaAtirar = false;
-
-    Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-    RaycastHit acerto;
-    Vector3 pontoAcerto;
-
-    if (Physics.Raycast(ray, out acerto))
-        pontoAcerto = acerto.point;
-    else
-        pontoAcerto = ray.GetPoint(75);
-
-    Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
-
-    for (int i = 0; i < tiroPorClick; i++)
     {
-        if (balasSobrando <= 0) break;
+        preparadoParaAtirar = false;
 
-        float x = Random.Range(-Espalhar, Espalhar);
-        float y = Random.Range(-Espalhar, Espalhar);
+        Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit acerto;
+        Vector3 pontoAcerto;
 
-        Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
+        // 1. AQUI APLICAMOS O ALCANCE (COMPRIMENTO/DISTÂNCIA) DO RAYCAST
+        if (Physics.Raycast(ray, out acerto, alcanceDoTiro, mascaraDeTiro, QueryTriggerInteraction.Ignore))
+            pontoAcerto = acerto.point;
+        else
+            pontoAcerto = ray.GetPoint(alcanceDoTiro); // Se não bater em nada, vai até o limite do alcance
 
-
-
-        // 1. Pega a bala do Pool ao invés de Instanciar
-        GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
-
-        // Define a posição e a direção da bala recém-pega do pool
-        balaAtual.transform.position = pontoAtaque.position;
-        balaAtual.transform.forward = direçãoComEspalhar.normalized;
-
-        // Ativa o item na cena
-        balaAtual.SetActive(true);
-
-        // 2. PASSAGEM DE DADOS: Configura os dados de dano na bala!
-        if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
+        if (lineRenderer != null)
         {
-            scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
+            StartCoroutine(DesenharRaio(pontoAtaque.position, pontoAcerto));
         }
 
-        // 3. Aplica forças físicas
-        Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
-        if (rb != null)
+        Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
+
+        for (int i = 0; i < tiroPorClick; i++)
         {
-                // IMPORTANTE: Zera a velocidade anterior para que o tiro não saia com a física acumulada do uso anterior no pool
+            if (balasSobrando <= 0) break;
+
+            // 2. AQUI APLICAMOS A LARGURA (ESPALHAMENTO HORIZONTAL E VERTICAL)
+            float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal);
+            float y = Random.Range(-espalhamentoVertical, espalhamentoVertical);
+
+            Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
+
+            // ... (O resto do seu código de pegar a bala do Pool continua igualzinho aqui embaixo)
+            GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
+            balaAtual.transform.position = pontoAtaque.position;
+            balaAtual.transform.forward = direçãoComEspalhar.normalized;
+            balaAtual.SetActive(true);
+
+            if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
+            {
+                scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
+            }
+
+            Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
 
-            rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
-            rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
+                rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
+                rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
+            }
+
+            balasSobrando--;
         }
 
-        balasSobrando--;
+        Invoke("ResetShot", tempoEntreAtirar);
     }
-
-    Invoke("ResetShot", tempoEntreAtirar);
-}
 
     private void ResetShot()
     {
@@ -158,5 +175,16 @@ public class tiropistola : MonoBehaviour
     {
         balasSobrando = tamanhoCarregador;
         recarregando = false;
+    }
+    //OPCIONAL VER O RAYCAST
+    private System.Collections.IEnumerator DesenharRaio(Vector3 inicio, Vector3 fim)
+    {
+        lineRenderer.SetPosition(0, inicio);
+        lineRenderer.SetPosition(1, fim);
+        lineRenderer.enabled = true;
+
+        yield return new WaitForSeconds(duracaoLinha);
+
+        lineRenderer.enabled = false;
     }
 }
