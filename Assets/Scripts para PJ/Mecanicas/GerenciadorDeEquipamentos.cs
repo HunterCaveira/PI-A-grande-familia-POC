@@ -12,8 +12,10 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
     private float tempoLiberadoParaTrocar = 0f;
     private int indiceEquipamentoAtual = 0;
 
-    //[Header("Prefabs das Habilidades")]
-    //[SerializeField] private List<GameObject> Pai;
+    [Header("Prefabs das Habilidades")]
+    [SerializeField] private Transform pontosMaos;
+    [SerializeField] private HabilidadeParede habilidadeParede;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -60,18 +62,27 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
 
     private void TrocarEquipamento(int novoIndice)
     {
+        if (habilidadeParede != null)
+        { 
+            habilidadeParede.CancelarPosicionamento();
+        
+        }
+
         if (novoIndice == indiceEquipamentoAtual)
         {
-            indiceEquipamentoAtual = 0;
+            novoIndice = 0;
 
         }
 
-        if (novoIndice == 1)
-        {
-            gameObject.SetActive(true);
-                
+        for (int i = 0; i < pontosMaos.childCount; i++) {
+
+            pontosMaos.GetChild(i).gameObject.SetActive(i == novoIndice); 
+           
         }
 
+        indiceEquipamentoAtual = novoIndice;
+
+        tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
     
     }
       

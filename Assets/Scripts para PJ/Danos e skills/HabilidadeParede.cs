@@ -145,4 +145,15 @@ public class HabilidadeParede : MonoBehaviour
         Vector3 escalaAtual = parede.localScale;
         parede.localScale = new Vector3(novaLargura, novaAltura, escalaAtual.z);
     }
+
+    public void CancelarPosicionamento()
+    {
+        prefabParedeFantasma.SetActive(false); 
+        modoPosicionamentoAtivo = false;
+
+
+    }
+
+
+
 }
