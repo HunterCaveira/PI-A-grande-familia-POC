@@ -92,9 +92,9 @@ public class tiropistola : MonoBehaviour
 
         if (acoesPlayer.MovimentoPlayer.Recarregar.WasPressedThisFrame() && balasSobrando < tamanhoCarregador && !recarregando)
             Reload();
-
+        //auto recarga
       //  if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0)
-        //s    Reload();
+        //    Reload();
 
         if (preparadoParaAtirar && atirando && !recarregando && balasSobrando > 0)
         {
@@ -127,11 +127,15 @@ public class tiropistola : MonoBehaviour
         {
             if (balasSobrando <= 0) break;
 
-            // 2. AQUI APLICAMOS A LARGURA (ESPALHAMENTO HORIZONTAL E VERTICAL)
+            // 2. APLICAÇÃO DO ESPALHAMENTO BASEADO NA ORIENTAÇÃO DA CÂMERA
             float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal);
             float y = Random.Range(-espalhamentoVertical, espalhamentoVertical);
 
-            Vector3 direçãoComEspalhar = direçãoSemEspalhar + new Vector3(x, y, 0);
+            // Transforma o desvio local (X e Y) em direções reais relativas à câmera
+            Vector3 vetorEspalhamento = (fpsCam.transform.right * x) + (fpsCam.transform.up * y);
+
+            // Aplica o vetor de espalhamento sobre a direção original
+            Vector3 direçãoComEspalhar = direçãoSemEspalhar + vetorEspalhamento;
 
             // ... (O resto do seu código de pegar a bala do Pool continua igualzinho aqui embaixo)
             GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
