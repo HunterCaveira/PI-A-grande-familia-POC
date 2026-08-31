@@ -3,90 +3,100 @@ using UnityEngine.InputSystem;
 
 public class GerenciadorDeEquipamentos : MonoBehaviour
 {
-    [Header("Estados das Habilidades")]
-    [SerializeField] private bool habilitado = false;
+    [Header("Configurações Visuais das Mãos")]
+    [SerializeField] private Transform pontoMaos;
+
+    [Header("Configurações de Tempo")]
+    [SerializeField] private float tempoAnimacaoTroca = 0.5f;
+    private float tempoLiberadoParaTrocar = 0f;
+
+    [Header("Controle Interno")]
+    private int indiceEquipamentoAtual = 0;
     private int proximoIndicePendente = -1;
 
-    [Header("Tempo de animação")]
-    [SerializeField] private float tempoAnimacaoTroca = 0.05f;
-    private float tempoLiberadoParaTrocar = 0f;
-    private int indiceEquipamentoAtual = 0;
+    // Componentes genéricos de habilidades (buscados automaticamente no personagem)
+    private IHabilidade[] habilidadesDoPersonagem;
 
-    [Header("Prefabs das Habilidades")]
-    [SerializeField] private Transform pontosMaos;
-    [SerializeField] private HabilidadeParede habilidadeParede;
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
-
+        // Coleta automaticamente todos os scripts do personagem que usam a interface IHabilidade
+        habilidadesDoPersonagem = GetComponents<IHabilidade>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Verifica se existe um teclado físico ou virtual conectado ao sistema para evitar erros de referência nula
+        // 1. Captura de teclas (Buffer de Agendamento)
         if (Keyboard.current != null)
         {
-            // Checa se a tecla Q foi pressionada exatamente neste frame
             if (Keyboard.current.qKey.wasPressedThisFrame)
             {
-                // Agenda a habilidade do slot 1 (Parede) na fila de espera
-                proximoIndicePendente = 1;
+                proximoIndicePendente = 1; // Slot 1: Q (Ex: Parede)
             }
-            // Se Q não foi pressionado, checa se a tecla E foi pressionada neste frame
             else if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                // Agenda a habilidade do slot 2 (Tônico) na fila de espera
-                proximoIndicePendente = 2;
+                proximoIndicePendente = 2; // Slot 2: E (Ex: Tônico)
             }
-            // Se nem Q nem E foram pressionados, checa se a tecla F foi pressionada neste frame
             else if (Keyboard.current.fKey.wasPressedThisFrame)
             {
-                // Agenda a habilidade do slot 3 (Cinto) na fila de espera
-                proximoIndicePendente = 3;
+                proximoIndicePendente = 3; // Slot 3: F (Ex: Cinto)
             }
         }
 
-        // Avalia duas condições: se a trava de tempo/animação já passou E se existe alguma troca agendada no buffer (diferente de -1)
+        // 2. Execução da troca quando a trava de tempo liberar
         if (Time.time >= tempoLiberadoParaTrocar && proximoIndicePendente != -1)
         {
-            // Executa a troca passando o número da habilidade que estava aguardando na fila
             TrocarEquipamento(proximoIndicePendente);
-
-            // Reseta o buffer para -1 para indicar que a fila está vazia e evitar trocas repetidas
             proximoIndicePendente = -1;
         }
     }
 
     private void TrocarEquipamento(int novoIndice)
     {
-        if (habilidadeParede != null)
-        { 
-            habilidadeParede.CancelarPosicionamento();
-        
-        }
+        // A. Cancela a projeção/mira de TODAS as habilidades ativas de forma genérica
+        CancelarTodasAsHabilidades();
 
+        // B. Trata o retorno para a arma principal se pressionar a mesma tecla
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
-
         }
 
-        for (int i = 0; i < pontosMaos.childCount; i++) {
-
-            pontosMaos.GetChild(i).gameObject.SetActive(i == novoIndice); 
-           
+        // C. Atualiza os visuais das mãos no 'pontoMaos' (se configurado no Inspector)
+        if (pontoMaos != null)
+        {
+            for (int i = 0; i < pontoMaos.childCount; i++)
+            {
+                pontoMaos.GetChild(i).gameObject.SetActive(i == novoIndice);
+            }
         }
 
+        // D. Ativa a habilidade lógica correspondente (se existir no personagem)
+        AtivarHabilidadePorSlot(novoIndice);
+
+        // E. Atualiza estados e grava o delay da animação
         indiceEquipamentoAtual = novoIndice;
-
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
-    
     }
-      
 
+    private void CancelarTodasAsHabilidades()
+    {
+        if (habilidadesDoPersonagem == null) return;
 
+        foreach (var hab in habilidadesDoPersonagem)
+        {
+            hab.CancelarHabilidade();
+        }
+    }
 
+    private void AtivarHabilidadePorSlot(int slotIndex)
+    {
+        if (habilidadesDoPersonagem == null) return;
+
+        // Se o slot for 1 (Tecla Q) e houver pelo menos 1 habilidade no personagem
+        if (slotIndex == 1 && habilidadesDoPersonagem.Length > 0)
+        {
+            habilidadesDoPersonagem[0].AtivarHabilidade();
+        }
+        // Se criar mais habilidades no futuro (Slot 2 = E, Slot 3 = F), elas entram aqui expandindo a lista
+    }
 }

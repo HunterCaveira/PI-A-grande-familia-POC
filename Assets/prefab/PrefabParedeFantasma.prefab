@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 7081015560751939203}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.081846, y: -21.197351, z: -19.149548}
+  m_LocalPosition: {x: 19.36628, y: -21.197351, z: 5.1654015}
   m_LocalScale: {x: 10, y: 3, z: 0.17652}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -72,7 +72,7 @@ MeshRenderer:
     firstSubMesh: 0
     subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
+  m_ProbeAnchor: {fileID: 7505011776156587176}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_ReceiveGI: 1
