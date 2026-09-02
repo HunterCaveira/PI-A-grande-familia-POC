@@ -6,6 +6,8 @@ public class GerenciadorDePartida : MonoBehaviour
     [Header("Interface (UI)")]
     [Tooltip("Arraste o objeto de Texto (TextMeshPro) do Canvas aqui")]
     public TextMeshProUGUI textoCronometro;
+    public TextMeshProUGUI dominaçãoRoxo;
+    public TextMeshProUGUI dominaçãoAmarelo;
 
     [Header("Telas de Fim de Jogo")]
     [Tooltip("Arraste as imagens/telas do Canvas que vão aparecer no fim da partida")]
@@ -41,7 +43,6 @@ public class GerenciadorDePartida : MonoBehaviour
 
         // 1. Cronômetro rodando para trás
         tempoRestante -= Time.deltaTime;
-        AtualizarRelogioNaTela(); // <--- Chama a função de atualizar a UI
 
         // 2. Pontuação do território
         if (areaDeDominacao != null)
@@ -56,36 +57,55 @@ public class GerenciadorDePartida : MonoBehaviour
             }
         }
 
-        // 3. Fim de partida
+        // 3. Atualiza os textos da tela com os tempos novos
+        AtualizarRelogiosNaTela();
+
+        // 4. Fim de partida
         if (tempoRestante <= 0)
         {
             FinalizarPartida();
         }
     }
 
-    // Função que transforma segundos em formato de relógio (Minutos:Segundos)
-    private void AtualizarRelogioNaTela()
+    // Gerencia a atualização de todos os textos de tempo da interface
+    private void AtualizarRelogiosNaTela()
     {
         if (textoCronometro != null)
         {
-            // Pega o tempo e divide matematicamente
-            int minutos = Mathf.FloorToInt(tempoRestante / 60);
-            int segundos = Mathf.FloorToInt(tempoRestante % 60);
+            textoCronometro.text = FormatarTempo(tempoRestante);
+        }
 
-            // Escreve no formato 00:00
-            textoCronometro.text = string.Format("{0:00}:{1:00}", minutos, segundos);
+        if (dominaçãoRoxo != null)
+        {
+            dominaçãoRoxo.text = string.Format($"{Mathf.Round(tempoTotalTime1)} %");
+        }
+
+        if (dominaçãoAmarelo != null)
+        {
+            dominaçãoAmarelo.text = string.Format($"{Mathf.Round(tempoTotalTime2)} %");
         }
     }
+
+    // Função que transforma segundos em formato de relógio (Minutos:Segundos)
+    private string FormatarTempo(float tempoEmSegundos)
+    {
+        int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
+        int segundos = Mathf.FloorToInt(tempoEmSegundos % 60);
+        return string.Format("{0:00}:{1:00}", minutos, segundos);
+
+        //return string.Format($"{Mathf.Round(tempoEmSegundos)} %");
+    }
+   
 
     private void FinalizarPartida()
     {
         partidaAcabou = true;
         tempoRestante = 0f;
-        AtualizarRelogioNaTela(); // Crava o relógio no 00:00 visualmente
+        AtualizarRelogiosNaTela(); // Crava o relógio no 00:00 visualmente e atualiza pontuação final
 
         Debug.Log($"Fim! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
 
-        // 4. Compara os tempos e exibe a imagem correspondente
+        // Compara os tempos e exibe a imagem correspondente
         if (tempoTotalTime1 > tempoTotalTime2)
         {
             Debug.Log("Time 1 Venceu!");
