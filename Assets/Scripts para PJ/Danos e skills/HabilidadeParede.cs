@@ -28,6 +28,8 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
     [SerializeField] private int limiteParedes = 2;
     [SerializeField] private float tempoCooldown = 5f;
 
+    [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
+
     private float tempoProximoUso = 0f;
     private List<GameObject> paredesAtivas = new List<GameObject>();
 
@@ -39,6 +41,12 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
             PosicionarECriarParede();
         }
     }
+    private void Awake()
+    {
+        // Busca o gerenciador no mesmo GameObject do jogador
+        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+    }
+
 
     // --- MÉTODOS DA INTERFACE (Contratados pelo Gerenciador) ---
 
@@ -90,26 +98,38 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
             prefabParedeFantasma.transform.position = posicaoAjustadaNoChao;
 
             // Confirmação com Botão Direito do Mouse
+            // CONFIRMAÇÃO: Instancia a parede real ao clicar com o botão direito do mouse
             if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             {
+                // A. Limpa da lista paredes destruídas
                 paredesAtivas.RemoveAll(parede => parede == null);
 
+                // B. Destrói a parede antiga se atingiu o limite
                 if (paredesAtivas.Count >= limiteParedes)
                 {
                     Destroy(paredesAtivas[0]);
                     paredesAtivas.RemoveAt(0);
                 }
 
+                // C. Instancia a parede sólida real
                 GameObject paredeCriada = Instantiate(prefabParedeReal, posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation);
                 paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
 
+                // D. Adiciona à lista e programa autodestruição
                 paredesAtivas.Add(paredeCriada);
                 Destroy(paredeCriada, tempoDeVida);
 
+                // E. Aplica o cooldown
                 tempoProximoUso = Time.time + tempoCooldown;
 
-                // Conclui e cancela o modo fantasma
+                // F. Cancela a projeção fantasma
                 CancelarHabilidade();
+
+                // G. RETORNO AUTOMÁTICO PARA A ARMA (ÍNDICE 0)
+                if (gerenciadorDeEquipamentos != null)
+                {
+                    gerenciadorDeEquipamentos.TrocarEquipamento(0);
+                }
             }
         }
         else

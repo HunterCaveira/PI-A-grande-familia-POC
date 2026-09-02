@@ -50,7 +50,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
         }
     }
 
-    private void TrocarEquipamento(int novoIndice)
+    public void TrocarEquipamento(int novoIndice)
     {
         // A. Cancela a projeção/mira de TODAS as habilidades ativas de forma genérica
         CancelarTodasAsHabilidades();
