@@ -173,6 +173,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4493585093827132993, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
+--- !u!1001 &159059381
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7225580781258606967, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_Name
+      value: Simulador de calvagada
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -313
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 96.63
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 251.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8002258668764484557, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b0d27b07ca49a974aba7a8cb26ee5bd9, type: 3}
 --- !u!4 &218744815 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2904460485245313336, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
@@ -3650,6 +3707,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4905993185050630305, guid: 6f5739f4960f70444aea34caae83fd81, type: 3}
+--- !u!1001 &1940479593
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -314.97
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 96.95728
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 236.61984
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 06246bc3740282a47af76247f99e069c, type: 3}
+      propertyPath: m_Name
+      value: simulador de esqui
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 06246bc3740282a47af76247f99e069c, type: 3}
 --- !u!1 &1949026793
 GameObject:
   m_ObjectHideFlags: 0
@@ -4878,3 +4992,5 @@ SceneRoots:
   - {fileID: 1344683478}
   - {fileID: 7617456317423542997}
   - {fileID: 1296932428942455551}
+  - {fileID: 159059381}
+  - {fileID: 1940479593}
