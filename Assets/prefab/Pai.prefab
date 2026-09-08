@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1875591672599462537}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.38, y: -0.06, z: 0.007}
+  m_LocalPosition: {x: 0.38, y: 2.606, z: 2.552}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -324,7 +324,7 @@ MonoBehaviour:
   tempoDeVida: 10
   limiteParedes: 2
   tempoCooldown: 1
-  gerenciadorDeEquipamentos: {fileID: 0}
+  gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
 --- !u!114 &8385738937422537084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,7 +530,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1521677869954969493
 Transform:
   m_ObjectHideFlags: 0
@@ -540,7 +540,7 @@ Transform:
   m_GameObject: {fileID: 4972495283499194072}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0, z: 0.39}
+  m_LocalPosition: {x: 0.01, y: -2.609, z: -2.112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -559,7 +559,6 @@ GameObject:
   - component: {fileID: 6554649493773162116}
   - component: {fileID: 6720833592516716642}
   - component: {fileID: 5779565532753508239}
-  - component: {fileID: 8320554885472452896}
   m_Layer: 6
   m_Name: cabo
   m_TagString: Bala
@@ -640,27 +639,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8320554885472452896
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5085287285687102860}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6340912272633379849
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,7 +940,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &511360171275777798
 Transform:
   m_ObjectHideFlags: 0
@@ -972,7 +950,7 @@ Transform:
   m_GameObject: {fileID: 7228568723087913597}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.017, y: -0.001, z: 0.323}
+  m_LocalPosition: {x: 0.029, y: -2.607, z: -2.279}
   m_LocalScale: {x: 0.22126, y: 0.80808604, z: 0.23117998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1456,6 +1434,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3381194159790458241}
     m_Modifications:
+    - target: {fileID: 1562770661072034603, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_Name
       value: PrefabParedeFantasma
@@ -1527,17 +1509,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: PrefabParedeReal
       objectReference: {fileID: 0}
+    - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.95
       objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.32926
+      value: -4.4
       objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.3254504
+      value: -6.26
       objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalRotation.w
