@@ -1,4 +1,4 @@
-using UnityEngine;
+/* using UnityEngine;
 
 public class HabilidadeCinto : MonoBehaviour, IHabilidade
 {
@@ -82,14 +82,6 @@ public class HabilidadeCinto : MonoBehaviour, IHabilidade
 
 
     }
-
-
-
-
-
-
-
-
     // --- MÉTODOS DA INTERFACE (Contratados pelo Gerenciador) ---
     public void AtivarHabilidade()
     {
@@ -116,3 +108,4 @@ public class HabilidadeCinto : MonoBehaviour, IHabilidade
 
 
 }
+*/
