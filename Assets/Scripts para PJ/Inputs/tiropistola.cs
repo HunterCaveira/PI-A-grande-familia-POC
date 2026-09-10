@@ -1,55 +1,46 @@
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
 
-
-public class tiropistola : MonoBehaviour
+public class tiroPistola : MonoBehaviour
 {
-    [Header("Configurações do Raycast (Física e Espalhamento)")]
-    [Tooltip("Até quantos metros o tiro consegue acertar o alvo? (Comprimento)")]
+    [Header("Configurações do Raycast")]
     [SerializeField] private float alcanceDoTiro = 100f;
-
-    [Tooltip("Largura do espalhamento da bala (Eixo X)")]
     [SerializeField] private float espalhamentoHorizontal = 0.5f;
-
-    [Tooltip("Altura do espalhamento da bala (Eixo Y)")]
     [SerializeField] private float espalhamentoVertical = 0.5f;
-
-    [Header("Configurações de Mira")]
-    [Tooltip("Quais camadas o Raycast pode acertar? (Ex: Cenário, Inimigos)")]
     public LayerMask mascaraDeTiro;
 
     [Header("Visual do Tiro")]
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private float duracaoLinha = 0.05f;
 
-    [Header("Pool de balas")]
+    [Header("Pool de Balas")]
     public BalaPool meuPoolDeBalas;
-    [Header("Configurações de Dano da Arma")]
+
+    [Header("Dano da Arma")]
     [SerializeField] private float danoPorTiro = 20f;
     [SerializeField] private TipoDano tipoDeDano = TipoDano.Fisico;
     [SerializeField] private string nomeDaArma = "Pistola";
 
-    [Header("Configurações do Projétil")]
-    public GameObject bala;
-    public float forçaTiro, forçaCima;
+    [Header("Projétil")]
+    public float forçaTiro;
+    [Tooltip("Força extra para cima (arco da bala). Deixe 0 para tiro reto seguindo a mira")]
+    public float forçaCima;
 
     [Header("Status da Arma")]
-    public float tempoEntreAtirar, Espalhar, tempoRecarga;
+    public float tempoEntreAtirar, tempoRecarga;
     public int tamanhoCarregador, tiroPorClick;
-    public bool permetirSegurarBotão;
-
-    private int balasSobrando;
-    private AcoesPlayer acoesPlayer;
-    private bool atirando, preparadoParaAtirar, recarregando;
+    public bool permitirSegurarBotão;
 
     [Header("Referências")]
-    public Camera fpsCam;
+    [Tooltip("Arraste a câmera que orbita o personagem aqui (ou deixe vazio para pegar a Camera.main)")]
+    public Camera playerCamera;
     public Transform pontoAtaque;
     public GameObject muzzleFlash;
     public TextMeshProUGUI ammunitionDisplay;
 
-    // Referência do jogador que segura a arma (para validação de PvP)
+    private int balasSobrando;
+    private AcoesPlayer acoesPlayer;
+    private bool atirando, preparadoParaAtirar, recarregando;
     private GameObject donoDaArma;
 
     private void Awake()
@@ -57,19 +48,12 @@ public class tiropistola : MonoBehaviour
         acoesPlayer = new AcoesPlayer();
         balasSobrando = tamanhoCarregador;
         preparadoParaAtirar = true;
-
-        // Pega a raiz do objeto (Player) que está segurando a arma
         donoDaArma = transform.root.gameObject;
+
+        if (playerCamera == null)
+            playerCamera = Camera.main;
     }
 
-    public void Update()
-    {
-        MyInput();
-
-        if (ammunitionDisplay != null)
-            ammunitionDisplay.SetText(balasSobrando / tiroPorClick + " / " + tamanhoCarregador / tiroPorClick);
-    }
-    //Debug.DrawRay(_camera.transform.position, _camera.transform.TransformDirection(Vector3.forward) , Color.red);
     private void OnEnable()
     {
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
@@ -83,96 +67,93 @@ public class tiropistola : MonoBehaviour
         acoesPlayer.MovimentoPlayer.Recarregar.Disable();
     }
 
+    private void Update()
+    {
+        MyInput();
+
+        if (ammunitionDisplay != null)
+            ammunitionDisplay.SetText(balasSobrando / tiroPorClick + " / " + tamanhoCarregador / tiroPorClick);
+    }
+
     private void MyInput()
     {
-        if (permetirSegurarBotão)
+        if (permitirSegurarBotão)
             atirando = acoesPlayer.MovimentoPlayer.Atirar.IsPressed();
         else
             atirando = acoesPlayer.MovimentoPlayer.Atirar.WasPressedThisFrame();
 
         if (acoesPlayer.MovimentoPlayer.Recarregar.WasPressedThisFrame() && balasSobrando < tamanhoCarregador && !recarregando)
             Reload();
-        //auto recarga
-      //  if (preparadoParaAtirar && atirando && !recarregando && balasSobrando <= 0)
-        //    Reload();
 
         if (preparadoParaAtirar && atirando && !recarregando && balasSobrando > 0)
-        {
-            atirar();
-        }
+            Atirar();
     }
 
-    private void atirar()
+    private void Atirar()
     {
         preparadoParaAtirar = false;
 
-        Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit acerto;
-        Vector3 pontoAcerto;
+        // O Ray sai do centro da tela (mira/crosshair) da câmera em terceira pessoa
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-        // 1. AQUI APLICAMOS O ALCANCE (COMPRIMENTO/DISTÂNCIA) DO RAYCAST
-        if (Physics.Raycast(ray, out acerto, alcanceDoTiro, mascaraDeTiro, QueryTriggerInteraction.Ignore))
+        Vector3 pontoAcerto;
+        if (Physics.Raycast(ray, out RaycastHit acerto, alcanceDoTiro, mascaraDeTiro, QueryTriggerInteraction.Ignore))
             pontoAcerto = acerto.point;
         else
-            pontoAcerto = ray.GetPoint(alcanceDoTiro); // Se não bater em nada, vai até o limite do alcance
+            pontoAcerto = ray.GetPoint(alcanceDoTiro);
 
         if (lineRenderer != null)
-        {
             StartCoroutine(DesenharRaio(pontoAtaque.position, pontoAcerto));
-        }
 
-        Vector3 direçãoSemEspalhar = pontoAcerto - pontoAtaque.position;
+        // Direção do cano da arma até o ponto que a mira da câmera está apontando
+        Vector3 direçãoBase = (pontoAcerto - pontoAtaque.position).normalized;
 
         for (int i = 0; i < tiroPorClick; i++)
         {
             if (balasSobrando <= 0) break;
 
-            // 2. APLICAÇÃO DO ESPALHAMENTO BASEADO NA ORIENTAÇÃO DA CÂMERA
-            float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal);
-            float y = Random.Range(-espalhamentoVertical, espalhamentoVertical);
+            // Reduzimos o impacto do espalhamento multiplicando por um fator menor (ex: 0.05f)
+            // Assim, valores como 0.5 no Inspetor viram um desvio sutil e realista
+            float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal) * 0.05f;
+            float y = Random.Range(-espalhamentoVertical, espalhamentoVertical) * 0.05f;
 
-            // Transforma o desvio local (X e Y) em direções reais relativas à câmera
-            Vector3 vetorEspalhamento = (fpsCam.transform.right * x) + (fpsCam.transform.up * y);
+            Vector3 vetorEspalhamento = (playerCamera.transform.right * x) + (playerCamera.transform.up * y);
+            Vector3 direçãoFinal = (direçãoBase + vetorEspalhamento).normalized;
 
-            // Aplica o vetor de espalhamento sobre a direção original
-            Vector3 direçãoComEspalhar = direçãoSemEspalhar + vetorEspalhamento;
-
-            // ... (O resto do seu código de pegar a bala do Pool continua igualzinho aqui embaixo)
             GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
             balaAtual.transform.position = pontoAtaque.position;
-            balaAtual.transform.forward = direçãoComEspalhar.normalized;
+            balaAtual.transform.forward = direçãoFinal;
             balaAtual.SetActive(true);
 
             if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
-            {
                 scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
-            }
 
-            Rigidbody rb = balaAtual.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (balaAtual.TryGetComponent<Rigidbody>(out Rigidbody rb))
             {
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
 
-                rb.AddForce(direçãoComEspalhar.normalized * forçaTiro, ForceMode.Impulse);
-                rb.AddForce(fpsCam.transform.up * forçaCima, ForceMode.Impulse);
+                rb.AddForce(direçãoFinal * forçaTiro, ForceMode.Impulse);
+
+                if (forçaCima > 0f)
+                    rb.AddForce(Vector3.up * forçaCima, ForceMode.Impulse);
             }
 
             balasSobrando--;
         }
 
-        Invoke("ResetShot", tempoEntreAtirar);
+        if (muzzleFlash != null)
+            Instantiate(muzzleFlash, pontoAtaque.position, Quaternion.identity, pontoAtaque);
+
+        Invoke(nameof(ResetShot), tempoEntreAtirar);
     }
 
-    private void ResetShot()
-    {
-        preparadoParaAtirar = true;
-    }   
+    private void ResetShot() => preparadoParaAtirar = true;
 
     private void Reload()
     {
         recarregando = true;
-        Invoke("TerminarRecarga", tempoRecarga);
+        Invoke(nameof(TerminarRecarga), tempoRecarga);
     }
 
     private void TerminarRecarga()
@@ -180,15 +161,13 @@ public class tiropistola : MonoBehaviour
         balasSobrando = tamanhoCarregador;
         recarregando = false;
     }
-    //OPCIONAL VER O RAYCAST
+
     private System.Collections.IEnumerator DesenharRaio(Vector3 inicio, Vector3 fim)
     {
         lineRenderer.SetPosition(0, inicio);
         lineRenderer.SetPosition(1, fim);
         lineRenderer.enabled = true;
-
         yield return new WaitForSeconds(duracaoLinha);
-
         lineRenderer.enabled = false;
     }
 }

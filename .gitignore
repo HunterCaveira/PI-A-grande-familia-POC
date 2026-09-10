@@ -78,4 +78,5 @@ ProjectSettings/ProjectSettings.asset
 Assets/Settings/DefaultVolumeProfile.asset
 ProjectSettings/ProjectSettings.asset
 ProjectSettings/QualitySettings.asset
-
+/Assets/Resources/PerformanceTestRunInfo.Json.meta
+/Assets/Resources/PerformanceTestRunSettings.Json.meta
