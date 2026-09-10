@@ -143,7 +143,9 @@ GameObject:
   - component: {fileID: 5131067276467938538}
   - component: {fileID: 8385738937422537084}
   - component: {fileID: 2588890255097247149}
-  m_Layer: 3
+  - component: {fileID: 8794448110551824356}
+  - component: {fileID: 1280254733132079239}
+  m_Layer: 0
   m_Name: Pai
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -168,6 +170,7 @@ Transform:
   - {fileID: 4969916919175986513}
   - {fileID: 62839059399748392}
   - {fileID: 8680360483879545405}
+  - {fileID: 7566779434684666353}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &9051275931637434775
@@ -190,9 +193,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.75
-  m_Height: 4.99
+  m_Height: 5.51
   m_Direction: 1
-  m_Center: {x: -1.25, y: -0.02, z: 0}
+  m_Center: {x: -1.25, y: 0.26, z: 0}
 --- !u!143 &8944851139297610719
 CharacterController:
   m_ObjectHideFlags: 0
@@ -217,7 +220,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: -1.23, y: -0.02, z: 0}
+  m_Center: {x: -1.23, y: 0.03, z: 0}
 --- !u!114 &4552206922848260112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,6 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tagJogador: Player
   velocidadeRotacao: 2
 --- !u!114 &6915849281859597048
 MonoBehaviour:
@@ -290,7 +294,6 @@ MonoBehaviour:
   pontosSpawnTime1:
   - {fileID: 0}
   pontosSpawnTime2:
-  - {fileID: 0}
   - {fileID: 0}
   tempoParaRespawn: 3
 --- !u!114 &5131067276467938538
@@ -361,6 +364,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeEquipamentos
   pontoMaos: {fileID: 6279650003651818010}
   tempoAnimacaoTroca: 0.5
+--- !u!114 &8794448110551824356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375185681077528402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43b27cb39a4227244ae24a72fba942f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
+  virtualCamera: {fileID: 0}
+  cameraFollowTarget: {fileID: 0}
+  raycastOrigin: {fileID: 0}
+  raioNormal: 5
+  offsetNormal: {x: 0, y: 0, z: 0}
+  raioParede: 2.5
+  offsetParede: {x: 1.5, y: 1, z: 0}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  rayThickness: 0.5
+  velocidadeSuavizacao: 8
+--- !u!114 &1280254733132079239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375185681077528402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
+  cameraTarget: {fileID: 7566779434684666353}
 --- !u!1 &3853642255824957655
 GameObject:
   m_ObjectHideFlags: 0
@@ -637,6 +677,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5503696140454005005
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7566779434684666353}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7566779434684666353
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5503696140454005005}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.4, y: 1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8512057462958208884}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6340912272633379849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1236,7 +1307,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -40.7
+      value: -41.4
       objectReference: {fileID: 0}
     - target: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_LocalPosition.z
