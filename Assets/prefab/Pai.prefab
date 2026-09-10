@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTarget: {fileID: 0}
+  cameraTarget: {fileID: 7566779434684666353}
   velocidadeRotacao: 2
   girarApenasEmMovimento: 0
 --- !u!114 &6915849281859597048
@@ -324,7 +324,7 @@ MonoBehaviour:
   prefabParedeReal: {fileID: 8832845509866653796}
   tempoDeVida: 10
   limiteParedes: 2
-  tempoCooldown: 1
+  tempoCooldown: 5
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
 --- !u!114 &2588890255097247149
 MonoBehaviour:
@@ -354,7 +354,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
   virtualCamera: {fileID: 0}
   cameraFollowTarget: {fileID: 7566779434684666353}
-  velocidadeSuavizacao: 8
 --- !u!114 &1280254733132079239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -986,7 +985,7 @@ Transform:
   m_GameObject: {fileID: 7228568723087913597}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.029, y: -2.607, z: -2.279}
+  m_LocalPosition: {x: 0.079, y: -3.06, z: -2.267}
   m_LocalScale: {x: 0.22126, y: 0.80808604, z: 0.23117998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1074,16 +1073,14 @@ MonoBehaviour:
   danoPorTiro: 20
   tipoDeDano: 0
   nomeDaArma: Pistola
-  bala: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
   "for\xE7aTiro": 50
   "for\xE7aCima": 0
   tempoEntreAtirar: 0.2
-  Espalhar: 10
   tempoRecarga: 1
   tamanhoCarregador: 200
   tiroPorClick: 10
-  "permetirSegurarBot\xE3o": 0
-  fpsCam: {fileID: 2194324494853763891}
+  "permitirSegurarBot\xE3o": 0
+  playerCamera: {fileID: 0}
   pontoAtaque: {fileID: 3095084623006946415}
   muzzleFlash: {fileID: 0}
   ammunitionDisplay: {fileID: 0}

@@ -2351,10 +2351,6 @@ PrefabInstance:
       value: Pai
       objectReference: {fileID: 0}
     - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: tempoCooldown
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: cameraPrincipal
       value: 
       objectReference: {fileID: 1047941038}

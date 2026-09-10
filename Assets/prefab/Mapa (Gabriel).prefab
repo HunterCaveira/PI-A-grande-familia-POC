@@ -8826,32 +8826,8 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
       insertIndex: 0
       addedObject: {fileID: 5565454167917069145}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 583172977008185912}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
---- !u!1 &1438765052641031740 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
-  m_PrefabInstance: {fileID: 2249245513451244397}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &583172977008185912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438765052641031740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tiropistola: {fileID: 0}
-  pontosDeSpawn:
-  - {fileID: 5565454167917069145}
-  tempoParaRenascer: 3
 --- !u!4 &1782393689077345414 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
@@ -9766,9 +9742,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3672770243148800121}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8324562627904345258}
   m_SourcePrefab: {fileID: 100100000, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
 --- !u!1 &7216828747197147179 stripped
 GameObject:
@@ -9796,23 +9769,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8324562627904345258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7216828747197147179}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tiropistola: {fileID: 0}
-  pontosDeSpawn:
-  - {fileID: 6409368345480460157}
-  - {fileID: 5565454167917069145}
-  tempoParaRenascer: 3
 --- !u!4 &8028936472561398417 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8675ab48ee1081e4ab74213aa937b0a7, type: 3}
