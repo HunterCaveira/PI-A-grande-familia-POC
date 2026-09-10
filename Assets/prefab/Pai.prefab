@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 5131067276467938538}
   - component: {fileID: 8385738937422537084}
   - component: {fileID: 2588890255097247149}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pai
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -292,8 +292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pontosSpawnTime1:
   - {fileID: 0}
-  pontosSpawnTime2:
-  - {fileID: 0}
+  pontosSpawnTime2: []
   tempoParaRespawn: 3
 --- !u!114 &5131067276467938538
 MonoBehaviour:
@@ -452,7 +451,7 @@ Transform:
   m_GameObject: {fileID: 4527486301257762825}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.25, y: -2.16, z: 0}
+  m_LocalPosition: {x: -1.25, y: -2.56, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1032,8 +1031,8 @@ MonoBehaviour:
   mascaraDeTiro:
     serializedVersion: 2
     m_Bits: 243
-  lineRenderer: {fileID: 297417764386813987}
-  duracaoLinha: 2
+  lineRenderer: {fileID: 0}
+  duracaoLinha: 0
   meuPoolDeBalas: {fileID: 0}
   danoPorTiro: 20
   tipoDeDano: 0

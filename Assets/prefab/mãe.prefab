@@ -8,6 +8,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 865057059230412375, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1287992204780677036, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897644635877593722, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3502860293790647170, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Height
       value: 3
@@ -19,6 +31,10 @@ PrefabInstance:
     - target: {fileID: 3502860293790647170, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_IsTrigger
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3826013037237145883, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3880426563033330700, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: atributos
@@ -32,17 +48,25 @@ PrefabInstance:
       propertyPath: velocidade
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5266455397087339572, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5306276564673576161, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -314.35
+      value: 105.37
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 105.39
+      value: -3.6
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 303.54
+      value: 39.2
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -77,8 +101,16 @@ PrefabInstance:
       value: "m\xE3e"
       objectReference: {fileID: 0}
     - target: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_TagString
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5869319992676107208, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7610844431637341551, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: danoPorTiro
@@ -96,13 +128,25 @@ PrefabInstance:
       propertyPath: "permetirSegurarBot\xE3o"
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3086037858400988094, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 3880426563033330700, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 865057059230412375, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1656439133528369595}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1944177568972663813}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7918369061038907768}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7586961957817815388}
   m_SourcePrefab: {fileID: 100100000, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
 --- !u!1 &6704441493054143345 stripped
 GameObject:
@@ -124,3 +168,66 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
   timeID: 2
   vidaAtual: 100
+--- !u!114 &1944177568972663813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a55333bfa6c9bad4b8a73f7099eee8c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReceptorDeImpacto
+  atrito: 3
+--- !u!195 &7918369061038907768
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &7586961957817815388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b96ce260256186e4db0834815652129b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DELETAR
+  alvo: {fileID: 0}
+  alcanceVisao: 20
+  tempoEntreTiros: 2
+  mascaraVisao:
+    serializedVersion: 2
+    m_Bits: 8
+  pontoDeTiro: {fileID: 8974312536955459874}
+  poolDeBalas: {fileID: 0}
+  forcaTiro: 50
+  danoInimigo: 10
+  tipoDeDano: 0
+--- !u!4 &8974312536955459874 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7968113783159736898, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+  m_PrefabInstance: {fileID: 1305838216753042272}
+  m_PrefabAsset: {fileID: 0}
