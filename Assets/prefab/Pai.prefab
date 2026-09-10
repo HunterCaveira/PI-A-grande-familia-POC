@@ -141,7 +141,6 @@ GameObject:
   - component: {fileID: 8305240971407860968}
   - component: {fileID: 2125328242363607523}
   - component: {fileID: 5131067276467938538}
-  - component: {fileID: 8385738937422537084}
   - component: {fileID: 2588890255097247149}
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
@@ -250,8 +249,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tagJogador: Player
+  cameraTarget: {fileID: 0}
   velocidadeRotacao: 2
+  girarApenasEmMovimento: 0
 --- !u!114 &6915849281859597048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,30 +326,6 @@ MonoBehaviour:
   limiteParedes: 2
   tempoCooldown: 1
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
---- !u!114 &8385738937422537084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43b27cb39a4227244ae24a72fba942f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
-  virtualCamera: {fileID: 0}
-  cameraFollowTarget: {fileID: 8680360483879545405}
-  raycastOrigin: {fileID: 0}
-  raioNormal: 5
-  offsetNormal: {x: 0, y: 0, z: 0}
-  raioParede: 0.7
-  offsetParede: {x: 0, y: 1.5, z: 0}
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  rayThickness: 0.5
-  velocidadeSuavizacao: 8
 --- !u!114 &2588890255097247149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,16 +353,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
   virtualCamera: {fileID: 0}
-  cameraFollowTarget: {fileID: 0}
-  raycastOrigin: {fileID: 0}
-  raioNormal: 5
-  offsetNormal: {x: 0, y: 0, z: 0}
-  raioParede: 2.5
-  offsetParede: {x: 1.5, y: 1, z: 0}
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  rayThickness: 0.5
+  cameraFollowTarget: {fileID: 7566779434684666353}
   velocidadeSuavizacao: 8
 --- !u!114 &1280254733132079239
 MonoBehaviour:

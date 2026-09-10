@@ -1955,6 +1955,18 @@ PrefabInstance:
       propertyPath: Target.TrackingTarget
       value: 
       objectReference: {fileID: 114147583}
+    - target: {fileID: 8950245877337786655, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+      propertyPath: AvoidObstacles.Damping
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950245877337786655, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+      propertyPath: MinimumDistanceFromTarget
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950245877337786655, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+      propertyPath: AvoidObstacles.CameraRadius
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2334,22 +2346,18 @@ PrefabInstance:
       propertyPath: 'pontosSpawnTime2.Array.data[0]'
       value: 
       objectReference: {fileID: 546275218}
-    - target: {fileID: 2125328242363607523, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: 'pontosSpawnTime2.Array.data[1]'
-      value: 
-      objectReference: {fileID: 546275218}
     - target: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_Name
       value: Pai
       objectReference: {fileID: 0}
     - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: tempoCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: cameraPrincipal
       value: 
       objectReference: {fileID: 1047941038}
-    - target: {fileID: 8385738937422537084, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: virtualCamera
-      value: 
-      objectReference: {fileID: 1555099624}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -176.1369
@@ -2390,6 +2398,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8794448110551824356, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 1555099624}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
