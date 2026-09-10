@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public interface IHabilidade
+public interface ISkill
 {
     void AtivarHabilidade();
     void CancelarHabilidade();
