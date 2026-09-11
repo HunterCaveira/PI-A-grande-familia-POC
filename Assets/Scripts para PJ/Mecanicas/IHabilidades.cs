@@ -1,11 +1,13 @@
-
 using UnityEngine;
 
-public interface ISkill
+public interface IHabilidade
 {
+    // Método para iniciar o uso/mira da habilidade
     void AtivarHabilidade();
+
+    // Método para cancelar o uso/mira e limpar efeitos
     void CancelarHabilidade();
 
-    // Pergunta que responde 'true' se estiver pronta ou 'false' se estiver em recarga
+    // Pergunta se a habilidade está fora do tempo de recarga (cooldown)
     bool EstaPronta();
 }

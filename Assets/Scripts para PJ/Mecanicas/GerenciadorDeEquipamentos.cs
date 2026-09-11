@@ -14,54 +14,60 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
     private int indiceEquipamentoAtual = 0;
     private int proximoIndicePendente = -1;
 
-    // Componentes genéricos de habilidades (buscados automaticamente no personagem)
-    private ISkill[] habilidadesDoPersonagem;
+    // Guardará os scripts de habilidade do personagem que usam IHabilidade
+    private IHabilidade[] habilidadesDoPersonagem;
 
     void Awake()
     {
-        // Coleta automaticamente todos os scripts do personagem que usam a interface IHabilidade
-        habilidadesDoPersonagem = GetComponents<ISkill>();
+        // Busca automaticamente todos os scripts de habilidade no mesmo personagem
+        habilidadesDoPersonagem = GetComponents<IHabilidade>();
     }
 
     void Update()
     {
-        // 1. Captura de teclas (Buffer de Agendamento)
+        // 1. Leitura das teclas e agendamento na fila (Buffer)
         if (Keyboard.current != null)
         {
             if (Keyboard.current.qKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 1; // Slot 1: Q (Ex: Parede)
+                proximoIndicePendente = 1; // Tecla Q -> Habilidade Slot 1
             }
             else if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 2; // Slot 2: E (Ex: Tônico)
+                proximoIndicePendente = 2; // Tecla E -> Habilidade Slot 2
             }
             else if (Keyboard.current.fKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 3; // Slot 3: F (Ex: Cinto)
+                proximoIndicePendente = 3; // Tecla F -> Habilidade Slot 3
             }
         }
 
-        // 2. Execução da troca quando a trava de tempo liberar
+        // 2. Executa a troca se o relógio liberou e há algo pendente no buffer
         if (Time.time >= tempoLiberadoParaTrocar && proximoIndicePendente != -1)
         {
             TrocarEquipamento(proximoIndicePendente);
-            proximoIndicePendente = -1;
+            proximoIndicePendente = -1; // Limpa o agendamento
         }
     }
 
     public void TrocarEquipamento(int novoIndice)
     {
-        // A. Cancela a projeção/mira de TODAS as habilidades ativas de forma genérica
+        // TRAVA DE COOLDOWN: Se não for a arma principal (índice 0) e a habilidade NÃO estiver pronta, cancela a troca
+        if (novoIndice != 0 && !PodeTrocarParaHabilidade(novoIndice))
+        {
+            return;
+        }
+
+        // Cancela projeções de outras habilidades antes de alternar
         CancelarTodasAsHabilidades();
 
-        // B. Trata o retorno para a arma principal se pressionar a mesma tecla
+        // Se pressionar a mesma tecla da habilidade ativa, alterna de volta para a Arma Principal (0)
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
         }
 
-        // C. Atualiza os visuais das mãos no 'pontoMaos' (se configurado no Inspector)
+        // Atualiza as malhas 3D filhas em 'pontoMaos' (Slot 0, 1, 2, 3...)
         if (pontoMaos != null)
         {
             for (int i = 0; i < pontoMaos.childCount; i++)
@@ -70,12 +76,26 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
             }
         }
 
-        // D. Ativa a habilidade lógica correspondente (se existir no personagem)
+        // Dispara o código de ativação da habilidade escolhida
         AtivarHabilidadePorSlot(novoIndice);
 
-        // E. Atualiza estados e grava o delay da animação
+        // Atualiza a variável do item ativo e grava a trava de tempo da animação
         indiceEquipamentoAtual = novoIndice;
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
+    }
+
+    private bool PodeTrocarParaHabilidade(int slotIndex)
+    {
+        if (habilidadesDoPersonagem == null) return false;
+
+        // Associa o Slot 1 (Q) à primeira habilidade no vetor e checa se ela está pronta
+        int arrayIndex = slotIndex - 1;
+        if (arrayIndex >= 0 && arrayIndex < habilidadesDoPersonagem.Length)
+        {
+            return habilidadesDoPersonagem[arrayIndex].EstaPronta();
+        }
+
+        return true;
     }
 
     private void CancelarTodasAsHabilidades()
@@ -92,11 +112,10 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
     {
         if (habilidadesDoPersonagem == null) return;
 
-        // Se o slot for 1 (Tecla Q) e houver pelo menos 1 habilidade no personagem
-        if (slotIndex == 1 && habilidadesDoPersonagem.Length > 0)
+        int arrayIndex = slotIndex - 1;
+        if (arrayIndex >= 0 && arrayIndex < habilidadesDoPersonagem.Length)
         {
-            habilidadesDoPersonagem[0].AtivarHabilidade();
+            habilidadesDoPersonagem[arrayIndex].AtivarHabilidade();
         }
-        // Se criar mais habilidades no futuro (Slot 2 = E, Slot 3 = F), elas entram aqui expandindo a lista
     }
 }
