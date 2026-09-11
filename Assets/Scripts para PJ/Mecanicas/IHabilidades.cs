@@ -1,11 +1,11 @@
 
 using UnityEngine;
 
-public interface IHabilidade
+public interface ISkill
 {
-    // Método chamado pelo gerenciador para ativar o modo/função da habilidade
     void AtivarHabilidade();
-
-    // Método chamado pelo gerenciador para cancelar a habilidade (ex: fechar fantasma)
     void CancelarHabilidade();
+
+    // Pergunta que responde 'true' se estiver pronta ou 'false' se estiver em recarga
+    bool EstaPronta();
 }

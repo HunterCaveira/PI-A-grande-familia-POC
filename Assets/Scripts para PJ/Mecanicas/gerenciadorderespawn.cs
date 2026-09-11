@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GerenciadorRespawn : MonoBehaviour
 {
-    [SerializeField] protected tiropistola  Tiropistola; 
+    [SerializeField] protected tiroPistola Tiropistola;
     [Header("Configurações de Respawn")]
     [SerializeField] private Transform[] pontosDeSpawn;
     [SerializeField] private float tempoParaRenascer = 3f;

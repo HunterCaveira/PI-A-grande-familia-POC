@@ -15,12 +15,12 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
     private int proximoIndicePendente = -1;
 
     // Componentes genéricos de habilidades (buscados automaticamente no personagem)
-    private IHabilidade[] habilidadesDoPersonagem;
+    private ISkill[] habilidadesDoPersonagem;
 
     void Awake()
     {
         // Coleta automaticamente todos os scripts do personagem que usam a interface IHabilidade
-        habilidadesDoPersonagem = GetComponents<IHabilidade>();
+        habilidadesDoPersonagem = GetComponents<ISkill>();
     }
 
     void Update()

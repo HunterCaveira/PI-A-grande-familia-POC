@@ -62,6 +62,10 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
             prefabParedeFantasma.SetActive(modoPosicionamentoAtivo);
         }
     }
+    public bool EstaPronta()
+    {
+        return Time.time >= tempoProximoUso;
+    }
 
     public void CancelarHabilidade()
     {
