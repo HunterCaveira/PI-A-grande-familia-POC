@@ -64,7 +64,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.09756027, y: 0.08182098, z: 1.0123}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4932673275829706526}
   m_Father: {fileID: 1521677869954969493}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &659752540699616968
@@ -135,6 +136,7 @@ GameObject:
   - component: {fileID: 8512057462958208884}
   - component: {fileID: 9051275931637434775}
   - component: {fileID: 8944851139297610719}
+  - component: {fileID: 5076658877515485142}
   - component: {fileID: 4552206922848260112}
   - component: {fileID: 849392077082758349}
   - component: {fileID: 6915849281859597048}
@@ -144,6 +146,7 @@ GameObject:
   - component: {fileID: 2588890255097247149}
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
+  - component: {fileID: 885443826420353248}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -220,6 +223,22 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: -1.23, y: 0.03, z: 0}
+--- !u!114 &5076658877515485142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375185681077528402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
+  Tiropistola: {fileID: 0}
+  pontosDeSpawn:
+  - {fileID: 0}
+  tempoParaRenascer: 3
 --- !u!114 &4552206922848260112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -366,6 +385,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
   cameraTarget: {fileID: 7566779434684666353}
+--- !u!114 &885443826420353248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375185681077528402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
+  cameraPrincipal: {fileID: 0}
+  distanciaMaxima: 15
+  tempoCooldown: 3
+  velocidadeLancamento: 30
+  velocidadePuxao: 10
+  gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
+  fivelaPontos: {fileID: 4932673275829706526}
+  prefabCinto: {fileID: 4972495283499194072}
+  fitaCintoVisual: {fileID: 0}
+  pontoOrigemMao: {fileID: 6279650003651818010}
+  idDoTime: 1
+  pontoDestinoPuxao: {fileID: 7549606984430182023}
 --- !u!1 &3853642255824957655
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,12 +586,12 @@ Transform:
   m_GameObject: {fileID: 4972495283499194072}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: -2.609, z: -2.112}
+  m_LocalPosition: {x: 0.01, y: -3.1, z: -2.112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1575610945547298151}
-  - {fileID: 4932673275829706526}
+  - {fileID: 7549606984430182023}
   m_Father: {fileID: 6279650003651818010}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5085287285687102860
@@ -642,6 +685,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5410837647314233358
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7549606984430182023}
+  m_Layer: 3
+  m_Name: Ponto de Puxao
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7549606984430182023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5410837647314233358}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2.5300012}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1521677869954969493}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5503696140454005005
 GameObject:
   m_ObjectHideFlags: 0
@@ -854,14 +928,14 @@ GameObject:
   - component: {fileID: 4932673275829706526}
   - component: {fileID: 2465172113406991962}
   - component: {fileID: 450429908875775204}
-  - component: {fileID: 577316728503428501}
+  - component: {fileID: 5424198351901199488}
   m_Layer: 3
   m_Name: Fivela
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4932673275829706526
 Transform:
   m_ObjectHideFlags: 0
@@ -871,11 +945,11 @@ Transform:
   m_GameObject: {fileID: 6944412300273848660}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.473}
-  m_LocalScale: {x: 0.20839661, y: 0.17181744, z: 0.19525266}
+  m_LocalPosition: {x: 0, y: 0, z: 0.4672547}
+  m_LocalScale: {x: 2.1360807, y: 2.099919, z: 0.19288023}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1521677869954969493}
+  m_Father: {fileID: 1575610945547298151}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2465172113406991962
 MeshFilter:
@@ -934,8 +1008,8 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &577316728503428501
-MeshCollider:
+--- !u!65 &5424198351901199488
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -949,13 +1023,12 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.99999994, z: 1}
+  m_Center: {x: 0, y: 0, z: -0.000015258789}
 --- !u!1 &7228568723087913597
 GameObject:
   m_ObjectHideFlags: 0
