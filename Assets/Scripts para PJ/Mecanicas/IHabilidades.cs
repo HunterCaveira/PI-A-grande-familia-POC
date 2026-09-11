@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public interface IHabilidade
+public interface ISkill
 {
     // Método para iniciar o uso/mira da habilidade
     void AtivarHabilidade();
