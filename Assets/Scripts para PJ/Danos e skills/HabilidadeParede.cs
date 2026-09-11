@@ -28,32 +28,44 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
     [SerializeField] private int limiteParedes = 2;
     [SerializeField] private float tempoCooldown = 5f;
 
-    [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
-
+    private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
     private float tempoProximoUso = 0f;
     private List<GameObject> paredesAtivas = new List<GameObject>();
 
+    private void Awake()
+    {
+        // Encontra o gerenciador de equipamentos automaticamente no mesmo GameObject
+        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+    }
+
     void Update()
     {
-        // O Update agora SÓ cuida de rastrear a posição no chão se o posicionamento estiver ativo
+        // Move e ajusta a parede fantasma enquanto o modo de posicionamento estiver ativo
         if (modoPosicionamentoAtivo)
         {
             PosicionarECriarParede();
         }
     }
-    private void Awake()
+
+    // --- MÉTODOS DA INTERFACE IHABILIDADE ---
+
+    public bool EstaPronta()
     {
-        // Busca o gerenciador no mesmo GameObject do jogador
-        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+        // Retorna 'true' se o tempo atual do jogo for maior ou igual ao tempo liberado pós-cooldown
+        return Time.time >= tempoProximoUso;
     }
-
-
-    // --- MÉTODOS DA INTERFACE (Contratados pelo Gerenciador) ---
 
     public void AtivarHabilidade()
     {
-        // Checa cooldown antes de ativar
-        if (Time.time < tempoProximoUso) return;
+        // Se estiver em cooldown, aborta e força o gerenciador a manter a Arma (0)
+        if (!EstaPronta())
+        {
+            if (gerenciadorDeEquipamentos != null)
+            {
+                gerenciadorDeEquipamentos.TrocarEquipamento(0);
+            }
+            return;
+        }
 
         modoPosicionamentoAtivo = !modoPosicionamentoAtivo;
 
@@ -61,10 +73,6 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
         {
             prefabParedeFantasma.SetActive(modoPosicionamentoAtivo);
         }
-    }
-    public bool EstaPronta()
-    {
-        return Time.time >= tempoProximoUso;
     }
 
     public void CancelarHabilidade()
@@ -77,7 +85,7 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
         }
     }
 
-    // --- LÓGICA INTERNA DE POSICIONAMENTO ---
+    // --- LÓGICA DE POSICIONAMENTO E CRIAÇÃO ---
 
     private void PosicionarECriarParede()
     {
@@ -88,7 +96,6 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
 
         if (Physics.Raycast(ray, out hit, distanciaMaxima, camadaChao))
         {
-            // Se o raio encontrou o chão e o objeto fantasma estava desativado, reativa ele
             if (!prefabParedeFantasma.activeSelf)
             {
                 prefabParedeFantasma.SetActive(true);
@@ -101,35 +108,30 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
 
             prefabParedeFantasma.transform.position = posicaoAjustadaNoChao;
 
-            // Confirmação com Botão Direito do Mouse
-            // CONFIRMAÇÃO: Instancia a parede real ao clicar com o botão direito do mouse
+            // Confirmação de criação ao clicar com o Botão Direito do Mouse
             if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             {
-                // A. Limpa da lista paredes destruídas
                 paredesAtivas.RemoveAll(parede => parede == null);
 
-                // B. Destrói a parede antiga se atingiu o limite
                 if (paredesAtivas.Count >= limiteParedes)
                 {
                     Destroy(paredesAtivas[0]);
                     paredesAtivas.RemoveAt(0);
                 }
 
-                // C. Instancia a parede sólida real
                 GameObject paredeCriada = Instantiate(prefabParedeReal, posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation);
                 paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
 
-                // D. Adiciona à lista e programa autodestruição
                 paredesAtivas.Add(paredeCriada);
                 Destroy(paredeCriada, tempoDeVida);
 
-                // E. Aplica o cooldown
+                // Aplica o Cooldown
                 tempoProximoUso = Time.time + tempoCooldown;
 
-                // F. Cancela a projeção fantasma
+                // Cancela o modo fantasma
                 CancelarHabilidade();
 
-                // G. RETORNO AUTOMÁTICO PARA A ARMA (ÍNDICE 0)
+                // RETORNO AUTOMÁTICO PARA A ARMA (Slot 0) após instanciar no chão
                 if (gerenciadorDeEquipamentos != null)
                 {
                     gerenciadorDeEquipamentos.TrocarEquipamento(0);
@@ -138,7 +140,7 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
         }
         else
         {
-            // Se o raio da mira for para o céu/fora do chão, oculta a fantasma para não flutuar
+            // Oculta a fantasma se olhar para fora do chão/céu
             if (prefabParedeFantasma.activeSelf)
             {
                 prefabParedeFantasma.SetActive(false);

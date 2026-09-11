@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6279650003651818010}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ponto _Maos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 1575610945547298151}
   - component: {fileID: 659752540699616968}
   - component: {fileID: 5486618302430420472}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Cinto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,7 @@ GameObject:
   - component: {fileID: 2588890255097247149}
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pai
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -324,8 +324,7 @@ MonoBehaviour:
   prefabParedeReal: {fileID: 8832845509866653796}
   tempoDeVida: 10
   limiteParedes: 2
-  tempoCooldown: 5
-  gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
+  tempoCooldown: 1
 --- !u!114 &2588890255097247149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,7 +375,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8680360483879545405}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -407,7 +406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 62839059399748392}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: "checar ch\xE3o"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -440,7 +439,7 @@ GameObject:
   - component: {fileID: 5978182053295648580}
   - component: {fileID: 4749012908464050401}
   - component: {fileID: 6200255665388046695}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Pai-Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -528,7 +527,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1521677869954969493}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Prefab_Cinto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -563,7 +562,7 @@ GameObject:
   - component: {fileID: 6554649493773162116}
   - component: {fileID: 6720833592516716642}
   - component: {fileID: 5779565532753508239}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: cabo
   m_TagString: Bala
   m_Icon: {fileID: 0}
@@ -652,7 +651,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7566779434684666353}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CameraTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -686,7 +685,7 @@ GameObject:
   - component: {fileID: 2194324494853763891}
   - component: {fileID: 307224403948246427}
   - component: {fileID: 4011944347066997773}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: camera pra atirar
   m_TagString: Bala
   m_Icon: {fileID: 0}
@@ -820,7 +819,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3381194159790458241}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Habilidade Parede
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -856,7 +855,7 @@ GameObject:
   - component: {fileID: 2465172113406991962}
   - component: {fileID: 450429908875775204}
   - component: {fileID: 577316728503428501}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Fivela
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -969,7 +968,7 @@ GameObject:
   - component: {fileID: 4419811893408393778}
   - component: {fileID: 4235503665129315517}
   - component: {fileID: 227339376035805017}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: arma
   m_TagString: Bala
   m_Icon: {fileID: 0}
@@ -1095,7 +1094,7 @@ GameObject:
   - component: {fileID: 3095084623006946415}
   - component: {fileID: 4342631831175673790}
   - component: {fileID: 5969982196608547893}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: ponto A
   m_TagString: Bala
   m_Icon: {fileID: 0}
@@ -1190,6 +1189,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PrefabParedeFantasma
       objectReference: {fileID: 0}
+    - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7505011776156587176, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1259,7 +1262,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_StaticEditorFlags
