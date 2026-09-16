@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-public class HabilidadeParede : MonoBehaviour, IHabilidade
+public class HabilidadeParede : MonoBehaviour, IHabilidade , ISkills
 {
     [Header("Configurações da Câmera e Raio")]
     [SerializeField] private Camera cameraPrincipal;
@@ -28,6 +28,21 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
     [SerializeField] private int limiteParedes = 2;
     [SerializeField] private float tempoCooldown = 5f;
 
+    [Header("Configuração do Slot")]
+    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
+    public int SlotIndex => slotIndex;
+
+    [Header("Imagens da UI")]
+    [SerializeField] private Sprite fotoPronta;
+    [SerializeField] private Sprite fotoRecarregando;
+    public Sprite FotoPronta => fotoPronta;
+    public Sprite FotoRecarregando => fotoRecarregando;
+
+    [Header("Tempo de Recarga para UI")]
+    [SerializeField] private float tempoDeRecarga = 4f;
+    private float tempoProximouso = 0f;
+    public float TempoProximouso => tempoProximoUso;
+
     private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
     private float tempoProximoUso = 0f;
     private List<GameObject> paredesAtivas = new List<GameObject>();
@@ -48,7 +63,10 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
     }
 
     // --- MÉTODOS DA INTERFACE IHABILIDADE ---
-
+    public bool PodeUsar()
+    {
+        return Time.time >= tempoProximouso;
+    }
     public bool EstaPronta()
     {
         // Retorna 'true' se o tempo atual do jogo for maior ou igual ao tempo liberado pós-cooldown
@@ -72,6 +90,11 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade
         if (prefabParedeFantasma != null)
         {
             prefabParedeFantasma.SetActive(modoPosicionamentoAtivo);
+        }
+        if (PodeUsar())
+        {
+            tempoProximouso = Time.time + tempoDeRecarga;
+            Debug.Log("Parede ativada!");
         }
     }
 
