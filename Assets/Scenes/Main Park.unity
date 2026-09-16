@@ -1122,16 +1122,14 @@ MonoBehaviour:
   danoPorTiro: 20
   tipoDeDano: 0
   nomeDaArma: Pistola
-  bala: {fileID: 4705233091075458520, guid: 80b1367f4f861fd47b01a4b8cf8a7093, type: 3}
   "for\xE7aTiro": 50
   "for\xE7aCima": 0
   tempoEntreAtirar: 0.2
-  Espalhar: 0
   tempoRecarga: 5
   tamanhoCarregador: 20
   tiroPorClick: 1
-  "permetirSegurarBot\xE3o": 1
-  fpsCam: {fileID: 633611171}
+  "permitirSegurarBot\xE3o": 0
+  playerCamera: {fileID: 0}
   pontoAtaque: {fileID: 1952009484}
   muzzleFlash: {fileID: 0}
   ammunitionDisplay: {fileID: 0}
@@ -1654,8 +1652,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1047941036}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15160654, y: -0.08146188, z: 0.012538245, w: 0.9849986}
-  m_LocalPosition: {x: -174.69472, y: 41.27353, z: 598.88824}
+  m_LocalRotation: {x: 0.23709181, y: 0.10665116, z: -0.02619617, w: 0.96525997}
+  m_LocalPosition: {x: -176.70908, y: 40.396168, z: 594.12445}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2134,15 +2132,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -195
+      value: -176.03
       objectReference: {fileID: 0}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 43.7
+      value: 38.77
       objectReference: {fileID: 0}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 601.6
+      value: 597.16
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2539,50 +2537,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3122325972268333233, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 5326631561144097891, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_Name
-      value: FreeLook Camera
+      value: FreeLook Camera 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -174.69472
+      value: -176.70908
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 41.27353
+      value: 40.396168
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 598.88824
+      value: 594.12445
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9849986
+      value: 0.96525997
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.15160654
+      value: 0.2370918
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.08146188
+      value: 0.10665114
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.012538244
+      value: -0.026196161
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6103512227427449555, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+    - target: {fileID: 6168901124509975560, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7091013494263123166, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+      propertyPath: Target.TrackingTarget
+      value: 
+      objectReference: {fileID: 988156100}
     - target: {fileID: 8655255676252080300, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
       propertyPath: Target.TrackingTarget
       value: 
@@ -2591,7 +2593,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 65df6b4f87ea5a44b999573340a64eb2, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
 --- !u!1 &1949026793
 GameObject:
   m_ObjectHideFlags: 0
@@ -2768,7 +2770,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraTarget: {fileID: 0}
   velocidadeRotacao: 2
+  girarApenasEmMovimento: 0
 --- !u!114 &1949026801
 MonoBehaviour:
   m_ObjectHideFlags: 0

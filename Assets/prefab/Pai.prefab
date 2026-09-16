@@ -236,7 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
-  Tiropistola: {fileID: 0}
+  Tiropistola: {fileID: 227339376035805017}
   pontosDeSpawn:
   - {fileID: 0}
   tempoParaRenascer: 3
@@ -345,6 +345,10 @@ MonoBehaviour:
   tempoDeVida: 10
   limiteParedes: 2
   tempoCooldown: 1
+  slotIndex: 1
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+  tempoDeRecarga: 1
 --- !u!114 &2588890255097247149
 MonoBehaviour:
   m_ObjectHideFlags: 0
