@@ -13,6 +13,9 @@ public class Sistemadevida : MonoBehaviour
 
     public int TimeID => timeID;
 
+    // [ACRÉSCIMO DA ETAPA 2]: Propriedade para aplicar a porcentagem de redução de dano do Tônico (Ex: 0.3f = 30% de desconto)
+    public float PorcentagemReducaoDano { get; set; } = 0f;
+
     // EVENTO: Envia (vidaAtual, vidaMaxima) para quem estiver ouvindo
     public event Action<float, float> OnVidaMudou;
 
@@ -43,8 +46,11 @@ public class Sistemadevida : MonoBehaviour
             }
         }
 
-        // Aplica o dano
-        vidaAtual -= dano.quantidade;
+        // [ACRÉSCIMO DA ETAPA 2]: Calcula o dano final aplicando a porcentagem de redução de dano
+        float danoFinal = dano.quantidade * (1f - PorcentagemReducaoDano);
+
+        // Aplica o dano com a mitigação calculada
+        vidaAtual -= danoFinal;
         vidaAtual = Mathf.Max(vidaAtual, 0f);
 
         // AVISA A UI QUE A VIDA MUDOU!
@@ -61,6 +67,7 @@ public class Sistemadevida : MonoBehaviour
         if (dadosDoHeroi != null)
         {
             vidaAtual = dadosDoHeroi.vidaMaxima;
+            PorcentagemReducaoDano = 0f; // Reseta a redução de dano caso o player estivesse bufado ao morrer
             NotificarMudancaDeVida(); // Avisa a UI no respawn
         }
     }
@@ -90,9 +97,4 @@ public class Sistemadevida : MonoBehaviour
             Debug.LogWarning("Nenhum GerenciadorRespawn encontrado na cena!");
         }
     }
-
-
-
-
-
 }
