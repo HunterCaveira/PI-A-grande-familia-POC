@@ -785,6 +785,11 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &805857086 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  m_PrefabInstance: {fileID: 6613487415229568428}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &855071017
 Mesh:
   m_ObjectHideFlags: 0
@@ -2623,6 +2628,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
+      propertyPath: jogador
+      value: 
+      objectReference: {fileID: 805857086}
     - target: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -2943,6 +2952,10 @@ PrefabInstance:
       propertyPath: cameraPrincipal
       value: 
       objectReference: {fileID: 1047941038}
+    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: atributosHeroi
+      value: 
+      objectReference: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: 106.6
@@ -3132,7 +3145,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8305240971407860968, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
   m_PrefabInstance: {fileID: 6613487415229568428}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 805857086}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}

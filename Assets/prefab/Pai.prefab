@@ -136,8 +136,8 @@ GameObject:
   - component: {fileID: 8512057462958208884}
   - component: {fileID: 9051275931637434775}
   - component: {fileID: 8944851139297610719}
+  - component: {fileID: 5462147207407341697}
   - component: {fileID: 5076658877515485142}
-  - component: {fileID: 4552206922848260112}
   - component: {fileID: 849392077082758349}
   - component: {fileID: 6915849281859597048}
   - component: {fileID: 8305240971407860968}
@@ -224,6 +224,24 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: -1.23, y: 0.03, z: 0}
+--- !u!114 &5462147207407341697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375185681077528402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
+  velocidade: 5
+  gravidade: -9.81
+  forcaPulo: 2
+  velocidadeVertical: 2
+  velocidadeAtual: 2
+  atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
 --- !u!114 &5076658877515485142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,27 +254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
-  Tiropistola: {fileID: 227339376035805017}
+  Tiropistola: {fileID: 0}
   pontosDeSpawn:
   - {fileID: 0}
   tempoParaRenascer: 3
---- !u!114 &4552206922848260112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  velocidade: 5
-  gravidade: -9.81
-  forcaPulo: 2
-  velocidadeVertical: 3
-  atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
 --- !u!114 &849392077082758349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,12 +427,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
   multiplicadorVelocidadeExtra: 1.5
   porcentagemReducaoDano: 0.3
-  duracaoDoEfeito: 2
+  duracaoDoEfeito: 50
   tempoAnimacaoConsumo: 1
   tempoCooldown: 1
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
+  movimentoPlayer: {fileID: 5462147207407341697}
   sistemaDeVida: {fileID: 8305240971407860968}
-  atributosHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
   prefabTonicoMao: {fileID: 7067021843553549109}
 --- !u!1 &3853642255824957655
 GameObject:
@@ -1128,7 +1129,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1154,7 +1155,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &511360171275777798
 Transform:
   m_ObjectHideFlags: 0
