@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 4491264818663289441}
   - component: {fileID: 4936489793720012237}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Q skill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
