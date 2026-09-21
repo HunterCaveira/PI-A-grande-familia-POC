@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class GerenciadorUI : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class GerenciadorUI : MonoBehaviour
     [SerializeField] private Image imagemSlotQ; // Slot 1
     [SerializeField] private Image imagemSlotE; // Slot 2
     [SerializeField] private Image imagemSlotF; // Slot 3
+    [SerializeField] public TextMeshProUGUI meuTexto;
+    [SerializeField] private tiroPistola pistolaRef;
 
     // Estrutura interna para controlar o estado de cada slot
     private class SlotUIInfo
@@ -26,6 +29,7 @@ public class GerenciadorUI : MonoBehaviour
 
     void Start()
     {
+        pistolaRef = FindFirstObjectByType<tiroPistola>();
         if (jogador == null)
         {
             Debug.LogWarning("O Jogador não foi atribuído no Gerenciador de UI!");
@@ -71,4 +75,19 @@ public class GerenciadorUI : MonoBehaviour
             }
         }
     }
+    public void AcabouMunição()
+    {
+        if(pistolaRef.balaZerada == true) 
+        {
+            meuTexto.color = Color.blue;
+        }
+        else
+        {
+            // Se ainda tem bala, pinta de branco
+            meuTexto.color = Color.white;
+        }
+    }
+
+
+
 }
