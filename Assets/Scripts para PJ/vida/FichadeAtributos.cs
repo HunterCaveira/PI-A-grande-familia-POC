@@ -21,4 +21,6 @@ public class AtributosPersonagem : ScriptableObject // Declara a classe pública 
     public float velocidadeMovimento = 10f; // Armazena a velocidade base de caminhada do personagem em m/s.
 
     public float forcaPulo = 2f; // Armazena o valor da força/altura aplicada ao pulo do herói.
+
+    public float porcentagemSpeed; // Modificador percentual de velocidade opcional mantido na ficha.
 }

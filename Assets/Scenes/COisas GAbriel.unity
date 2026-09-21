@@ -2956,6 +2956,22 @@ PrefabInstance:
       propertyPath: atributosHeroi
       value: 
       objectReference: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
+    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: duracaoDoEfeito
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: atributosOriginal
+      value: 
+      objectReference: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
+    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: velocidadeComBuff
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: porcentagemAumentoVelocidade
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: 106.6

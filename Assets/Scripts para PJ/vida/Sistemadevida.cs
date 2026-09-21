@@ -17,7 +17,7 @@ public class Sistemadevida : MonoBehaviour // Declara a classe pública Sistemade
 
     public int TimeID => timeID; // Propriedade pública de apenas leitura para consultar o ID de time do herói.
 
-    // [CORREÇÃO DO ERRO CS1061]: Propriedade pública para armazenar a taxa de mitigação/redução de dano sofrido (0f = 0%, 0.3f = 30%)
+    // Propriedade pública para armazenar a taxa de mitigação/redução de dano sofrido (0f = 0%, 0.3f = 30%)
     public float PorcentagemReducaoDano { get; set; } = 0f;
 
     // EVENTO: Transmite (vidaAtual, vidaMaxima) para scripts da UI ouvirem e atualizarem as barras na tela
@@ -43,7 +43,25 @@ public class Sistemadevida : MonoBehaviour // Declara a classe pública Sistemade
 
 
     // ==========================================
-    // 3. PROCESSAMENTO DE DANO E MORTE
+    // 3. MÉTODOS PÚBLICOS DE GERENCIAMENTO DE FICHA
+    // ==========================================
+
+    /// <summary>
+    /// Permite trocar a referência da ficha de atributos ativa em tempo de execução (Usado pelo Tônico).
+    /// </summary>
+    public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
+    {
+        if (novaFicha != null)
+        {
+            dadosDoHeroi = novaFicha; // Atualiza a referência da ficha para a duplicada ou a original.
+            NotificarMudancaDeVida(); // Recalcula os valores e atualiza a UI.
+            Debug.Log($"[SISTEMA DE VIDA] Ficha de atributos atualizada! Vida máxima da ficha: {dadosDoHeroi.vidaMaxima}");
+        }
+    }
+
+
+    // ==========================================
+    // 4. PROCESSAMENTO DE DANO E MORTE
     // ==========================================
 
     public void ReceberDano(InformacaoDano dano) // Método público invocado quando o herói sofre um golpe contendo os dados do dano.

@@ -57,7 +57,24 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública Movim
 
 
     // ==========================================
-    // 3. LÓGICA DE MOVIMENTO E FÍSICA
+    // 3. MÉTODOS PÚBLICOS DE GERENCIAMENTO DE FICHA
+    // ==========================================
+
+    /// <summary>
+    /// Permite trocar a ficha de atributos ativa em tempo de execução (Usado pelo Tônico para trocar entre a ficha original e a duplicada).
+    /// </summary>
+    public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
+    {
+        if (novaFicha != null)
+        {
+            atributos = novaFicha; // Atribui a nova ficha (duplicada com buff ou restaurada original).
+            Debug.Log($"[MOVIMENTO PLAYER] Ficha de atributos atualizada! Nova velocidade base: {atributos.velocidadeMovimento} | % Speed: {atributos.porcentagemSpeed}%");
+        }
+    }
+
+
+    // ==========================================
+    // 4. LÓGICA DE MOVIMENTO E FÍSICA
     // ==========================================
 
     void AplicarGravidade() // Trata o cálculo da força da gravidade e estado tocando o chão.
@@ -84,8 +101,13 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública Movim
 
     void Correr() // Determina a velocidade de deslocamento horizontal.
     {
-        // Lê a velocidade de movimento diretamente da ficha de atributos (ou usa o fallback de 5m/s)
-        float velocidadeBase = (atributos != null) ? atributos.velocidadeMovimento : 5f;
+        float velocidadeBase = 5f; // Valor padrão de fallback.
+
+        if (atributos != null)
+        {
+            // Calcula a velocidade somando o valor base com a porcentagemSpeed configurada na ficha
+            velocidadeBase = atributos.velocidadeMovimento + (atributos.velocidadeMovimento * (atributos.porcentagemSpeed / 100f));
+        }
 
         bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed(); // Verifica se a tecla de corrida está pressionada.
 
