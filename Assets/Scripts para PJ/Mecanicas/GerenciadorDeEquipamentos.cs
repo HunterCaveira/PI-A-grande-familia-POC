@@ -19,7 +19,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviour // Declara a classe do Ge
     private int proximoIndicePendente = -1; // Armazena a intenção de troca agendada no buffer (-1 = Nenhuma troca pendente).
 
     // Array que guardará as referências dos scripts de habilidade do personagem que implementam a interface IHabilidade
-    private IHabilidade[] habilidadesDoPersonagem;
+    private ISkills[] habilidadesDoPersonagem;
 
 
     // ==========================================
@@ -29,7 +29,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviour // Declara a classe do Ge
     void Awake() // Executado ao carregar a cena/componente na memória.
     {
         // Busca automaticamente todos os scripts do mesmo GameObject que implementam a interface IHabilidade
-        habilidadesDoPersonagem = GetComponents<IHabilidade>();
+        habilidadesDoPersonagem = GetComponents<ISkills>();
     }
 
     void Update() // Executado uma vez a cada frame do jogo.
