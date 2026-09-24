@@ -1,163 +1,161 @@
-using UnityEngine; // Importa a biblioteca principal do motor da Unity.
+using System.Collections.Generic;
+using UnityEngine;
 
-public class HabilidadeCinto : MonoBehaviour, IHabilidade // Declara a classe pública HabilidadeCinto herdando de MonoBehaviour e implementando o contrato IHabilidade.
+public class HabilidadeCinto : MonoBehaviour, ISkills
 {
     // ==========================================
     // 1. CONFIGURAÇÕES DA CÂMERA E ALCANCE
     // ==========================================
 
-    [Header("Configurações da Câmera e Alcançe")] // Seção de mira e distância no Inspector.
-
-    [SerializeField] // Exibe o campo no Inspector mantendo a variável privada.
-    private Camera cameraPrincipal; // Armazena a referência da câmera usada para calcular a direção da mira.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private float distanciaMaxima = 15f; // Alcance máximo em metros que o cinto percorrerá.
+    [Header("Configurações da Câmera e Alcançe")]
+    [SerializeField] private Camera cameraPrincipal;
+    [SerializeField] private float distanciaMaxima = 15f;
 
 
     // ==========================================
     // 2. TEMPOS E VELOCIDADES
     // ==========================================
 
-    [Header("Controle de Tempo e Velocidades")] // Seção de tempos e velocidades no Inspector.
+    [Header("Controle de Tempo e Velocidades")]
+    [SerializeField] private float tempoCooldown = 3.0f;
 
-    [SerializeField] // Exibe o campo no Inspector.
-    private float tempoCooldown = 3.0f; // Tempo de recarga em segundos.
+    // Variáveis de tempo (mantendo compatibilidade com os dois nomes)
+    private float tempoProximouso = 0f;
+    public float TempoProximouso => tempoProximouso;
 
-    private float tempoProximoUso = 0f; // Tempo liberado no relógio da Unity (Time.time) para o próximo uso.
+    // Compatibilidade com o nome antigo caso outro script chame:
+    private float tempoProximoUso
+    {
+        get => tempoProximouso;
+        set => tempoProximouso = value;
+    }
 
-    [SerializeField] // Exibe o campo no Inspector.
-    private float velocidadeAvanco = 30f; // Velocidade com que o cinto avança em direção à mira.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private float velocidadeRetorno = 20f; // Velocidade com que o cinto e o inimigo retornam para a mão.
+    [SerializeField] private float velocidadeAvanco = 30f;
+    [SerializeField] private float velocidadeRetorno = 20f;
 
 
     // ==========================================
     // 3. REFERÊNCIAS DE COMPONENTES E VISUAIS
     // ==========================================
 
-    [Header("Controle De Referência e Visuais")] // Seção de conexões e visuais no Inspector.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private GerenciadorDeEquipamentos gerenciadorDeEquipamentos; // Referência do gerenciador de trocas das mãos.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private GameObject prefabCinto; // O objeto do cinto/fivela que se deslocará pelo espaço.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private Transform pontoFivelaPontos; // Ponto da fivela na ponta do cinto usado para detectar colisões.
-
-    [SerializeField] // Exibe o campo no Inspector.
-    private Transform pontoDestinoPuxao; // Ponto fixo na mão/peito para onde o inimigo e o cinto retornam.
+    [Header("Controle De Referência e Visuais")]
+    [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
+    [SerializeField] private GameObject prefabCinto;
+    [SerializeField] private Transform pontoFivelaPontos;
+    [SerializeField] private Transform pontoDestinoPuxao;
 
 
     // ==========================================
-    // 4. COMBATE E MÁQUINA DE ESTADOS
+    // 4. CONFIGURAÇÃO DE SLOT E UI (INTERFACE)
     // ==========================================
 
-    [Header("Filtragem de Time")] // Seção de regras PvP.
+    [Header("Configuração do Slot")]
+    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
+    public int SlotIndex => slotIndex;
 
-    [SerializeField] // Exibe o campo no Inspector.
-    private int idDoTime = 1; // ID do time do jogador atual.
-
-    public int IdDoTime => idDoTime; // Propriedade pública de leitura do idDoTime.
-
-    private enum EstadoCinto { Inativo, Avancando, PuxandoInimigo, RecolhendoVazio } // Os 4 estados lógicos do movimento.
-    private EstadoCinto estadoAtual = EstadoCinto.Inativo; // Guarda o estado atual da habilidade.
-
-    private Transform inimigoCapturado; // Guarda o Transform do inimigo preso no cinto.
-    private CharacterController controllerInimigo; // [NOVO]: Guarda o CharacterController do inimigo para desativar colisão durante o puxão.
-    private Rigidbody rbInimigo; // [NOVO]: Guarda o Rigidbody do inimigo para aplicar Kinematic durante o puxão.
-
-    private Vector3 posicaoInicialLocal; // Guarda a posição local neutra do cinto guardado na mão.
-    private Vector3 pontoFinalMundo; // Guarda o ponto final tridimensional para onde o cinto avança no disparo.
+    [Header("Imagens da UI")]
+    [SerializeField] private Sprite fotoPronta;
+    [SerializeField] private Sprite fotoRecarregando;
+    public Sprite FotoPronta => fotoPronta;
+    public Sprite FotoRecarregando => fotoRecarregando;
 
 
     // ==========================================
-    // 5. CICLO DE VIDA DA UNITY
+    // 5. COMBATE E MÁQUINA DE ESTADOS
     // ==========================================
 
-    private void Awake() // Inicialização do script na memória.
+    [Header("Filtragem de Time")]
+    [SerializeField] private int idDoTime = 1;
+    public int IdDoTime => idDoTime;
+
+    private enum EstadoCinto { Inativo, Avancando, PuxandoInimigo, RecolhendoVazio }
+    private EstadoCinto estadoAtual = EstadoCinto.Inativo;
+
+    private Transform inimigoCapturado;
+    private CharacterController controllerInimigo;
+    private Rigidbody rbInimigo;
+
+    private Vector3 posicaoInicialLocal;
+    private Vector3 pontoFinalMundo;
+
+
+    // ==========================================
+    // 6. CICLO DE VIDA DA UNITY
+    // ==========================================
+
+    private void Awake()
     {
-        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>(); // Auto-busca o Gerenciador no próprio GameObject.
+        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
 
-        if (prefabCinto != null) // SE a referência do objeto do cinto foi atribuída.
+        if (prefabCinto != null)
         {
-            posicaoInicialLocal = prefabCinto.transform.localPosition; // Guarda a posição local de descanso dentro da mão.
+            posicaoInicialLocal = prefabCinto.transform.localPosition;
         }
     }
 
-    private void Update() // Atualização frame a frame.
+    private void Update()
     {
-        if (estadoAtual == EstadoCinto.Inativo) return; // SE estiver Inativo, ignora a atualização.
+        if (estadoAtual == EstadoCinto.Inativo) return;
 
-        // MÁQUINA DE ESTADOS DO CINTO
-        switch (estadoAtual) // Avalia a variável estadoAtual.
+        switch (estadoAtual)
         {
-            case EstadoCinto.Avancando: // CASO esteja viajando para a frente em direção à mira.
-                ProcessarAvanco(); // Executa o deslocamento e verifica colisões com inimigos.
+            case EstadoCinto.Avancando:
+                ProcessarAvanco();
                 break;
 
-            case EstadoCinto.PuxandoInimigo: // CASO tenha capturado um inimigo.
-                ProcessarPuxao(); // Traz o cinto e o inimigo colado de volta para a mão.
+            case EstadoCinto.PuxandoInimigo:
+                ProcessarPuxao();
                 break;
 
-            case EstadoCinto.RecolhendoVazio: // CASO esteja voltando para a mão (continua detectando inimigos!).
-                ProcessarRecolhimento(); // Traz o cinto de volta e escaneia a área no caminho.
+            case EstadoCinto.RecolhendoVazio:
+                ProcessarRecolhimento();
                 break;
         }
     }
 
 
     // ==========================================
-    // 6. LÓGICA DE DETECÇÃO, AVANÇO E PUXÃO
+    // 7. LÓGICA DE DETECÇÃO, AVANÇO E PUXÃO
     // ==========================================
 
-    private void ProcessarAvanco() // Desloca o cinto no mundo até o ponto final calculado na mira.
+    private void ProcessarAvanco()
     {
-        if (prefabCinto == null) return; // Cancela se o objeto não existir.
+        if (prefabCinto == null) return;
 
-        // Mover o cinto em direção ao ponto final no espaço do mundo
         prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, pontoFinalMundo, velocidadeAvanco * Time.deltaTime);
 
-        // Tenta capturar um inimigo no trajeto de avanço
-        if (ChecarEPrenderInimigo()) return; // SE capturou alguém, interrompe o avanço (o estado muda dentro da função).
+        if (ChecarEPrenderInimigo()) return;
 
-        // SE o cinto atingiu o limite de 15m sem prender nenhum inimigo
         if (Vector3.Distance(prefabCinto.transform.position, pontoFinalMundo) <= 0.2f)
         {
-            estadoAtual = EstadoCinto.RecolhendoVazio; // Inicia o recolhimento de volta para a mão.
+            estadoAtual = EstadoCinto.RecolhendoVazio;
         }
     }
 
-    private void ProcessarRecolhimento() // Recolhe o cinto para a mão e CONTINUA checando inimigos no caminho de volta.
+    private void ProcessarRecolhimento()
     {
-        if (prefabCinto == null) return; // Cancela se o objeto não existir.
+        if (prefabCinto == null) return;
 
         Vector3 destinoMao = pontoDestinoPuxao != null ? pontoDestinoPuxao.position : transform.position;
 
-        // Mover o cinto de volta para a posição da mão no mundo
         prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeAvanco * Time.deltaTime);
 
-        // [NOVO / AJUSTADO]: Continua verificando se algum inimigo entra em contato com a fivela mesmo enquanto o cinto está voltando!
-        if (ChecarEPrenderInimigo()) return; // SE um inimigo encostar na fivela na volta, prende ele e muda para PuxandoInimigo!
+        if (ChecarEPrenderInimigo()) return;
 
-        // SE o cinto chegou de volta à mão sem pegar ninguém
         if (Vector3.Distance(prefabCinto.transform.position, destinoMao) <= 0.2f)
         {
-            FinalizarHabilidade(); // Conclui e troca para a arma principal.
+            FinalizarHabilidade();
         }
     }
 
-    private bool ChecarEPrenderInimigo() // [NOVO]: Função unificada para checar colisão da fivela tanto no avanço quanto no retorno.
+    private bool ChecarEPrenderInimigo()
     {
         Vector3 posicaoCheck = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
-        Collider[] hits = Physics.OverlapSphere(posicaoCheck, 0.6f); // Esfera invisível de impacto na fivela.
+        Collider[] hits = Physics.OverlapSphere(posicaoCheck, 0.6f);
 
         foreach (var col in hits)
         {
-            if (col.transform == transform || col.transform.IsChildOf(transform)) continue; // Ignora o próprio jogador.
+            if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
             Sistemadevida vidaAlvo = col.GetComponent<Sistemadevida>();
             HabilidadeCinto scriptAlvo = col.GetComponent<HabilidadeCinto>();
@@ -166,132 +164,48 @@ public class HabilidadeCinto : MonoBehaviour, IHabilidade // Declara a classe pú
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
             else if (scriptAlvo != null) timeAlvo = scriptAlvo.IdDoTime;
 
-            // SE for um inimigo válido no PvP
             if (timeAlvo != -1 && timeAlvo != this.idDoTime)
             {
-                inimigoCapturado = col.transform; // Captura o Transform do inimigo.
+                inimigoCapturado = col.transform;
 
-                // [SOLUÇÃO DO EMPURRÃO]: Desativa temporariamente a física do inimigo para não dar conflito durante o movimento
                 controllerInimigo = col.GetComponent<CharacterController>();
-                if (controllerInimigo != null) controllerInimigo.enabled = false; // Desativa o CharacterController para não "chutar" o inimigo.
+                if (controllerInimigo != null) controllerInimigo.enabled = false;
 
                 rbInimigo = col.GetComponent<Rigidbody>();
-                if (rbInimigo != null) rbInimigo.isKinematic = true; // Trava a física do Rigidbody.
+                if (rbInimigo != null) rbInimigo.isKinematic = true;
 
-                estadoAtual = EstadoCinto.PuxandoInimigo; // Muda o estado para puxar.
-                return true; // Retorna true confirmando a captura.
+                estadoAtual = EstadoCinto.PuxandoInimigo;
+                return true;
             }
         }
 
-        return false; // Nenhum inimigo capturado.
+        return false;
     }
 
-    private void ProcessarPuxao() // Trava o inimigo capturado e arrasta de volta para a mão do jogador.
+    private void ProcessarPuxao()
     {
-        if (prefabCinto == null) return; // Cancela se o objeto não existir.
+        if (prefabCinto == null) return;
 
         Vector3 destinoMao = pontoDestinoPuxao != null ? pontoDestinoPuxao.position : transform.position;
 
-        // Move a posição do cinto de volta para a mão
         prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeRetorno * Time.deltaTime);
 
-        // Trava o corpo do inimigo colado na fivela durante o movimento de retorno
         if (inimigoCapturado != null)
         {
             Vector3 posicaoFivela = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
-            inimigoCapturado.position = posicaoFivela; // Garante que o inimigo venha colado na fivela sem sofrer empurrão físico.
+            inimigoCapturado.position = posicaoFivela;
         }
 
-        // SE o cinto e o inimigo chegaram perto da mão do jogador (distância <= 0.8m)
         if (Vector3.Distance(prefabCinto.transform.position, destinoMao) <= 0.8f)
         {
-            FinalizarHabilidade(); // Conclui o puxão e libera a física do inimigo.
+            FinalizarHabilidade();
         }
     }
 
-    private void FinalizarHabilidade() // Restaura as físicas, reseta as posições locais e efetua a troca no Gerenciador.
-    {
-        estadoAtual = EstadoCinto.Inativo; // Reseta o estado interno.
-
-        // [RESTAURAÇÃO DA FÍSICA DO INIMIGO]: Devolve o controle do CharacterController e Rigidbody do inimigo ao chegar
-        if (controllerInimigo != null)
-        {
-            controllerInimigo.enabled = true; // Reativa a movimentação normal do inimigo.
-            controllerInimigo = null;
-        }
-
-        if (rbInimigo != null)
-        {
-            rbInimigo.isKinematic = false; // Reativa a física do Rigidbody.
-            rbInimigo = null;
-        }
-
-        inimigoCapturado = null; // Libera o vínculo do inimigo.
-
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.localPosition = posicaoInicialLocal; // Restaura a posição local neutra de descanso na mão.
-            prefabCinto.transform.localRotation = Quaternion.identity; // Restaura a rotação local padrão.
-        }
-
-        CancelarHabilidade(); // Oculta o visual no jogo.
-
-        if (gerenciadorDeEquipamentos != null)
-        {
-            gerenciadorDeEquipamentos.TrocarEquipamento(0); // Solicita a troca do visual da mão para a Arma Principal (Slot 0).
-        }
-    }
-
-
-    // ==========================================
-    // 7. MÉTODOS DA INTERFACE IHABILIDADE
-    // ==========================================
-
-    public bool EstaPronta() // Pergunta contratada pela interface IHabilidade.
-    {
-        return Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
-    }
-
-    public void AtivarHabilidade() // Método chamado ao apertar a tecla associada à habilidade.
-    {
-        if (!EstaPronta())
-        {
-            if (gerenciadorDeEquipamentos != null)
-            {
-                gerenciadorDeEquipamentos.TrocarEquipamento(0);
-            }
-            return;
-        }
-
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.localPosition = posicaoInicialLocal;
-            prefabCinto.SetActive(true);
-        }
-
-        // CÁLCULO DA MIRA EM QUALQUER DIREÇÃO
-        Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        pontoFinalMundo = ray.origin + ray.direction * distanciaMaxima;
-
-        if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima))
-        {
-            pontoFinalMundo = hit.point;
-        }
-
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.LookAt(pontoFinalMundo); // Aponta o cinto para o ponto da mira.
-        }
-
-        tempoProximoUso = Time.time + tempoCooldown;
-        estadoAtual = EstadoCinto.Avancando; // Inicia o avanço.
-    }
-
-    public void CancelarHabilidade() // Método de cancelamento e limpeza.
+    private void FinalizarHabilidade()
     {
         estadoAtual = EstadoCinto.Inativo;
 
-        // Garante a reativação da física do inimigo caso a habilidade seja cancelada bruscamente
         if (controllerInimigo != null)
         {
             controllerInimigo.enabled = true;
@@ -310,7 +224,90 @@ public class HabilidadeCinto : MonoBehaviour, IHabilidade // Declara a classe pú
         {
             prefabCinto.transform.localPosition = posicaoInicialLocal;
             prefabCinto.transform.localRotation = Quaternion.identity;
-            prefabCinto.SetActive(false); // Oculta o cinto.
+        }
+
+        CancelarHabilidade();
+
+        if (gerenciadorDeEquipamentos != null)
+        {
+            gerenciadorDeEquipamentos.TrocarEquipamento(0);
+        }
+    }
+
+
+    // ==========================================
+    // 8. MÉTODOS DA INTERFACE (E COMPATIBILIDADE)
+    // ==========================================
+
+    public bool PodeUsar()
+    {
+        return Time.time >= tempoProximouso && estadoAtual == EstadoCinto.Inativo;
+    }
+
+    // Método antigo de compatibilidade caso outro script o chame:
+    public bool EstaPronta()
+    {
+        return PodeUsar();
+    }
+
+    public void AtivarHabilidade()
+    {
+        if (!PodeUsar())
+        {
+            if (gerenciadorDeEquipamentos != null)
+            {
+                gerenciadorDeEquipamentos.TrocarEquipamento(0);
+            }
+            return;
+        }
+
+        if (prefabCinto != null)
+        {
+            prefabCinto.transform.localPosition = posicaoInicialLocal;
+            prefabCinto.SetActive(true);
+        }
+
+        tempoProximouso = Time.time + tempoCooldown;
+
+        Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        pontoFinalMundo = ray.origin + ray.direction * distanciaMaxima;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima))
+        {
+            pontoFinalMundo = hit.point;
+        }
+
+        if (prefabCinto != null)
+        {
+            prefabCinto.transform.LookAt(pontoFinalMundo);
+        }
+
+        estadoAtual = EstadoCinto.Avancando;
+    }
+
+    public void CancelarHabilidade()
+    {
+        estadoAtual = EstadoCinto.Inativo;
+
+        if (controllerInimigo != null)
+        {
+            controllerInimigo.enabled = true;
+            controllerInimigo = null;
+        }
+
+        if (rbInimigo != null)
+        {
+            rbInimigo.isKinematic = false;
+            rbInimigo = null;
+        }
+
+        inimigoCapturado = null;
+
+        if (prefabCinto != null)
+        {
+            prefabCinto.transform.localPosition = posicaoInicialLocal;
+            prefabCinto.transform.localRotation = Quaternion.identity;
+            prefabCinto.SetActive(false);
         }
     }
 }

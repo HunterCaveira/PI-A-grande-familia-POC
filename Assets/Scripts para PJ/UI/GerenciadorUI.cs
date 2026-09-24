@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using System.Collections.Generic;
 
-public class GerenciadorUI : MonoBehaviour
+public class GerenciadorUIOtimizado : MonoBehaviour
 {
     [Header("Referências")]
     [Tooltip("Arraste o objeto do seu Jogador aqui")]
@@ -14,13 +12,11 @@ public class GerenciadorUI : MonoBehaviour
     [SerializeField] private Image imagemSlotQ; // Slot 1
     [SerializeField] private Image imagemSlotE; // Slot 2
     [SerializeField] private Image imagemSlotF; // Slot 3
-    [SerializeField] public TextMeshProUGUI meuTexto;
-    [SerializeField] private tiroPistola pistolaRef;
 
     // Estrutura interna para controlar o estado de cada slot
     private class SlotUIInfo
     {
-        public ISkills Habilidade;
+        public ISkills Habilidade; // Mudado para IHabilidade
         public Image ImagemUI;
         public bool UltimoEstadoPronto = true;
     }
@@ -29,7 +25,6 @@ public class GerenciadorUI : MonoBehaviour
 
     void Start()
     {
-        pistolaRef = FindFirstObjectByType<tiroPistola>();
         if (jogador == null)
         {
             Debug.LogWarning("O Jogador não foi atribuído no Gerenciador de UI!");
@@ -41,16 +36,22 @@ public class GerenciadorUI : MonoBehaviour
         slotsMap[2] = new SlotUIInfo { ImagemUI = imagemSlotE }; // 2 = E
         slotsMap[3] = new SlotUIInfo { ImagemUI = imagemSlotF }; // 3 = F
 
-        // 2. PEGA automaticamente todas as habilidades que estão no Jogador
+        // 2. PEGA automaticamente todas as habilidades do Jogador usando a interface correta
         ISkills[] habilidadesDoJogador = jogador.GetComponents<ISkills>();
 
-        // 3. Associa cada habilidade encontrada ao seu respectivo slot baseado no SlotIndex dela
+        Debug.Log($"Gerenciador UI encontrou {habilidadesDoJogador.Length} habilidades no jogador.");
+
+        // 3. Associa cada habilidade encontrada ao seu respectivo slot
         foreach (var hab in habilidadesDoJogador)
         {
             if (slotsMap.ContainsKey(hab.SlotIndex))
             {
                 slotsMap[hab.SlotIndex].Habilidade = hab;
-                Debug.Log($"Habilidade encontrada e encaixada no Slot {hab.SlotIndex}!");
+                Debug.Log($"Habilidade do Slot {hab.SlotIndex} conectada com sucesso na UI!");
+            }
+            else
+            {
+                Debug.LogWarning($"A habilidade achada tem o SlotIndex {hab.SlotIndex}, mas a UI não tem um slot mapeado para esse número!");
             }
         }
     }
@@ -75,19 +76,4 @@ public class GerenciadorUI : MonoBehaviour
             }
         }
     }
-    public void AcabouMunição()
-    {
-        if(pistolaRef.balaZerada == true) 
-        {
-            meuTexto.color = Color.blue;
-        }
-        else
-        {
-            // Se ainda tem bala, pinta de branco
-            meuTexto.color = Color.white;
-        }
-    }
-
-
-
 }

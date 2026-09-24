@@ -1,7 +1,7 @@
 using System.Collections; // Importa suporte a Corrotinas (IEnumerator e WaitForSeconds).
 using UnityEngine; // Importa as ferramentas principais do motor da Unity.
 
-public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe pública HabilidadeTonico implementando a interface IHabilidade.
+public class HabilidadeTonico : MonoBehaviour // Declara a classe pública HabilidadeTonico implementando a interface IHabilidade.
 {
     // ==========================================
     // 1. CONFIGURAÇÕES DOS BUFFS
