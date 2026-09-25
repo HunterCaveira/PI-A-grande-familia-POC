@@ -365,13 +365,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
   cameraPrincipal: {fileID: 0}
   distanciaMaxima: 10
-  tempoCooldown: 0
+  tempoCooldown: 4
   velocidadeAvanco: 30
   velocidadeRetorno: 20
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
   pontoFivelaPontos: {fileID: 4932673275829706526}
   pontoDestinoPuxao: {fileID: 0}
+  slotIndex: 2
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   idDoTime: 1
 --- !u!114 &6155027452624956214
 MonoBehaviour:
@@ -385,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  porcentagemAumentoVelocidade: 50
+  velocidadeComBuff: 20
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 50
   tempoAnimacaoConsumo: 1

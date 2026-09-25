@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6220591073685751629}
   - component: {fileID: 7643895223355425182}
   - component: {fileID: 2732845165014215290}
+  - component: {fileID: 2037871294924100072}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -71,3 +72,20 @@ MonoBehaviour:
   imagemSlotQ: {fileID: 0}
   imagemSlotE: {fileID: 0}
   imagemSlotF: {fileID: 0}
+--- !u!114 &2037871294924100072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4136945313930268639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
+  Tiropistola: {fileID: 0}
+  pontosDeSpawn:
+  - {fileID: 0}
+  - {fileID: 0}
+  tempoParaRenascer: 3
