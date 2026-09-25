@@ -365,13 +365,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
   cameraPrincipal: {fileID: 0}
   distanciaMaxima: 10
-  tempoCooldown: 4
+  tempoCooldown: 0
   velocidadeAvanco: 30
   velocidadeRetorno: 20
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
   pontoFivelaPontos: {fileID: 4932673275829706526}
   pontoDestinoPuxao: {fileID: 0}
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   slotIndex: 2
   fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
@@ -381,6 +382,8 @@ MonoBehaviour:
   fotoPronta: {fileID: 0}
   fotoRecarregando: {fileID: 0}
 >>>>>>> Stashed changes
+=======
+>>>>>>> parent of 252362c (coisas feitas)
   idDoTime: 1
 --- !u!114 &6155027452624956214
 MonoBehaviour:
@@ -394,11 +397,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   velocidadeComBuff: 20
 =======
   velocidadeComBuff: 10
 >>>>>>> Stashed changes
+=======
+  porcentagemAumentoVelocidade: 50
+>>>>>>> parent of 252362c (coisas feitas)
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 10
   tempoAnimacaoConsumo: 1
