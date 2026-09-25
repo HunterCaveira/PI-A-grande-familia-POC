@@ -10,9 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee0ba9c09968ffc4d99f992e24fe009b, type: 3}
-  m_Name: Pai_Atributos_Original
-  m_EditorClassIdentifier: Assembly-CSharp::AtributosPersonagem
+  m_Name: Pai
+  m_EditorClassIdentifier: 
   vidaMaxima: 500
   velocidadeMovimento: 5
-  forcaPulo: 3
-  porcentagemSpeed: 0
+  forcaPulo: 2

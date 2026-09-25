@@ -38,11 +38,10 @@ public class tiroPistola : MonoBehaviour
     public GameObject muzzleFlash;
     public TextMeshProUGUI ammunitionDisplay;
 
-    protected int balasSobrando;
+    private int balasSobrando;
     private AcoesPlayer acoesPlayer;
     private bool atirando, preparadoParaAtirar, recarregando;
     private GameObject donoDaArma;
-    public bool balaZerada;
 
     private void Awake()
     {
@@ -111,18 +110,8 @@ public class tiroPistola : MonoBehaviour
 
         for (int i = 0; i < tiroPorClick; i++)
         {
-            if (balasSobrando <= 0)
-            {
-                break;
-            }
-            if (tamanhoCarregador <= 0)
-            {
-                balaZerada = true;
-            }
-            else
-            {
-                balaZerada = false;
-            }
+            if (balasSobrando <= 0) break;
+
             // Reduzimos o impacto do espalhamento multiplicando por um fator menor (ex: 0.05f)
             // Assim, valores como 0.5 no Inspetor viram um desvio sutil e realista
             float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal) * 0.05f;
@@ -172,8 +161,6 @@ public class tiroPistola : MonoBehaviour
         balasSobrando = tamanhoCarregador;
         recarregando = false;
     }
-
-    
 
     private System.Collections.IEnumerator DesenharRaio(Vector3 inicio, Vector3 fim)
     {

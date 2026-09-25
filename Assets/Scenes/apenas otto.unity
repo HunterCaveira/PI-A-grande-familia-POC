@@ -619,7 +619,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8305240971407860968, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
   m_PrefabInstance: {fileID: 2128817326}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201707721}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
@@ -1761,11 +1761,6 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
---- !u!1 &1201707721 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-  m_PrefabInstance: {fileID: 2128817326}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1380945872 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
@@ -1965,6 +1960,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+--- !u!114 &1555099624 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7091013494263123166, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+  m_PrefabInstance: {fileID: 1491107808}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1586816207
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2053,30 +2059,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4936489793720012237, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+    - target: {fileID: 1173759080331113473, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2321299151143401525, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5684523098650350525, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: sistemaDeVida
       value: 
       objectReference: {fileID: 291525964}
-    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-      propertyPath: m_fontColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-      propertyPath: m_fontColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-      propertyPath: m_fontColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 4294967295
-      objectReference: {fileID: 0}
     - target: {fileID: 7984770155519934624, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2127,17 +2121,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3714491508172889076, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
   m_PrefabInstance: {fileID: 1586816207}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1956667605 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4936489793720012237, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-  m_PrefabInstance: {fileID: 1586816207}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!43 &1982759464
 Mesh:
   m_ObjectHideFlags: 0
@@ -2351,6 +2334,10 @@ PrefabInstance:
       propertyPath: 'pontosSpawnTime2.Array.data[0]'
       value: 
       objectReference: {fileID: 546275218}
+    - target: {fileID: 2125328242363607523, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: 'pontosSpawnTime2.Array.data[1]'
+      value: 
+      objectReference: {fileID: 546275218}
     - target: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_Name
       value: Pai
@@ -2359,6 +2346,10 @@ PrefabInstance:
       propertyPath: cameraPrincipal
       value: 
       objectReference: {fileID: 1047941038}
+    - target: {fileID: 8385738937422537084, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 1555099624}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -176.1369
@@ -2412,26 +2403,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: jogador
-      value: 
-      objectReference: {fileID: 1201707721}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: meuTexto
-      value: 
-      objectReference: {fileID: 1380945872}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: pistolaRef
-      value: 
-      objectReference: {fileID: 567465278}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: imagemSlotQ
-      value: 
-      objectReference: {fileID: 1956667605}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: outroScriptRef
-      value: 
-      objectReference: {fileID: 567465278}
     - target: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_Name
       value: GameManager

@@ -1,129 +1,98 @@
-using System; // Importa suporte para delegates e eventos (Action).
-using UnityEngine; // Importa a biblioteca de componentes da Unity.
+using System; // Importante para usar o Action!
+using UnityEngine;
 
-public class Sistemadevida : MonoBehaviour // Declara a classe pública Sistemadevida herdando de MonoBehaviour.
+public class Sistemadevida : MonoBehaviour
 {
-    // ==========================================
-    // 1. ATRIBUTOS E VARIÁVEIS
-    // ==========================================
+    [Header("Configurações do Herói")]
+    [SerializeField] private AtributosPersonagem dadosDoHeroi;
 
-    [Header("Configurações do Herói")] // Seção do Inspector da Unity.
-    [SerializeField] private AtributosPersonagem dadosDoHeroi; // Referência à ficha de atributos para ler a vida máxima.
+    [Header("PvP e Partida")]
+    [SerializeField] private int timeID = 1;
 
-    [Header("PvP e Partida")] // Seção de identificação de partidas no Inspector.
-    [SerializeField] private int timeID = 1; // ID do time para controle de Fogo Amigo.
+    [SerializeField] public float vidaAtual;
 
-    [SerializeField] public float vidaAtual; // Quantidade atual de pontos de vida mantida em memória.
+    public int TimeID => timeID;
 
-    public int TimeID => timeID; // Propriedade pública de apenas leitura para consultar o ID de time do herói.
-
-    // Propriedade pública para armazenar a taxa de mitigação/redução de dano sofrido (0f = 0%, 0.3f = 30%)
-    public float PorcentagemReducaoDano { get; set; } = 0f;
-
-    // EVENTO: Transmite (vidaAtual, vidaMaxima) para scripts da UI ouvirem e atualizarem as barras na tela
+    // EVENTO: Envia (vidaAtual, vidaMaxima) para quem estiver ouvindo
     public event Action<float, float> OnVidaMudou;
 
-
-    // ==========================================
-    // 2. CICLO DE VIDA DA UNITY
-    // ==========================================
-
-    private void Awake() // Método invocado assim que o objeto é carregado na memória da cena.
+    private void Awake()
     {
-        if (dadosDoHeroi != null) // SE a ficha de atributos foi atribuída no Inspector.
+        if (dadosDoHeroi != null)
         {
-            vidaAtual = dadosDoHeroi.vidaMaxima; // Inicializa a vida atual com o valor máximo configurado na ficha.
+            vidaAtual = dadosDoHeroi.vidaMaxima;
         }
     }
 
-    private void Start() // Chamado antes da primeira atualização de frame.
+    private void Start()
     {
-        NotificarMudancaDeVida(); // Dispara o evento inicial para preencher as barras de vida na UI do jogo.
+        // Dispara o evento no início para a UI começar com o valor correto
+        NotificarMudancaDeVida();
     }
 
-
-    // ==========================================
-    // 3. MÉTODOS PÚBLICOS DE GERENCIAMENTO DE FICHA
-    // ==========================================
-
-    /// <summary>
-    /// Permite trocar a referência da ficha de atributos ativa em tempo de execução (Usado pelo Tônico).
-    /// </summary>
-    public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
+    public void ReceberDano(InformacaoDano dano)
     {
-        if (novaFicha != null)
-        {
-            dadosDoHeroi = novaFicha; // Atualiza a referência da ficha para a duplicada ou a original.
-            NotificarMudancaDeVida(); // Recalcula os valores e atualiza a UI.
-            Debug.Log($"[SISTEMA DE VIDA] Ficha de atributos atualizada! Vida máxima da ficha: {dadosDoHeroi.vidaMaxima}");
-        }
-    }
+        if (vidaAtual <= 0) return;
 
-
-    // ==========================================
-    // 4. PROCESSAMENTO DE DANO E MORTE
-    // ==========================================
-
-    public void ReceberDano(InformacaoDano dano) // Método público invocado quando o herói sofre um golpe contendo os dados do dano.
-    {
-        if (vidaAtual <= 0) return; // SE o herói já estiver morto, ignora novos processamentos de dano.
-
-        // Lógica de Fogo Amigo: Checa se o atacante é um aliado do mesmo time
+        // Fogo amigo
         if (dano.atacante != null && dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
         {
-            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject) // SE for do mesmo time e não for dano próprio.
+            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject)
             {
-                return; // Cancela e ignora a recepção de dano.
+                return;
             }
         }
 
-        // Calcula o dano final aplicando o desconto da PorcentagemReducaoDano (Ex: se for 0.3, multiplica o dano por 0.7)
-        float danoFinal = dano.quantidade * (1f - PorcentagemReducaoDano);
+        // Aplica o dano
+        vidaAtual -= dano.quantidade;
+        vidaAtual = Mathf.Max(vidaAtual, 0f);
 
-        // Subtrai o dano mitigado da vida atual do herói
-        vidaAtual -= danoFinal;
-        vidaAtual = Mathf.Max(vidaAtual, 0f); // Garante que a vida nunca fique menor do que zero.
+        // AVISA A UI QUE A VIDA MUDOU!
+        NotificarMudancaDeVida();
 
-        NotificarMudancaDeVida(); // Notifica a interface gráfica (UI) sobre a perda de vida.
-
-        if (vidaAtual <= 0) // SE a vida atual zerar após a dedução.
+        if (vidaAtual <= 0)
         {
-            Morrer(); // Dispara a função de eliminação do herói.
+            Morrer();
         }
     }
 
-    public void Renascer() // Método invocado no momento do respawn.
+    public void Renascer()
     {
-        if (dadosDoHeroi != null) // SE a ficha de atributos for válida.
+        if (dadosDoHeroi != null)
         {
-            vidaAtual = dadosDoHeroi.vidaMaxima; // Restaura os pontos de vida total.
-            PorcentagemReducaoDano = 0f; // Reseta qualquer modificador de mitigação ativo.
-            NotificarMudancaDeVida(); // Notifica a UI sobre a restauração da vida.
+            vidaAtual = dadosDoHeroi.vidaMaxima;
+            NotificarMudancaDeVida(); // Avisa a UI no respawn
         }
     }
 
-    private void NotificarMudancaDeVida() // Método privado auxiliar de disparo de eventos.
+    private void NotificarMudancaDeVida()
     {
-        // Dispara o evento OnVidaMudou passando (vidaAtual, vidaMaxima) apenas se houver algum script escutando (?.Invoke)
+        // O ?.Invoke garante que só dispara se houver algum script escutando esse evento
         if (dadosDoHeroi != null)
         {
             OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
         }
     }
 
-    private void Morrer() // Lógica de tratamento da morte e envio para a fila de respawn.
+    private void Morrer()
     {
-        Debug.Log($"{gameObject.name} foi eliminado!"); // Exibe mensagem no Console da Unity.
+        Debug.Log($"{gameObject.name} foi eliminado!");
 
-        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>(); // Procura a instância do GerenciadorRespawn na cena.
+        // Procura o gerenciador na cena e envia o objeto para a rotina de respawn
+        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
 
-        if (gerenciador != null) // SE o gerenciador for encontrado na cena.
+        if (gerenciador != null)
         {
-            gerenciador.ProcessarMorte(this.gameObject); // Envia o GameObject do jogador eliminado para o gerenciador.
+            gerenciador.ProcessarMorte(this.gameObject);
         }
-        else // SENÃO (se o gerenciador de respawn não for encontrado).
+        else
         {
-            Debug.LogWarning("Nenhum GerenciadorRespawn encontrado na cena!"); // Emite um aviso no Console.
+            Debug.LogWarning("Nenhum GerenciadorRespawn encontrado na cena!");
         }
     }
+
+
+
+
+
 }

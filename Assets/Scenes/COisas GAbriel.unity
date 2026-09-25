@@ -753,6 +753,11 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!4 &655033066 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1575610945547298151, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  m_PrefabInstance: {fileID: 6613487415229568428}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &702676518
 Mesh:
   m_ObjectHideFlags: 0
@@ -2431,6 +2436,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6409368345480460157, guid: 89601e2f0a2809f4bba35141325ca12c, type: 3}
   m_PrefabInstance: {fileID: 1082660335027092512}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2076692513 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4932673275829706526, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  m_PrefabInstance: {fileID: 6613487415229568428}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &107936397137430419
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2779,10 +2789,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+<<<<<<< HEAD
     - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: jogador
       value: 
       objectReference: {fileID: 309714308}
+=======
+>>>>>>> parent of 526c8ef (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
     - target: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -3051,6 +3064,158 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2321299151143401525, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
   m_PrefabInstance: {fileID: 3877522472244019294}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
+=======
+--- !u!1001 &6613487415229568428
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 227339376035805017, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: meuPoolDeBalas
+      value: 
+      objectReference: {fileID: 1663824576}
+    - target: {fileID: 577316728503428501, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 577316728503428501, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 849392077082758349, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: velocidadeRotacao
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: tempoCooldown
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: cameraPrincipal
+      value: 
+      objectReference: {fileID: 1047941038}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: distanciaMaxima
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: fitaCintoVisual
+      value: 
+      objectReference: {fileID: 655033066}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: pontoFivelaPontos
+      value: 
+      objectReference: {fileID: 2076692513}
+    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: velocidadeLancamento
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521677869954969493, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521677869954969493, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1575610945547298151, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2125328242363607523, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: 'pontosSpawnTime1.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2069511034}
+    - target: {fileID: 2125328242363607523, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: 'pontosSpawnTime2.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1152419745}
+    - target: {fileID: 3325855674697102231, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_Name
+      value: Pai
+      objectReference: {fileID: 0}
+    - target: {fileID: 4972495283499194072, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5076658877515485142, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: Tiropistola
+      value: 
+      objectReference: {fileID: 1681681749}
+    - target: {fileID: 5076658877515485142, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: 'pontosDeSpawn.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2069511034}
+    - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: cameraPrincipal
+      value: 
+      objectReference: {fileID: 1047941038}
+    - target: {fileID: 6944412300273848660, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7228568723087913597, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 106.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 38.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794448110551824356, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 1432904587}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+>>>>>>> parent of 526c8ef (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
 --- !u!1001 &7617456317423542997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3186,6 +3351,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49037adbadf32d04c93836ece3adfaef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
+=======
+--- !u!114 &7623000527699206353 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8305240971407860968, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  m_PrefabInstance: {fileID: 6613487415229568428}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &7937905289794853569 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  m_PrefabInstance: {fileID: 6613487415229568428}
+  m_PrefabAsset: {fileID: 0}
+>>>>>>> parent of 526c8ef (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
 --- !u!1001 &7956978299940278619
 PrefabInstance:
   m_ObjectHideFlags: 0
