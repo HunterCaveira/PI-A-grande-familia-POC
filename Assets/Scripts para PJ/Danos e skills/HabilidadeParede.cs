@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-public class HabilidadeParede : MonoBehaviour, ISkills
+public class HabilidadeParede : MonoBehaviour, IHabilidade , ISkills
 {
     [Header("Configurações da Câmera e Raio")]
     [SerializeField] private Camera cameraPrincipal;
@@ -37,12 +37,12 @@ public class HabilidadeParede : MonoBehaviour, ISkills
     [SerializeField] private Sprite fotoRecarregando;
     public Sprite FotoPronta => fotoPronta;
     public Sprite FotoRecarregando => fotoRecarregando;
-    
+
     [Header("Tempo de Recarga para UI")]
     [SerializeField] private float tempoDeRecarga = 4f;
     private float tempoProximouso = 0f;
     public float TempoProximouso => tempoProximoUso;
-   
+
     private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
     private float tempoProximoUso = 0f;
     private List<GameObject> paredesAtivas = new List<GameObject>();
@@ -61,15 +61,12 @@ public class HabilidadeParede : MonoBehaviour, ISkills
             PosicionarECriarParede();
         }
     }
-    
-   
-   
+
     // --- MÉTODOS DA INTERFACE IHABILIDADE ---
     public bool PodeUsar()
     {
         return Time.time >= tempoProximouso;
     }
-     
     public bool EstaPronta()
     {
         // Retorna 'true' se o tempo atual do jogo for maior ou igual ao tempo liberado pós-cooldown

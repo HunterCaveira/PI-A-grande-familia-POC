@@ -181,17 +181,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
   m_PrefabInstance: {fileID: 2128817326}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &141971937 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8319420045216907053, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-  m_PrefabInstance: {fileID: 1586816207}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!43 &172740434
 Mesh:
   m_ObjectHideFlags: 0
@@ -978,17 +967,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7398705707482277403, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
   m_PrefabInstance: {fileID: 1586816207}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &766514420 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9048034416701902273, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
-  m_PrefabInstance: {fileID: 1586816207}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &875116694 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
@@ -2078,11 +2056,27 @@ PrefabInstance:
     - target: {fileID: 4936489793720012237, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 98c526ffe13fef141b2bd5413a9ebd31, type: 3}
+      objectReference: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
     - target: {fileID: 5684523098650350525, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: sistemaDeVida
       value: 
       objectReference: {fileID: 291525964}
+    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7011194548823149577, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 7984770155519934624, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2342,10 +2336,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 227339376035805017, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: playerCamera
-      value: 
-      objectReference: {fileID: 1047941038}
-    - target: {fileID: 227339376035805017, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: meuPoolDeBalas
       value: 
       objectReference: {fileID: 2037878242}
@@ -2353,26 +2343,6 @@ PrefabInstance:
       propertyPath: ammunitionDisplay
       value: 
       objectReference: {fileID: 1380945872}
-    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: slotIndex
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: fotoPronta
-      value: 
-      objectReference: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
-    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: tempoCooldown
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: cameraPrincipal
-      value: 
-      objectReference: {fileID: 1047941038}
-    - target: {fileID: 885443826420353248, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: fotoRecarregando
-      value: 
-      objectReference: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
     - target: {fileID: 2125328242363607523, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: 'pontosSpawnTime1.Array.data[0]'
       value: 
@@ -2389,18 +2359,6 @@ PrefabInstance:
       propertyPath: cameraPrincipal
       value: 
       objectReference: {fileID: 1047941038}
-    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: slotIndex
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: fotoPronta
-      value: 
-      objectReference: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
-    - target: {fileID: 6155027452624956214, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
-      propertyPath: fotoRecarregando
-      value: 
-      objectReference: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
     - target: {fileID: 8512057462958208884, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -176.1369
@@ -2466,14 +2424,6 @@ PrefabInstance:
       propertyPath: pistolaRef
       value: 
       objectReference: {fileID: 567465278}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: imagemSlotE
-      value: 
-      objectReference: {fileID: 141971937}
-    - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      propertyPath: imagemSlotF
-      value: 
-      objectReference: {fileID: 766514420}
     - target: {fileID: 2732845165014215290, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: imagemSlotQ
       value: 
