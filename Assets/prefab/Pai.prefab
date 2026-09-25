@@ -385,14 +385,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  porcentagemAumentoVelocidade: 50
+  velocidadeComBuff: 20
   porcentagemReducaoDano: 0.3
-  duracaoDoEfeito: 50
+  duracaoDoEfeito: 2
   tempoAnimacaoConsumo: 1
   tempoCooldown: 1
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   sistemaDeVida: {fileID: 8305240971407860968}
-  atributosOriginal: {fileID: 0}
+  atributosOriginal: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
   prefabTonicoMao: {fileID: 7067021843553549109}
 --- !u!114 &2588890255097247149
 MonoBehaviour:

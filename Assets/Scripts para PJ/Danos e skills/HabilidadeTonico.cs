@@ -59,7 +59,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
     private void OnDisable() // Executado automaticamente se o herói for desativado ou morrer.
     {
-        CancelarHabilidade(); // Oculta objetos e limpa corrotinas sem quebrar o estado original.
+        CancelarHabilidadeForcado(); // Se o herói for desativado ou morrer, resgata a ficha original de emergência.
     }
 
 
@@ -87,9 +87,22 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
         StartCoroutine(RotinaConsumirEAplicarTonico());
     }
 
-    public void CancelarHabilidade() // Interrupção rápida apenas para ocultar a malha da mão.
+    public void CancelarHabilidade() // Chamado pelo Gerenciador ao trocar de equipamento.
+    {
+        // Se já consumiu a bebida e o efeito está rodando no temporizador, NÃO cancela a corrotina!
+        if (emUsoOuAnimacao)
+        {
+            if (prefabTonicoMao != null) prefabTonicoMao.SetActive(false); // Apenas esconde a malha visual da mão.
+            return; // Permite que o tempo do buff continue contando até expirar!
+        }
+
+        CancelarHabilidadeForcado();
+    }
+
+    private void CancelarHabilidadeForcado() // Interrupção de emergência (Morte/Desativação)
     {
         StopAllCoroutines();
+        RemoverBuffs(); // Devolve a ficha original
         emUsoOuAnimacao = false;
 
         if (prefabTonicoMao != null) prefabTonicoMao.SetActive(false);
@@ -125,7 +138,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
         yield return new WaitForSeconds(duracaoDoEfeito);
 
         // FASE 4: REMOÇÃO DOS BUFFS E RESTAURAÇÃO DA FICHA ORIGINAL
-        RemoverBuffs(); // Executado exclusivamente quando o tempo do buff zera!
+        RemoverBuffs(); // Executado após a duração do efeito finalizar!
 
         tempoProximoUso = Time.time + tempoCooldown; // Define o próximo segundo do relógio para liberação.
         emUsoOuAnimacao = false; // Libera a trava de execução da habilidade.
@@ -142,6 +155,9 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
     {
         if (atributosOriginal != null)
         {
+            // Se houver alguma ficha duplicada anterior pendente na memória, destrói antes
+            if (atributosBuffados != null) Destroy(atributosBuffados);
+
             // Cria uma duplicata em memória da ficha original para não alterar o arquivo no disco
             atributosBuffados = Instantiate(atributosOriginal);
             atributosBuffados.velocidadeMovimento = velocidadeComBuff; // Injeta a velocidade com buff (Ex: 20).
@@ -190,6 +206,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
         if (atributosBuffados != null)
         {
             Destroy(atributosBuffados);
+            atributosBuffados = null;
         }
     }
 }
