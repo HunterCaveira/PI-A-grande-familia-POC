@@ -242,7 +242,7 @@ MonoBehaviour:
   gravidade: -9.81
   forcaPulo: 2
   velocidadeVertical: 2
-  atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
+  atributos: {fileID: 11400000, guid: 9f1b0b4d75b2c0149afd36c178fcc38d, type: 2}
 --- !u!114 &5076658877515485142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,7 +298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dadosDoHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
+  dadosDoHeroi: {fileID: 11400000, guid: 9f1b0b4d75b2c0149afd36c178fcc38d, type: 2}
   timeID: 1
   vidaAtual: 500
 --- !u!114 &2125328242363607523
@@ -385,10 +385,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  velocidadeComBuff: 20
+  velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
-  duracaoDoEfeito: 2
-  tempoAnimacaoConsumo: 1
+  duracaoDoEfeito: 3
+  tempoAnimacaoConsumo: 2
   tempoCooldown: 1
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   sistemaDeVida: {fileID: 8305240971407860968}
