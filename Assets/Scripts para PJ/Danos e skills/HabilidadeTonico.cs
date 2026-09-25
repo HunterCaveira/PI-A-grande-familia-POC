@@ -74,7 +74,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
     public void AtivarHabilidade() // Método invocado pelo GerenciadorDeEquipamentos assim que a tecla (F) é pressionada.
     {
-        Debug.Log("[TÔNICO] Tecla 'F' pressionada! Verificando prontidão da habilidade...");
+        //Debug.Log("[TÔNICO] Tecla 'F' pressionada! Verificando prontidão da habilidade...");
 
         if (!EstaPronta()) // SE a habilidade estiver em cooldown ou execução.
         {
@@ -119,13 +119,13 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
         if (prefabTonicoMao != null) prefabTonicoMao.SetActive(true); // Exibe o objeto 3D do frasco na mão do herói.
 
-        Debug.Log($"[TÔNICO] Bebendo o tônico... Aguardando {tempoAnimacaoConsumo}s de tempo de consumo.");
+        //Debug.Log($"[TÔNICO] Bebendo o tônico... Aguardando {tempoAnimacaoConsumo}s de tempo de consumo.");
 
         // FASE 1: TEMPO DE CONSUMO (ANIMAÇÃO DE BEBER)
         yield return new WaitForSeconds(tempoAnimacaoConsumo);
 
         // LOG DE CONFIRMAÇÃO DE CONSUMO
-        Debug.Log("<color=green>[TÔNICO LOG] O Tônico foi consumido com sucesso!</color>");
+       // Debug.Log("<color=green>[TÔNICO LOG] O Tônico foi consumido com sucesso!</color>");
 
         // FASE 2: APLICAÇÃO DOS BUFFS (GERA E INJETA A FICHA TEMPORÁRIA DUPLICADA)
         AplicarBuffs();
@@ -134,7 +134,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
         if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0); // Retorna a mão para a arma principal (Slot 0).
 
         // FASE 3: DURAÇÃO DO EFEITO
-        Debug.Log($"[TÔNICO] Buffs ativos! Duração do efeito: {duracaoDoEfeito} segundos.");
+        //Debug.Log($"[TÔNICO] Buffs ativos! Duração do efeito: {duracaoDoEfeito} segundos.");
         yield return new WaitForSeconds(duracaoDoEfeito);
 
         // FASE 4: REMOÇÃO DOS BUFFS E RESTAURAÇÃO DA FICHA ORIGINAL
@@ -176,12 +176,12 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
                 sistemaDeVida.PorcentagemReducaoDano = porcentagemReducaoDano; // Aplica a redução de dano (Ex: 30%).
             }
 
-            Debug.Log($"<color=cyan>[TÔNICO BUFF] Ficha temporária ativada com velocidade: {atributosBuffados.velocidadeMovimento}</color>");
+            //Debug.Log($"<color=cyan>[TÔNICO BUFF] Ficha temporária ativada com velocidade: {atributosBuffados.velocidadeMovimento}</color>");
         }
-        else
-        {
-            Debug.LogError("[TÔNICO ERRO] A referência 'atributosOriginal' NÃO foi atribuída no Inspector do Tônico!");
-        }
+        //else
+        //{
+           // Debug.LogError("[TÔNICO ERRO] A referência 'atributosOriginal' NÃO foi atribuída no Inspector do Tônico!");
+        //}
     }
 
     private void RemoverBuffs()
@@ -200,7 +200,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
             sistemaDeVida.PorcentagemReducaoDano = 0f;
         }
 
-        Debug.Log($"<color=yellow>[TÔNICO RESET] Ficha original restaurada no herói com velocidade base: {atributosOriginal.velocidadeMovimento}</color>");
+      //  Debug.Log($"<color=yellow>[TÔNICO RESET] Ficha original restaurada no herói com velocidade base: {atributosOriginal.velocidadeMovimento}</color>");
 
         // Limpa a ficha temporária da memória RAM
         if (atributosBuffados != null)
