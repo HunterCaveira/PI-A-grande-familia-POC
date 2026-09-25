@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 7807232602340061961}
   - component: {fileID: 2890885756291952660}
   - component: {fileID: 8400236809144163583}
-  - component: {fileID: 4980257965826302620}
+  - component: {fileID: 7927215097776356965}
   - component: {fileID: 6309027157344768495}
   - component: {fileID: 8488379881335226378}
   - component: {fileID: 9092815932743340394}
@@ -262,7 +262,7 @@ MonoBehaviour:
   pontosSpawnTime2:
   - {fileID: 0}
   tempoParaRespawn: 1
---- !u!114 &4980257965826302620
+--- !u!114 &7927215097776356965
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -273,7 +273,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::HabilidadeParede
   cameraPrincipal: {fileID: 0}
   distanciaMaxima: 15
   camadaChao:
@@ -281,20 +281,20 @@ MonoBehaviour:
     m_Bits: 64
   camadaParedesEObstaculos:
     serializedVersion: 2
-    m_Bits: 0
-  larguraMaxima: 10
+    m_Bits: 128
+  larguraMaxima: 5
   larguraMinima: 1
-  alturaMaxima: 3
+  alturaMaxima: 4
   alturaMinima: 0.5
   prefabParedeFantasma: {fileID: 1166711883038520629}
   prefabParedeReal: {fileID: 7706863651507868334}
   tempoDeVida: 10
   limiteParedes: 2
-  tempoCooldown: 1
+  tempoCooldown: 5
   slotIndex: 1
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
-  tempoDeRecarga: 1
+  fotoPronta: {fileID: 0}
+  fotoRecarregando: {fileID: 0}
+  tempoDeRecarga: 4
 --- !u!114 &6309027157344768495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,9 +316,6 @@ MonoBehaviour:
   prefabCinto: {fileID: 8082166327913506060}
   pontoFivelaPontos: {fileID: 8013847593769561089}
   pontoDestinoPuxao: {fileID: 0}
-  slotIndex: 1
-  fotoPronta: {fileID: 0}
-  fotoRecarregando: {fileID: 0}
   idDoTime: 1
 --- !u!114 &8488379881335226378
 MonoBehaviour:
