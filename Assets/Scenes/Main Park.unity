@@ -2064,6 +2064,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pai
       objectReference: {fileID: 0}
+<<<<<<< HEAD
     - target: {fileID: 807063184450502427, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -188.7
@@ -2120,6 +2121,8 @@ PrefabInstance:
       propertyPath: 'pontosSpawnTime2.Array.data[0]'
       value: 
       objectReference: {fileID: 6884576644643582782}
+=======
+>>>>>>> parent of de4e51c (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
     - target: {fileID: 5131067276467938538, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
       propertyPath: cameraPrincipal
       value: 

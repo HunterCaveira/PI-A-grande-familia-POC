@@ -37,16 +37,9 @@ public class Dominacao : MonoBehaviour
         }
         else
         {
-            // === AQUI ENTRA O SEU RACIOCÍNIO ===
-            // Se a área está completamente vazia:
-
+            // Se não tem ninguém na área, ninguém está tentando dominar
             timeTentandoDominar = 0;
             emDisputa = false;
-
-            // 1. Remove o dono atual da área (volta a ser neutra)
-            timeDonoDoTerritorio = 0;
-            progressoTime1 = 0f;
-            progressoTime2 = 0f;
         }
 
         AtualizarInterface();
@@ -155,7 +148,6 @@ public class Dominacao : MonoBehaviour
         if (scriptDoJogador != null && jogadoresNaArea.Contains(scriptDoJogador))
         {
             jogadoresNaArea.Remove(scriptDoJogador);
-            
         }
     }
 }   

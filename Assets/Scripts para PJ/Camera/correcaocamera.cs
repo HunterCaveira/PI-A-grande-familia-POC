@@ -1,77 +1,47 @@
 using UnityEngine;
-using Unity.Cinemachine; // Cinemachine v3
 
-public class CorrecaoCameraPersonagem : MonoBehaviour
+public class correcalcamera : MonoBehaviour
 {
-    [Header("Configuração de Foco da Câmera")]
-    [Tooltip("Arraste o objeto filho 'CameraTarget' posicionado no ombro do personagem.")]
-    [SerializeField] private Transform cameraTarget;
 
-    [Header("Rotação do Personagem")]
-    [SerializeField] private float velocidadeRotacao = 10f;
-    [Tooltip("Gira o personagem apenas quando ele estiver se movendo? (Recomendado para jogos estilo Marvel Rivals)")]
-    [SerializeField] private bool girarApenasEmMovimento = false;
+    // varivel declarada para Rotação da camera.
+    [SerializeField] private float velocidadeRotacao;
 
-    private Transform cameraTransform;
-
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Encontra a câmera principal
-        if (Camera.main != null)
-        {
-            cameraTransform = Camera.main.transform;
-        }
 
-        // Se não atribuiu o ponto no ombro no Inspector, tenta achar o objeto filho "CameraTarget"
-        if (cameraTarget == null)
-        {
-            Transform encontrado = transform.Find("CameraTarget");
-            cameraTarget = encontrado != null ? encontrado : transform;
-        }
 
-        // Conecta o alvo do Cinemachine v3 de forma correta
-        CinemachineCamera freeLookCam = FindFirstObjectByType<CinemachineCamera>();
-        if (freeLookCam != null)
-        {
-            freeLookCam.Target.TrackingTarget = cameraTarget;
-        }
+
+
     }
 
+    // Update is called once per frame
     void Update()
     {
-        AlinharPersonagemComCamera();
-    }
 
-    private void AlinharPersonagemComCamera()
-    {
-        if (cameraTransform == null) return;
+        Vector3 camFrente = Camera.main.transform.forward;
+        camFrente.y = 0;
 
-        // Se a opção estiver ativa, só gira se houver input de movimento
-        if (girarApenasEmMovimento)
-        {
-            float inputHorizontal = Input.GetAxisRaw("Horizontal");
-            float inputVertical = Input.GetAxisRaw("Vertical");
+        if (camFrente.sqrMagnitude < 0.0001f)
+            return;
 
-            if (inputHorizontal == 0 && inputVertical == 0) return;
-        }
+        Quaternion rotacaoAlvo = Quaternion.LookRotation(camFrente);
 
-        // Obtém a direção para onde a câmera está olhando no plano horizontal
-        Vector3 direcaoCamera = cameraTransform.forward;
-        direcaoCamera.y = 0;
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
 
-        if (direcaoCamera.sqrMagnitude < 0.0001f) return;
-
-        // Rotaciona APENAS o corpo do personagem suavemente
-        Quaternion rotacaoAlvo = Quaternion.LookRotation(direcaoCamera);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (cameraTarget != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(cameraTarget.position, 0.15f);
-        }
     }
 }
+
+// Resolução conta: (leituraInput.x * transform.right) + (leituraInput.y * transform.forward);
+// se eu apertar a tecla D ou a  SETA PARA DIREITA ele retorna um valor positivo em x = 1
+// leituraInput. = 1
+// transform.right = vector3 (1, 0, 0)
+// leituraInput.x (1) x transform.right(1,0,0) = (1,0,0)
+
+// se eu aperta a tecla W ou a SETA PARA CIMA ELE retorna um valor positivo em y = 1
+// leituraInput.y = 1
+// tranform.forward = Vector3 (0, 0, 1)
+// leituraInput.y (1) X transdorm.forward (0, 0, 1) = (0, 0, 1)
+
+//soma as duas partes
+// (1, 0, 0,) + (0, 0, 1) = (1, 0, 1)

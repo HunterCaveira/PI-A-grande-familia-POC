@@ -1,13 +1,11 @@
+
 using UnityEngine;
 
 public interface IHabilidade
 {
-    // Método para iniciar o uso/mira da habilidade
+    // Método chamado pelo gerenciador para ativar o modo/função da habilidade
     void AtivarHabilidade();
 
-    // Método para cancelar o uso/mira e limpar efeitos
+    // Método chamado pelo gerenciador para cancelar a habilidade (ex: fechar fantasma)
     void CancelarHabilidade();
-
-    // Pergunta se a habilidade está fora do tempo de recarga (cooldown)
-    bool EstaPronta();
 }

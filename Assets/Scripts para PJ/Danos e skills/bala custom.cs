@@ -20,7 +20,7 @@ public class balacustom : MonoBehaviour
         //Destroy(gameObject, tempoVidaMaximo);
         StartCoroutine(StartDisableObject());
     }
-    
+
 
 
     // Este método é chamado automaticamente pela Unity quando o Rigidbody da bala bate em qualquer Collider
@@ -41,7 +41,7 @@ public class balacustom : MonoBehaviour
 
         // Deleta o objeto da bala imediatamente !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        
+      //  Destroy(gameObject);
 
     }
 

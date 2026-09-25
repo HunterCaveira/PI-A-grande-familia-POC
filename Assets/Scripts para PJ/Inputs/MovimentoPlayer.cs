@@ -69,8 +69,8 @@ public class MovimentodoPlayer : MonoBehaviour
         if (characterController.isGrounded)
         {
             // Obtém a força do pulo direto do ScriptableObject
-            float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
-            velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade);
+            float forcaPulo = (atributos != null) ? atributos.forcaPulo : 2f;
+            velocidadeVertical = Mathf.Sqrt(forcaPulo * -2f * gravidade);
         }
     }
     void Correr()

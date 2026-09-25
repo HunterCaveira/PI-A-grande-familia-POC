@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textoCronometro: {fileID: 0}
-  "domina\xE7\xE3oRoxo": {fileID: 0}
-  "domina\xE7\xE3oAmarelo": {fileID: 0}
   imagemVitoriaTime1: {fileID: 0}
   imagemVitoriaTime2: {fileID: 0}
   imagemEmpate: {fileID: 0}

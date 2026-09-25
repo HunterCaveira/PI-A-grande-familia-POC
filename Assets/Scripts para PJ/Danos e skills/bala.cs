@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bala : MonoBehaviour
@@ -45,7 +44,6 @@ public class Bala : MonoBehaviour
         }
 
         // Destrói a bala ao colidir com qualquer superfície (Personagem, Parede, Chão)
-        
-            gameObject.SetActive(false);
+       // Destroy(gameObject);
     }
 }

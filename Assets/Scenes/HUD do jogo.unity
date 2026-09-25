@@ -739,8 +739,14 @@ RectTransform:
   m_LocalScale: {x: 3.6875, y: 2.9499, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+<<<<<<< HEAD
   - {fileID: 339330577}
   - {fileID: 956850503}
+=======
+  - {fileID: 1690890207}
+  - {fileID: 1884755178}
+  - {fileID: 58036168}
+>>>>>>> parent of de4e51c (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
   m_Father: {fileID: 1718411508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1956,6 +1962,42 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1627298193}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
+=======
+--- !u!1 &1690890206
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1690890207}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1690890207
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690890206}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 18.117039, y: -138.34555, z: 3565.1023}
+  m_LocalScale: {x: 0.21917598, y: 0.25828156, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 339330577}
+  - {fileID: 1202607766}
+  m_Father: {fileID: 553815976}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+>>>>>>> parent of de4e51c (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
 --- !u!1 &1718411504
 GameObject:
   m_ObjectHideFlags: 0
