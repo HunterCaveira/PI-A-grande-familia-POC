@@ -11,40 +11,41 @@ public class Menu : MonoBehaviour
     [SerializeField] private GameObject Creditos;
     [SerializeField] private Slider sliderVolume;
     [SerializeField] private Scrollbar scrollbarMusica;
-    [SerializeField] private TMP_InputField nickName;
-    [SerializeField] private TMP_Text novonome;
-
+    [SerializeField] public GameObject painelGeral;
+    [SerializeField] public GameObject painelSom;
 
     public void NovoJogo()
     {
         SceneManager.LoadScene(1);
-       
+
     }
     public void opção()
     {
         menuPrincipal.SetActive(false);
         Configuração.SetActive(true);
         Creditos.SetActive(false);
-        
+
     }
     public void voltar()
     {
         menuPrincipal.SetActive(true);
         Configuração.SetActive(false);
         Creditos.SetActive(false);
-        
+        painelGeral.SetActive(false);
+        painelSom.SetActive(false);
+
     }
     public void Credito()
     {
         Creditos.SetActive(true);
         menuPrincipal.SetActive(false);
         Configuração.SetActive(false);
-        
+
     }
     public void sair()
     {
         Application.Quit();
-       
+
     }
     public void mudarVolume()
     {
@@ -54,8 +55,14 @@ public class Menu : MonoBehaviour
     {
         Debug.Log(scrollbarMusica.value);
     }
-    public void seuNome(TMP_InputField input)
+    public void TrocarSOM()
     {
-        novonome.text = input.text;
+        painelSom.SetActive(true);
+        painelGeral.SetActive(false);
+    }
+    public void TrocarGeral()
+    {
+        painelGeral.SetActive(true);
+        painelSom.SetActive(false);
     }
 }
