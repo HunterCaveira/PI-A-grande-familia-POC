@@ -364,15 +364,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
-  cameraPrincipal: {fileID: 2194324494853763891}
+  cameraPrincipal: {fileID: 4150468671446003424, guid: afbe4d1b5e23aca4480675cdd1e7cc5e, type: 3}
   distanciaMaxima: 10
   tempoCooldown: 0
   velocidadeAvanco: 30
   velocidadeRetorno: 20
+  slotIndex: 2
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
   pontoFivelaPontos: {fileID: 4932673275829706526}
-  pontoDestinoPuxao: {fileID: 0}
+  pontoDestinoPuxao: {fileID: 7566779434684666353}
   idDoTime: 1
 --- !u!114 &6155027452624956214
 MonoBehaviour:
@@ -386,6 +389,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
+  slotIndex: 3
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 3
@@ -421,7 +427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43b27cb39a4227244ae24a72fba942f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
-  virtualCamera: {fileID: 7091013494263123166, guid: e3e1d0422122cf4408c36455f6cfd8ee, type: 3}
+  virtualCamera: {fileID: 0}
   cameraFollowTarget: {fileID: 7566779434684666353}
 --- !u!114 &1280254733132079239
 MonoBehaviour:
@@ -1151,7 +1157,6 @@ GameObject:
   - component: {fileID: 4419811893408393778}
   - component: {fileID: 4235503665129315517}
   - component: {fileID: 227339376035805017}
-  - component: {fileID: 7415548578790139605}
   m_Layer: 3
   m_Name: arma
   m_TagString: Bala
@@ -1265,42 +1270,6 @@ MonoBehaviour:
   "permitirSegurarBot\xE3o": 0
   playerCamera: {fileID: 0}
   pontoAtaque: {fileID: 3095084623006946415}
-  muzzleFlash: {fileID: 0}
-  ammunitionDisplay: {fileID: 0}
-  balaZerada: 0
---- !u!114 &7415548578790139605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7228568723087913597}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac60f38d6245cc7488d6272b5f201cd1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  alcanceDoTiro: 20
-  espalhamentoHorizontal: 2
-  espalhamentoVertical: 2
-  mascaraDeTiro:
-    serializedVersion: 2
-    m_Bits: 243
-  lineRenderer: {fileID: 0}
-  duracaoLinha: 0
-  meuPoolDeBalas: {fileID: 0}
-  danoPorTiro: 20
-  tipoDeDano: 0
-  nomeDaArma: Pistola
-  "for\xE7aTiro": 50
-  "for\xE7aCima": 0
-  tempoEntreAtirar: 0.2
-  tempoRecarga: 1
-  tamanhoCarregador: 200
-  tiroPorClick: 10
-  "permitirSegurarBot\xE3o": 0
-  playerCamera: {fileID: 0}
-  pontoAtaque: {fileID: 0}
   muzzleFlash: {fileID: 0}
   ammunitionDisplay: {fileID: 0}
   balaZerada: 0
