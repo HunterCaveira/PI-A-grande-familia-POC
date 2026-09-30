@@ -1,11 +1,10 @@
 using UnityEngine;
 
-public interface ISkills
+
+public interface IasUI : IHabilidade
 {
-    int SlotIndex { get; }        // 1 (Q), 2 (E), 3 (F)
+    int SlotIndex { get; }
     float TempoProximouso { get; }
     Sprite FotoPronta { get; }
     Sprite FotoRecarregando { get; }
-
-    bool PodeUsar();
 }

@@ -1,10 +1,25 @@
 using System.Collections; // Importa suporte a Corrotinas (IEnumerator e WaitForSeconds).
 using UnityEngine; // Importa as ferramentas principais do motor da Unity.
 
-public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe pública HabilidadeTonico implementando a interface IHabilidade.
+public class HabilidadeTonico : MonoBehaviour, IasUI // Implementa IasUI (que herda de IHabilidade)
 {
+    [Header("Configuração do Slot e UI")]
+    [SerializeField] private int slotIndex = 3;
+    public int SlotIndex => slotIndex;
+
+    // Propriedades exigidas pela interface IasUI para o HUD/UI
+    [SerializeField] private Sprite fotoPronta;
+    public Sprite FotoPronta => fotoPronta;
+
+    [SerializeField] private Sprite fotoRecarregando;
+    public Sprite FotoRecarregando => fotoRecarregando;
+
+    // Propriedade corrigida para atender a interface IasUI permitindo leitura e escrita
+    public float TempoProximouso { get; set; } = 0f;
+
+
     // ==========================================
-    // 1. CONFIGURAÇÕES DOS BUFFS
+    // 2. CONFIGURAÇÕES DOS BUFFS
     // ==========================================
 
     [Header("Configurações do Buff")]
@@ -21,7 +36,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
 
     // ==========================================
-    // 2. TEMPOS E CONTROLES
+    // 3. TEMPOS E CONTROLES
     // ==========================================
 
     [Header("Tempo de Animação e Cooldown")]
@@ -29,12 +44,11 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
     [SerializeField] private float tempoAnimacaoConsumo = 1.0f; // Tempo com o tônico na mão para simular o consumo.
     [SerializeField] private float tempoCooldown = 10.0f; // Tempo de recarga após o fim do efeito.
 
-    private float tempoProximoUso = 0f; // Temporizador interno de recarga (Time.time).
     private bool emUsoOuAnimacao = false; // Trava booleana de execução interna.
 
 
     // ==========================================
-    // 3. REFERÊNCIAS E FICHAS DE ATRIBUTOS
+    // 4. REFERÊNCIAS E FICHAS DE ATRIBUTOS
     // ==========================================
 
     [Header("Controle De Referência")]
@@ -48,7 +62,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
 
     // ==========================================
-    // 4. CICLO DE VIDA DA UNITY
+    // 5. CICLO DE VIDA DA UNITY
     // ==========================================
 
     private void Awake() // Método de inicialização ao carregar o componente na cena.
@@ -64,26 +78,32 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
 
     // ==========================================
-    // 5. MÉTODOS DA INTERFACE IHABILIDADE
+    // 6. MÉTODOS DA INTERFACE (IasUI / IHabilidade)
     // ==========================================
 
     public bool EstaPronta() // Consulta se a habilidade está fora de recarga e pronta para uso.
     {
-        return Time.time >= tempoProximoUso && !emUsoOuAnimacao;
+        return Time.time >= TempoProximouso && !emUsoOuAnimacao;
     }
 
-    public void AtivarHabilidade() // Método invocado pelo GerenciadorDeEquipamentos assim que a tecla (F) é pressionada.
+    // ADICIONADO PARA ATENDER À CONTRATAÇÃO DA INTERFACE IHABILIDADE:
+    public bool PodeUsar()
     {
-        //Debug.Log("[TÔNICO] Tecla 'F' pressionada! Verificando prontidão da habilidade...");
+        return EstaPronta();
+    }
+
+    public void AtivarHabilidade() // Método invocado pelo GerenciadorDeEquipamentos assim que a tecla correspondente é pressionada.
+    {
+        Debug.Log("1. Tentando ativar habilidade"); // <--- ETAPA 1
 
         if (!EstaPronta()) // SE a habilidade estiver em cooldown ou execução.
         {
-            Debug.LogWarning($"[TÔNICO] Habilidade em recarga/uso! Disponível apenas em: {tempoProximoUso - Time.time:F1}s");
+            Debug.LogWarning($"[TÔNICO] Habilidade em recarga/uso! Disponível apenas em: {TempoProximouso - Time.time:F1}s");
             if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0); // Garante o retorno à arma principal.
             return;
         }
 
-        // Dispara a corrotina de consumo direto ao pressionar a tecla 'F'
+        // Dispara a corrotina de consumo direto ao pressionar a tecla
         StartCoroutine(RotinaConsumirEAplicarTonico());
     }
 
@@ -110,7 +130,7 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
 
     // ==========================================
-    // 6. CORROTINA DO TÔNICO
+    // 7. CORROTINA DO TÔNICO
     // ==========================================
 
     private IEnumerator RotinaConsumirEAplicarTonico() // Corrotina que executa o consumo direto do tônico.
@@ -119,13 +139,10 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
 
         if (prefabTonicoMao != null) prefabTonicoMao.SetActive(true); // Exibe o objeto 3D do frasco na mão do herói.
 
-        //Debug.Log($"[TÔNICO] Bebendo o tônico... Aguardando {tempoAnimacaoConsumo}s de tempo de consumo.");
+        Debug.Log("2. Bebendo tônico... Aguardando animação."); // <--- ETAPA 2
 
         // FASE 1: TEMPO DE CONSUMO (ANIMAÇÃO DE BEBER)
         yield return new WaitForSeconds(tempoAnimacaoConsumo);
-
-        // LOG DE CONFIRMAÇÃO DE CONSUMO
-       // Debug.Log("<color=green>[TÔNICO LOG] O Tônico foi consumido com sucesso!</color>");
 
         // FASE 2: APLICAÇÃO DOS BUFFS (GERA E INJETA A FICHA TEMPORÁRIA DUPLICADA)
         AplicarBuffs();
@@ -134,21 +151,20 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
         if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0); // Retorna a mão para a arma principal (Slot 0).
 
         // FASE 3: DURAÇÃO DO EFEITO
-        //Debug.Log($"[TÔNICO] Buffs ativos! Duração do efeito: {duracaoDoEfeito} segundos.");
         yield return new WaitForSeconds(duracaoDoEfeito);
 
         // FASE 4: REMOÇÃO DOS BUFFS E RESTAURAÇÃO DA FICHA ORIGINAL
         RemoverBuffs(); // Executado após a duração do efeito finalizar!
 
-        tempoProximoUso = Time.time + tempoCooldown; // Define o próximo segundo do relógio para liberação.
+        TempoProximouso = Time.time + tempoCooldown; // Define o próximo segundo do relógio para liberação.
         emUsoOuAnimacao = false; // Libera a trava de execução da habilidade.
 
-        Debug.Log($"[TÔNICO] Efeito finalizado. Habilidade entrou em Cooldown de {tempoCooldown}s.");
+        Debug.Log($"4. [TÔNICO] Efeito finalizado. Habilidade entrou em Cooldown de {tempoCooldown}s."); // <--- ETAPA 4
     }
 
 
     // ==========================================
-    // 7. APLICAÇÃO E REMOÇÃO DE STATUS (SISTEMA DE FICHA DUPLICADA)
+    // 8. APLICAÇÃO E REMOÇÃO DE STATUS (SISTEMA DE FICHA DUPLICADA)
     // ==========================================
 
     private void AplicarBuffs()
@@ -161,6 +177,8 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
             // Cria uma duplicata em memória da ficha original para não alterar o arquivo no disco
             atributosBuffados = Instantiate(atributosOriginal);
             atributosBuffados.velocidadeMovimento = velocidadeComBuff; // Injeta a velocidade com buff (Ex: 20).
+
+            Debug.Log("3. Ficha clonada. Velocidade configurada para: " + atributosBuffados.velocidadeMovimento); // <--- ETAPA 3
 
             // Atualiza o script de MovimentodoPlayer com a nova ficha temporária
             MovimentodoPlayer movimento = GetComponent<MovimentodoPlayer>();
@@ -175,13 +193,11 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
                 sistemaDeVida.AtualizarFichaAtributos(atributosBuffados);
                 sistemaDeVida.PorcentagemReducaoDano = porcentagemReducaoDano; // Aplica a redução de dano (Ex: 30%).
             }
-
-            //Debug.Log($"<color=cyan>[TÔNICO BUFF] Ficha temporária ativada com velocidade: {atributosBuffados.velocidadeMovimento}</color>");
         }
-        //else
-        //{
-           // Debug.LogError("[TÔNICO ERRO] A referência 'atributosOriginal' NÃO foi atribuída no Inspector do Tônico!");
-        //}
+        else
+        {
+            Debug.LogError("[TÔNICO] O campo 'Atributos Original' está vazio no Inspetor!");
+        }
     }
 
     private void RemoverBuffs()
@@ -199,8 +215,6 @@ public class HabilidadeTonico : MonoBehaviour, IHabilidade // Declara a classe p
             sistemaDeVida.AtualizarFichaAtributos(atributosOriginal);
             sistemaDeVida.PorcentagemReducaoDano = 0f;
         }
-
-      //  Debug.Log($"<color=yellow>[TÔNICO RESET] Ficha original restaurada no herói com velocidade base: {atributosOriginal.velocidadeMovimento}</color>");
 
         // Limpa a ficha temporária da memória RAM
         if (atributosBuffados != null)
