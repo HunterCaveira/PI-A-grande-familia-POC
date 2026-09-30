@@ -331,14 +331,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraPrincipal: {fileID: 2194324494853763891}
+  cameraPrincipal: {fileID: 0}
   distanciaMaxima: 15
   camadaChao:
     serializedVersion: 2
     m_Bits: 64
   camadaParedesEObstaculos:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   larguraMaxima: 10
   larguraMinima: 1
   alturaMaxima: 3
@@ -364,7 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
-  cameraPrincipal: {fileID: 4150468671446003424, guid: afbe4d1b5e23aca4480675cdd1e7cc5e, type: 3}
+  cameraPrincipal: {fileID: 0}
   distanciaMaxima: 10
   tempoCooldown: 0
   velocidadeAvanco: 30
@@ -375,7 +375,7 @@ MonoBehaviour:
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
   pontoFivelaPontos: {fileID: 4932673275829706526}
-  pontoDestinoPuxao: {fileID: 7566779434684666353}
+  pontoDestinoPuxao: {fileID: 511360171275777798}
   idDoTime: 1
 --- !u!114 &6155027452624956214
 MonoBehaviour:
@@ -1043,7 +1043,7 @@ GameObject:
   - component: {fileID: 4226408948408179257}
   - component: {fileID: 7687801800096056631}
   - component: {fileID: 7292887001349039003}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Prefab_Tonico
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1376,6 +1376,10 @@ PrefabInstance:
       value: PrefabParedeReal
       objectReference: {fileID: 0}
     - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -1515,6 +1519,10 @@ PrefabInstance:
     - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_Name
       value: PrefabParedeFantasma
+      objectReference: {fileID: 0}
+    - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7505011776156587176, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_LocalPosition.x
