@@ -349,7 +349,7 @@ MonoBehaviour:
   limiteParedes: 2
   tempoCooldown: 1
   slotIndex: 1
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoPronta: {fileID: 21300000, guid: 5871ef8a91521d6408407dfafdb7a0a4, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   tempoDeRecarga: 1
 --- !u!114 &885443826420353248
@@ -370,7 +370,7 @@ MonoBehaviour:
   velocidadeAvanco: 30
   velocidadeRetorno: 20
   slotIndex: 2
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoPronta: {fileID: 21300000, guid: fe79c05c3225f7a4696d642ac859cb6e, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
@@ -390,7 +390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
   slotIndex: 3
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoPronta: {fileID: 21300000, guid: 717c2d2799ae8f147913049e0fdf9539, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
