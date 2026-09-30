@@ -137,7 +137,6 @@ GameObject:
   - component: {fileID: 9051275931637434775}
   - component: {fileID: 8944851139297610719}
   - component: {fileID: 5462147207407341697}
-  - component: {fileID: 5076658877515485142}
   - component: {fileID: 849392077082758349}
   - component: {fileID: 6915849281859597048}
   - component: {fileID: 8305240971407860968}
@@ -243,23 +242,6 @@ MonoBehaviour:
   forcaPulo: 2
   velocidadeVertical: 2
   atributos: {fileID: 11400000, guid: 9f1b0b4d75b2c0149afd36c178fcc38d, type: 2}
---- !u!114 &5076658877515485142
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
-  Tiropistola: {fileID: 227339376035805017}
-  pontosDeSpawn:
-  - {fileID: 0}
-  - {fileID: 0}
-  tempoParaRenascer: 3
 --- !u!114 &849392077082758349
 MonoBehaviour:
   m_ObjectHideFlags: 0
