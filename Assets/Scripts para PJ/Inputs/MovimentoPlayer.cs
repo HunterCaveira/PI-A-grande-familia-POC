@@ -1,121 +1,111 @@
-using UnityEngine; // Importa a biblioteca principal do motor da Unity para acessar MonoBehaviour, CharacterController, etc.
+// biblioteca de acesso da unity
+using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))] // Garante a presença automática do CharacterController no GameObject.
-public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública herdando de MonoBehaviour.
+// um classe chamada MovimentoPlayer
+// : -> significao herança
+// Monobehaviour - Classe de comportamento unico dentro da unity, que permite a criação de scripts para objetos do jogo.
+[RequireComponent(typeof(CharacterController))]
+public class MovimentodoPlayer : MonoBehaviour
 {
-    // ==========================================
-    // 1. VARIÁVEIS DE COMPONENTES E INPUT
-    // ==========================================
+    private CharacterController characterController;
+    private AcoesPlayer acoesPlay;
 
-    private CharacterController characterController; // Referência para o controlador de movimento físico da Unity.
-    private AcoesPlayer acoesPlay; // Referência para o sistema de inputs do jogador.
-
-    [Header("Configurações de Movimento")] // Seção de organização no Inspector.
-    [SerializeField] private float velocidade; // Velocidade privada de fallback do Inspector.
-    [SerializeField] private float gravidade = -9.81f; // Força de gravidade aplicada ao personagem no ar.
-    [SerializeField] private float forcaPulo = 2f; // Força de impulso vertical do pulo.
-    [SerializeField] private float velocidadeVertical; // Acumulador de aceleração vertical no eixo Y.
-    private float velocidadeAtual; // Guarda a velocidade calculada para o frame atual (andando ou correndo).
-
-    [Header("Ficha de Atributos")]
-    [SerializeField] private AtributosPersonagem atributos; // Referência ao ScriptableObject de atributos do personagem.
-
-
-    // ==========================================
-    // 2. CICLO DE VIDA DA UNITY
-    // ==========================================
-
-    private void Awake() // Método de inicialização de instâncias.
+    [Header("Configurações de Movimento")]
+    [SerializeField] private float velocidade;
+    [SerializeField] private float gravidade = -9.81f;
+    [SerializeField] private float forcaPulo = 2f;
+    [SerializeField] private float velocidadeVertical;
+    private float velocidadeAtual;
+    [SerializeField] private AtributosPersonagem atributos;
+    private void Awake()
     {
-        acoesPlay = new AcoesPlayer(); // Instancia a classe de comandos de Input do jogador.
+        acoesPlay = new AcoesPlayer();
     }
 
-    void Start() // Método chamado antes do primeiro frame de execução.
+    // É chamado antes do primeiro frame de execução
+    void Start()
     {
-        characterController = GetComponent<CharacterController>(); // Atribui o componente CharacterController do GameObject.
+        characterController = GetComponent<CharacterController>();
 
-        // Registra o evento da tecla de pulo chamando o método SolicitarPulo
+        // CORREÇÃO 1: Forma correta de registrar o evento usando a lambda (ctx =>)
         acoesPlay.MovimentoPlayer.Pular.started += ctx => SolicitarPulo();
     }
 
-    private void OnEnable() // Executado quando o script é ativado.
+    private void OnEnable()
     {
-        acoesPlay.MovimentoPlayer.Enable(); // Ativa o mapa de ações de input do jogador.
+        acoesPlay.MovimentoPlayer.Enable();
     }
 
-    private void OnDisable() // Executado quando o script é desativado.
+    private void OnDisable()
     {
-        acoesPlay.MovimentoPlayer.Disable(); // Desativa o mapa de ações para poupar processamento e evitar vazamentos.
+        acoesPlay.MovimentoPlayer.Disable();
     }
 
-    void Update() // Executado uma vez por frame do jogo.
+    // É chamado uma vez a cada frame.
+    void Update()
     {
-        AplicarGravidade(); // Executa o cálculo da física de queda e grounded.
-        Correr(); // Recalcula a velocidade base considerando a ficha de atributos e o botão de corrida.
-        Andar(); // Aplica a movimentação tridimensional final no CharacterController.
-    }
-
-
-    // ==========================================
-    // 3. MÉTODOS DE CÁLCULO FÍSICO E MOVIMENTO
-    // ==========================================
-
-    void AplicarGravidade() // Trata o acúmulo da gravidade e a estabilização no chão.
-    {
-        if (characterController.isGrounded && velocidadeVertical < 0) // SE o jogador estiver pisando firme no solo.
-        {
-            velocidadeVertical = -2f; // Reseta a gravidade para um valor negativo baixo mantendo o herói preso ao chão.
-        }
-        else // SENÃO (se estiver caindo ou pulando no ar).
-        {
-            velocidadeVertical += gravidade * Time.deltaTime; // Acumula a força de atração da gravidade no tempo.
-        }
-    }
-
-    void SolicitarPulo() // Método responsável por aplicar a força de impulso do pulo.
-    {
-        if (characterController.isGrounded) // SE o personagem estiver pisando no solo.
-        {
-            // Obtém a força do pulo direto da ficha de atributos (ou usa o valor do Inspector como fallback)
-            float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
-            velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade); // Aplica a fórmula física de velocidade de pulo.
-        }
-    }
-
-    void Correr() // Calcula a velocidade do movimento em tempo real.
-    {
-        // Lê a VelocidadeFinal (Base x Multiplicador) direto da ficha de atributos a cada frame
-        float velocidadeBase = (atributos != null) ? atributos.VelocidadeFinal : 5f;
-
-        bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed(); // Checa se o botão de corrida está pressionado.
-
-        if (botaoCorrerPressionado) // SE estiver correndo.
-        {
-            velocidadeAtual = velocidadeBase * 2f; // Dobra a velocidade base calculada.
-        }
-        else // SENÃO (caminhada normal).
-        {
-            velocidadeAtual = velocidadeBase; // Aplica a velocidade base normal.
-        }
-    }
-
-    void Andar() // Aplica o deslocamento tridimensional no motor físico.
-    {
-        Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>(); // Lê a direção das teclas WASD ou analógico.
-
-        // Recalcula a velocidade no próprio frame do movimento para garantir atualização imediata
+        // CORREÇÃO 2: O Update agora apenas CHAMA as funções na ordem certa
+        AplicarGravidade();
         Correr();
+        Andar();
+    }
 
-        // Calcula a direção local orientada pela rotação do herói
+    // CORREÇÃO 2: Criamos a função isolada, fora do Update
+    void AplicarGravidade()
+    {
+        if (characterController.isGrounded && velocidadeVertical < 0)
+        {
+            velocidadeVertical = -2f; // Reseta a gravidade se estiver no chão
+        }
+        else
+        {
+            // Se não estiver no chão, a gravidade acumula com o tempo
+            velocidadeVertical += gravidade * Time.deltaTime;
+        }
+    }
+    // CORREÇÃO 4: Removemos a função Pular() antiga que estava no Update e mantivemos esta
+    void SolicitarPulo()
+    {
+        if (characterController.isGrounded)
+        {
+            // Obtém a força do pulo direto do ScriptableObject
+            float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
+            velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade);
+        }
+    }
+    void Correr()
+    {
+        // Só altera a velocidade horizontal se o jogador estiver pisando no chão
+
+        float velocidadeBase = (atributos != null) ? atributos.velocidadeMovimento : 5f;
+        bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed();
+
+        if (botaoCorrerPressionado)
+        {
+            velocidadeAtual = velocidadeBase * 2f;
+        }
+        else
+        {
+            velocidadeAtual = velocidadeBase;
+        }
+
+        // Se estiver no ar, ele mantém a velocidade do momento em que pulou (conservação de impulso)
+    }
+
+    void Andar()
+    {
+        Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
+
+        // Calcula a direção no plano horizontal
         Vector3 direcao = (transform.right * leituraInput.x) + (transform.forward * leituraInput.y);
 
-        // Aplica o vetor de movimento horizontal com a velocidade recém-calculada
+        // Multiplica a direção pela velocidade (normal ou de corrida)
         Vector3 movimentoHorizontal = direcao * velocidadeAtual;
 
-        // Combina o vetor horizontal com a aceleração vertical da gravidade no eixo Y
+        // Junta a velocidade horizontal com a gravidade vertical
         Vector3 movimentoFinal = new Vector3(movimentoHorizontal.x, velocidadeVertical, movimentoHorizontal.z);
 
-        // Move o CharacterController no mundo multiplicado pelo delta time
+        // Aplica o movimento
         characterController.Move(movimentoFinal * Time.deltaTime);
     }
 }

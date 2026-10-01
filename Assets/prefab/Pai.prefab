@@ -147,7 +147,6 @@ GameObject:
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
   - component: {fileID: 885443826420353248}
-  - component: {fileID: 6155027452624956214}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -408,27 +407,6 @@ MonoBehaviour:
   pontoFivelaPontos: {fileID: 4932673275829706526}
   pontoDestinoPuxao: {fileID: 0}
   idDoTime: 1
---- !u!114 &6155027452624956214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  multiplicadorVelocidadeExtra: 1.5
-  porcentagemReducaoDano: 0.3
-  duracaoDoEfeito: 2
-  tempoAnimacaoConsumo: 1
-  tempoCooldown: 1
-  gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
-  sistemaDeVida: {fileID: 8305240971407860968}
-  atributosHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
-  prefabTonicoMao: {fileID: 7067021843553549109}
 --- !u!1 &3853642255824957655
 GameObject:
   m_ObjectHideFlags: 0
