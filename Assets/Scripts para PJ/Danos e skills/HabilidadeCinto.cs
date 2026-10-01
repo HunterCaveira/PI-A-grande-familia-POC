@@ -1,12 +1,12 @@
 using UnityEngine; // Importa a biblioteca principal do motor da Unity.
 
-public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do Cinto herdando de MonoBehaviour e implementando ISkills.
+public class HabilidadeCinto : MonoBehaviour, IHabilidade // Declara a classe pública HabilidadeCinto herdando de MonoBehaviour e implementando o contrato IHabilidade.
 {
     // ==========================================
     // 1. CONFIGURAÇÕES DA CÂMERA E ALCANCE
     // ==========================================
 
-    [Header("Configurações da Câmera e Alcance")] // Seção de mira e distância no Inspector.
+    [Header("Configurações da Câmera e Alcançe")] // Seção de mira e distância no Inspector.
 
     [SerializeField] // Exibe o campo no Inspector mantendo a variável privada.
     private Camera cameraPrincipal; // Armazena a referência da câmera usada para calcular a direção da mira.
@@ -25,7 +25,6 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
     private float tempoCooldown = 3.0f; // Tempo de recarga em segundos.
 
     private float tempoProximoUso = 0f; // Tempo liberado no relógio da Unity (Time.time) para o próximo uso.
-    public float TempoProximouso => tempoProximoUso; // Propriedade exigida pela interface ISkills.
 
     [SerializeField] // Exibe o campo no Inspector.
     private float velocidadeAvanco = 30f; // Velocidade com que o cinto avança em direção à mira.
@@ -35,22 +34,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
 
 
     // ==========================================
-    // 3. CONFIGURAÇÃO DE SLOT E UI (OBRIGATÓRIO)
-    // ==========================================
-
-    [Header("Configuração de Slot e UI")]
-    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
-    public int SlotIndex => slotIndex;
-
-    [SerializeField] private Sprite fotoPronta;
-    public Sprite FotoPronta => fotoPronta;
-
-    [SerializeField] private Sprite fotoRecarregando;
-    public Sprite FotoRecarregando => fotoRecarregando;
-
-
-    // ==========================================
-    // 4. REFERÊNCIAS DE COMPONENTES E VISUAIS
+    // 3. REFERÊNCIAS DE COMPONENTES E VISUAIS
     // ==========================================
 
     [Header("Controle De Referência e Visuais")] // Seção de conexões e visuais no Inspector.
@@ -69,7 +53,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
 
 
     // ==========================================
-    // 5. COMBATE E MÁQUINA DE ESTADOS
+    // 4. COMBATE E MÁQUINA DE ESTADOS
     // ==========================================
 
     [Header("Filtragem de Time")] // Seção de regras PvP.
@@ -83,22 +67,20 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
     private EstadoCinto estadoAtual = EstadoCinto.Inativo; // Guarda o estado atual da habilidade.
 
     private Transform inimigoCapturado; // Guarda o Transform do inimigo preso no cinto.
-    private CharacterController controllerInimigo; // Guarda o CharacterController do inimigo para desativar colisão durante o puxão.
-    private Rigidbody rbInimigo; // Guarda o Rigidbody do inimigo para aplicar Kinematic durante o puxão.
+    private CharacterController controllerInimigo; // [NOVO]: Guarda o CharacterController do inimigo para desativar colisão durante o puxão.
+    private Rigidbody rbInimigo; // [NOVO]: Guarda o Rigidbody do inimigo para aplicar Kinematic durante o puxão.
 
     private Vector3 posicaoInicialLocal; // Guarda a posição local neutra do cinto guardado na mão.
     private Vector3 pontoFinalMundo; // Guarda o ponto final tridimensional para onde o cinto avança no disparo.
 
 
     // ==========================================
-    // 6. CICLO DE VIDA DA UNITY
+    // 5. CICLO DE VIDA DA UNITY
     // ==========================================
 
     private void Awake() // Inicialização do script na memória.
     {
-        if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>(); // Auto-busca o Gerenciador no próprio GameObject.
-
-        if (cameraPrincipal == null) cameraPrincipal = Camera.main; // Auto-busca a câmera principal caso esteja vazia.
+        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>(); // Auto-busca o Gerenciador no próprio GameObject.
 
         if (prefabCinto != null) // SE a referência do objeto do cinto foi atribuída.
         {
@@ -129,7 +111,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
 
 
     // ==========================================
-    // 7. LÓGICA DE DETECÇÃO, AVANÇO E PUXÃO
+    // 6. LÓGICA DE DETECÇÃO, AVANÇO E PUXÃO
     // ==========================================
 
     private void ProcessarAvanco() // Desloca o cinto no mundo até o ponto final calculado na mira.
@@ -158,7 +140,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
         // Mover o cinto de volta para a posição da mão no mundo
         prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeAvanco * Time.deltaTime);
 
-        // Continua verificando se algum inimigo entra em contato com a fivela mesmo enquanto o cinto está voltando!
+        // [NOVO / AJUSTADO]: Continua verificando se algum inimigo entra em contato com a fivela mesmo enquanto o cinto está voltando!
         if (ChecarEPrenderInimigo()) return; // SE um inimigo encostar na fivela na volta, prende ele e muda para PuxandoInimigo!
 
         // SE o cinto chegou de volta à mão sem pegar ninguém
@@ -168,7 +150,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
         }
     }
 
-    private bool ChecarEPrenderInimigo() // Função unificada para checar colisão da fivela tanto no avanço quanto no retorno.
+    private bool ChecarEPrenderInimigo() // [NOVO]: Função unificada para checar colisão da fivela tanto no avanço quanto no retorno.
     {
         Vector3 posicaoCheck = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
         Collider[] hits = Physics.OverlapSphere(posicaoCheck, 0.6f); // Esfera invisível de impacto na fivela.
@@ -189,7 +171,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
             {
                 inimigoCapturado = col.transform; // Captura o Transform do inimigo.
 
-                // Desativa temporariamente a física do inimigo para não dar conflito durante o movimento
+                // [SOLUÇÃO DO EMPURRÃO]: Desativa temporariamente a física do inimigo para não dar conflito durante o movimento
                 controllerInimigo = col.GetComponent<CharacterController>();
                 if (controllerInimigo != null) controllerInimigo.enabled = false; // Desativa o CharacterController para não "chutar" o inimigo.
 
@@ -231,7 +213,7 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
     {
         estadoAtual = EstadoCinto.Inativo; // Reseta o estado interno.
 
-        // Restaura o controle do CharacterController e Rigidbody do inimigo ao chegar
+        // [RESTAURAÇÃO DA FÍSICA DO INIMIGO]: Devolve o controle do CharacterController e Rigidbody do inimigo ao chegar
         if (controllerInimigo != null)
         {
             controllerInimigo.enabled = true; // Reativa a movimentação normal do inimigo.
@@ -262,23 +244,17 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
 
 
     // ==========================================
-    // 8. MÉTODOS DA INTERFACE ISKILLS
+    // 7. MÉTODOS DA INTERFACE IHABILIDADE
     // ==========================================
 
-    public bool EstaPronta()
+    public bool EstaPronta() // Pergunta contratada pela interface IHabilidade.
     {
         return Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
     }
 
-    // Exigido pelo contrato da interface ISkills:
-    public bool PodeUsar()
-    {
-        return EstaPronta();
-    }
-
     public void AtivarHabilidade() // Método chamado ao apertar a tecla associada à habilidade.
     {
-        if (!PodeUsar())
+        if (!EstaPronta())
         {
             if (gerenciadorDeEquipamentos != null)
             {
@@ -294,15 +270,12 @@ public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do C
         }
 
         // CÁLCULO DA MIRA EM QUALQUER DIREÇÃO
-        if (cameraPrincipal != null)
-        {
-            Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            pontoFinalMundo = ray.origin + ray.direction * distanciaMaxima;
+        Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        pontoFinalMundo = ray.origin + ray.direction * distanciaMaxima;
 
-            if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima))
-            {
-                pontoFinalMundo = hit.point;
-            }
+        if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima))
+        {
+            pontoFinalMundo = hit.point;
         }
 
         if (prefabCinto != null)

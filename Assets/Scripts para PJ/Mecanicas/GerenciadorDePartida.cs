@@ -44,28 +44,24 @@ public class GerenciadorDePartida : MonoBehaviour
         // 1. Cronômetro rodando para trás
         tempoRestante -= Time.deltaTime;
 
-        // 2. Pontuação do território (SÓ SOMA SE NÃO ESTIVER EM DISPUTA)
+        // 2. Pontuação do território
         if (areaDeDominacao != null)
         {
-            // Se a área estiver em disputa, nenhum time ganha pontos de controle total
-            if (!areaDeDominacao.emDisputa)
+            if (areaDeDominacao.timeDonoDoTerritorio == 1)
             {
-                if (areaDeDominacao.timeDonoDoTerritorio == 1)
-                {
-                    tempoTotalTime1 += Time.deltaTime;
-                }
-                else if (areaDeDominacao.timeDonoDoTerritorio == 2)
-                {
-                    tempoTotalTime2 += Time.deltaTime;
-                }
+                tempoTotalTime1 += Time.deltaTime;
+            }
+            else if (areaDeDominacao.timeDonoDoTerritorio == 2)
+            {
+                tempoTotalTime2 += Time.deltaTime;
             }
         }
 
         // 3. Atualiza os textos da tela com os tempos novos
         AtualizarRelogiosNaTela();
 
-        // 4. Fim de partida (Corrigido o '== 100' para '>=' para evitar bugs de ponto flutuante)
-        if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+        // 4. Fim de partida
+        if (tempoRestante <= 0)
         {
             FinalizarPartida();
         }
@@ -96,7 +92,10 @@ public class GerenciadorDePartida : MonoBehaviour
         int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
         int segundos = Mathf.FloorToInt(tempoEmSegundos % 60);
         return string.Format("{0:00}:{1:00}", minutos, segundos);
+
+        //return string.Format($"{Mathf.Round(tempoEmSegundos)} %");
     }
+   
 
     private void FinalizarPartida()
     {
@@ -107,12 +106,12 @@ public class GerenciadorDePartida : MonoBehaviour
         Debug.Log($"Fim! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
 
         // Compara os tempos e exibe a imagem correspondente
-        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
+        if (tempoTotalTime1 > tempoTotalTime2)
         {
             Debug.Log("Time 1 Venceu!");
             if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
         }
-        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f)
+        else if (tempoTotalTime2 > tempoTotalTime1)
         {
             Debug.Log("Time 2 Venceu!");
             if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(true);

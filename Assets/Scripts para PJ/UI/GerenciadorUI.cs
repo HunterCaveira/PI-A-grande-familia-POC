@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -19,7 +20,7 @@ public class GerenciadorUI : MonoBehaviour
     // Estrutura interna para controlar o estado de cada slot
     private class SlotUIInfo
     {
-        public IasUI Habilidade;
+        public ISkills Habilidade;
         public Image ImagemUI;
         public bool UltimoEstadoPronto = true;
     }
@@ -41,7 +42,7 @@ public class GerenciadorUI : MonoBehaviour
         slotsMap[3] = new SlotUIInfo { ImagemUI = imagemSlotF }; // 3 = F
 
         // 2. PEGA automaticamente todas as habilidades que estão no Jogador
-        IasUI[] habilidadesDoJogador = jogador.GetComponents<IasUI>();
+        ISkills[] habilidadesDoJogador = jogador.GetComponents<ISkills>();
 
         // 3. Associa cada habilidade encontrada ao seu respectivo slot baseado no SlotIndex dela
         foreach (var hab in habilidadesDoJogador)
@@ -56,33 +57,27 @@ public class GerenciadorUI : MonoBehaviour
 
     void Update()
     {
-        // Atualiza a cor do texto da munição em tempo real
-        AcabouMunição();
-
-        // Atualiza o visual das habilidades apenas quando houver mudança de estado (Pronta <-> Recarregando)
+        // Atualiza o visual apenas quando houver mudança de estado (Pronta <-> Recarregando)
         foreach (var par in slotsMap)
         {
             SlotUIInfo slotInfo = par.Value;
 
             if (slotInfo.Habilidade == null || slotInfo.ImagemUI == null) continue;
 
-            // CORREÇÃO: Utiliza o método EstaPronta() para respeitar tanto o tempo quanto as travas de animação/uso
-            bool estaPronta = slotInfo.Habilidade.EstaPronta();
+            // Verifica se o tempo atual já ultrapassou o tempo de recarga
+            bool estaPronta = Time.time >= slotInfo.Habilidade.TempoProximouso;
 
             if (estaPronta != slotInfo.UltimoEstadoPronto)
             {
                 slotInfo.UltimoEstadoPronto = estaPronta;
-                // Troca para a foto certa (Pronta ou Recarregando) da própria interface
+                // Troca para a foto certa (Pronta ou Recarregando)
                 slotInfo.ImagemUI.sprite = estaPronta ? slotInfo.Habilidade.FotoPronta : slotInfo.Habilidade.FotoRecarregando;
             }
         }
     }
-
     public void AcabouMunição()
     {
-        if (pistolaRef == null) return;
-
-        if (pistolaRef.balaZerada == true)
+        if(pistolaRef.balaZerada == true) 
         {
             meuTexto.color = Color.blue;
         }
@@ -92,4 +87,7 @@ public class GerenciadorUI : MonoBehaviour
             meuTexto.color = Color.white;
         }
     }
+
+
+
 }

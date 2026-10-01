@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bala : MonoBehaviour
@@ -6,10 +7,6 @@ public class Bala : MonoBehaviour
     private TipoDano tipoDano;
     private GameObject atirador;
     private string nomeArma;
-
-    [Header("Configurações de Colisão")]
-    [Tooltip("Camadas que a bala deve ignorar completamente.")]
-    [SerializeField] private LayerMask camadasParaIgnorar;
 
     // Método de inicialização invocado pela arma ao disparar
     public void Inicializar(float danoBase, TipoDano tipo, GameObject dono, string nomeDaArma)
@@ -25,17 +22,13 @@ public class Bala : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 1. Evita colidir com o próprio atirador no momento do disparo
+        // Evita colidir com o próprio atirador no momento do disparo
         if (other.gameObject == atirador) return;
 
-        // 2. Evita colidir com outras balas
         if (other.gameObject.CompareTag("Bala")) return;
 
-        // 3. Ignora se o objeto pertencer a uma Layer configurada para ser ignorada
-        // (Converte a layer do objeto em bitmask e verifica se está inclusa na LayerMask)
-        if ((camadasParaIgnorar.value & (1 << other.gameObject.layer)) != 0) return;
 
-        // 4. Se atingiu alguém que possui o Sistema de Vida
+        // Se atingiu alguém que possui o Sistema de Vida
         if (other.TryGetComponent<Sistemadevida>(out Sistemadevida vidaAtingida))
         {
             // Monta a struct de transporte de dano
@@ -46,12 +39,13 @@ public class Bala : MonoBehaviour
                 nomeArma
             );
 
+
             // Aplica o dano
             vidaAtingida.ReceberDano(infoDano);
         }
 
-        // 5. Desativa a bala apenas se passou por todas as verificações anteriores
-        // (Isso garante que ela não será desativada ao cruzar layers ignoradas)
-        gameObject.SetActive(false);
+        // Destrói a bala ao colidir com qualquer superfície (Personagem, Parede, Chão)
+        
+            gameObject.SetActive(false);
     }
 }

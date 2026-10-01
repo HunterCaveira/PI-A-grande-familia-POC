@@ -255,9 +255,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b8cea15f23b934fac541ea7d8878de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorRespawn
-  Tiropistola: {fileID: 227339376035805017}
+  Tiropistola: {fileID: 0}
   pontosDeSpawn:
-  - {fileID: 0}
   - {fileID: 0}
   tempoParaRenascer: 3
 --- !u!114 &849392077082758349
@@ -315,9 +314,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pontosSpawnTime1:
-  - {fileID: 3644916060881773861, guid: d4ce2a73502eb294e9d266962321db0a, type: 3}
+  - {fileID: 0}
   pontosSpawnTime2:
-  - {fileID: 1100983017872450593, guid: b85fc1013138bba40a8a280bd741abee, type: 3}
+  - {fileID: 0}
   tempoParaRespawn: 3
 --- !u!114 &5131067276467938538
 MonoBehaviour:
@@ -338,7 +337,7 @@ MonoBehaviour:
     m_Bits: 64
   camadaParedesEObstaculos:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
   larguraMaxima: 10
   larguraMinima: 1
   alturaMaxima: 3
@@ -349,7 +348,7 @@ MonoBehaviour:
   limiteParedes: 2
   tempoCooldown: 1
   slotIndex: 1
-  fotoPronta: {fileID: 21300000, guid: 5871ef8a91521d6408407dfafdb7a0a4, type: 3}
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   tempoDeRecarga: 1
 --- !u!114 &885443826420353248
@@ -369,13 +368,10 @@ MonoBehaviour:
   tempoCooldown: 0
   velocidadeAvanco: 30
   velocidadeRetorno: 20
-  slotIndex: 2
-  fotoPronta: {fileID: 21300000, guid: fe79c05c3225f7a4696d642ac859cb6e, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
   prefabCinto: {fileID: 4972495283499194072}
   pontoFivelaPontos: {fileID: 4932673275829706526}
-  pontoDestinoPuxao: {fileID: 511360171275777798}
+  pontoDestinoPuxao: {fileID: 0}
   idDoTime: 1
 --- !u!114 &6155027452624956214
 MonoBehaviour:
@@ -389,9 +385,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  slotIndex: 3
-  fotoPronta: {fileID: 21300000, guid: 717c2d2799ae8f147913049e0fdf9539, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 3
@@ -1043,7 +1036,7 @@ GameObject:
   - component: {fileID: 4226408948408179257}
   - component: {fileID: 7687801800096056631}
   - component: {fileID: 7292887001349039003}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Prefab_Tonico
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1376,10 +1369,6 @@ PrefabInstance:
       value: PrefabParedeReal
       objectReference: {fileID: 0}
     - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
-      propertyPath: m_Layer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -1519,10 +1508,6 @@ PrefabInstance:
     - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_Name
       value: PrefabParedeFantasma
-      objectReference: {fileID: 0}
-    - target: {fileID: 7081015560751939203, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
-      propertyPath: m_Layer
-      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7505011776156587176, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
       propertyPath: m_LocalPosition.x

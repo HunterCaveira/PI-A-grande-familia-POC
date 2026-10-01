@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
+public class HabilidadeParede : MonoBehaviour, IHabilidade , ISkills
 {
     [Header("Configurações da Câmera e Raio")]
     [SerializeField] private Camera cameraPrincipal;
