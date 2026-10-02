@@ -55,9 +55,9 @@ public class Dominacao : MonoBehaviour
     private void ProcessarCaptura()
     {
         int timeEncontrado = -1;
-        emDisputa = false;
+        bool conflitoDetectado = false;
 
-        // Verifica quem está na área
+        // 1. PRIMEIRO: Varre a lista inteira para ver se há mais de um time diferente
         foreach (Sistemadevida jogador in jogadoresNaArea)
         {
             if (timeEncontrado == -1)
@@ -66,21 +66,28 @@ public class Dominacao : MonoBehaviour
             }
             else if (jogador.TimeID != timeEncontrado)
             {
-                emDisputa = true;
+                conflitoDetectado = true;
                 break;
             }
         }
 
-        if (emDisputa) return; // Se tem conflito, pausa a contagem
+        // 2. Atualiza a flag global de disputa
+        emDisputa = conflitoDetectado;
 
-        // Atualiza quem está dominando no momento (para a UI)
+        // 3. SE ESTÁ EM DISPUTA, PARA TUDO AQUI! Ninguém ganha progresso.
+        if (emDisputa)
+        {
+            timeTentandoDominar = 0;
+            return;
+        }
+
+        // Se chegou aqui, só existe UM time na área (ou todos são do mesmo time)
         timeTentandoDominar = timeEncontrado;
 
-        // Se o time já for o dono, não faz nada
+        // Se o time atual já for o dono do território, não precisa somar progresso
         if (timeEncontrado == timeDonoDoTerritorio) return;
 
-        // AQUI ESTÁ A MÁGICA DOS TEMPOS INDEPENDENTES:
-        // Verifica qual time está na área e soma APENAS no tempo dele
+        // 4. Soma o progresso apenas para o time isolado correto
         if (timeEncontrado == 1)
         {
             progressoTime1 += Time.deltaTime;
@@ -100,7 +107,6 @@ public class Dominacao : MonoBehaviour
             }
         }
     }
-
     // Função separada para organizar o que acontece quando alguém ganha
     private void DominarTerritorio(int novoDono)
     {

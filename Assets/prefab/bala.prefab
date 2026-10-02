@@ -140,6 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49037adbadf32d04c93836ece3adfaef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camadasParaIgnorar:
+    serializedVersion: 2
+    m_Bits: 768
 --- !u!54 &1489153451067334908
 Rigidbody:
   m_ObjectHideFlags: 0

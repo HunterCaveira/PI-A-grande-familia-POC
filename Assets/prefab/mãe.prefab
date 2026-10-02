@@ -17,6 +17,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2897644635877593722, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Name
+      value: camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897644635877593722, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
@@ -50,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5266455397087339572, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5306276564673576161, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Layer
@@ -58,15 +62,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 105.37
+      value: -178.41
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.6
+      value: 37.28
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 39.2
+      value: 601.1
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -125,13 +129,32 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7610844431637341551, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: mascaraDeTiro.m_Bits
+      value: 768
+      objectReference: {fileID: 0}
+    - target: {fileID: 7610844431637341551, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: "permetirSegurarBot\xE3o"
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.368
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3086037858400988094, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     - {fileID: 3880426563033330700, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     - {fileID: 865057059230412375, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 6921912480176676528, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 3860298064969230173, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 1586971987620217125, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -140,7 +163,7 @@ PrefabInstance:
       addedObject: {fileID: 1656439133528369595}
     - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1944177568972663813}
+      addedObject: {fileID: 3969852072276476862}
   m_SourcePrefab: {fileID: 100100000, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
 --- !u!1 &6704441493054143345 stripped
 GameObject:
@@ -162,7 +185,7 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
   timeID: 2
   vidaAtual: 100
---- !u!114 &1944177568972663813
+--- !u!114 &3969852072276476862
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -171,7 +194,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 6704441493054143345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a55333bfa6c9bad4b8a73f7099eee8c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ReceptorDeImpacto
-  atrito: 3
+  m_EditorClassIdentifier: Assembly-CSharp::Cursor
