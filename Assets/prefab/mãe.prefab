@@ -17,6 +17,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2897644635877593722, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_Name
+      value: camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897644635877593722, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
@@ -50,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5266455397087339572, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5306276564673576161, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_Layer
@@ -58,15 +62,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 105.37
+      value: -178.41
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.6
+      value: 37.28
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 39.2
+      value: 601.1
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -125,13 +129,32 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7610844431637341551, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: mascaraDeTiro.m_Bits
+      value: 768
+      objectReference: {fileID: 0}
+    - target: {fileID: 7610844431637341551, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: "permetirSegurarBot\xE3o"
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.368
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3086037858400988094, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     - {fileID: 3880426563033330700, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     - {fileID: 865057059230412375, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 6921912480176676528, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 3860298064969230173, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+    - {fileID: 1586971987620217125, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -141,6 +164,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1944177568972663813}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 507844066069261825}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9076734114964912830}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3969852072276476862}
+    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6013001755622417797}
   m_SourcePrefab: {fileID: 100100000, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
 --- !u!1 &6704441493054143345 stripped
 GameObject:
@@ -175,3 +210,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReceptorDeImpacto
   atrito: 3
+--- !u!114 &507844066069261825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
+  velocidade: 0
+  gravidade: -9.81
+  forcaPulo: 2
+  velocidadeVertical: 0
+  atributos: {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
+--- !u!114 &9076734114964912830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CorrecaoCameraPersonagem
+  cameraTarget: {fileID: 7653469292404335057}
+  velocidadeRotacao: 10
+  girarApenasEmMovimento: 0
+--- !u!114 &3969852072276476862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Cursor
+--- !u!114 &6013001755622417797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704441493054143345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
+  cameraTarget: {fileID: 7653469292404335057}
+--- !u!4 &7653469292404335057 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
+  m_PrefabInstance: {fileID: 1305838216753042272}
+  m_PrefabAsset: {fileID: 0}
