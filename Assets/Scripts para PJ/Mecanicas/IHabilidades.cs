@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IHabilidade
+public interface IHabilidades
 {
     // Método para iniciar o uso/mira da habilidade
     void AtivarHabilidade();

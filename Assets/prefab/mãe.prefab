@@ -163,19 +163,7 @@ PrefabInstance:
       addedObject: {fileID: 1656439133528369595}
     - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1944177568972663813}
-    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 507844066069261825}
-    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 9076734114964912830}
-    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3969852072276476862}
-    - targetCorrespondingSourceObject: {fileID: 5698657667389614097, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6013001755622417797}
   m_SourcePrefab: {fileID: 100100000, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
 --- !u!1 &6704441493054143345 stripped
 GameObject:
@@ -197,51 +185,6 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
   timeID: 2
   vidaAtual: 100
---- !u!114 &1944177568972663813
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6704441493054143345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a55333bfa6c9bad4b8a73f7099eee8c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ReceptorDeImpacto
-  atrito: 3
---- !u!114 &507844066069261825
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6704441493054143345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
-  velocidade: 0
-  gravidade: -9.81
-  forcaPulo: 2
-  velocidadeVertical: 0
-  atributos: {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
---- !u!114 &9076734114964912830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6704441493054143345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CorrecaoCameraPersonagem
-  cameraTarget: {fileID: 7653469292404335057}
-  velocidadeRotacao: 10
-  girarApenasEmMovimento: 0
 --- !u!114 &3969852072276476862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,21 +197,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cursor
---- !u!114 &6013001755622417797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6704441493054143345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
-  cameraTarget: {fileID: 7653469292404335057}
---- !u!4 &7653469292404335057 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8658681784339215025, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
-  m_PrefabInstance: {fileID: 1305838216753042272}
-  m_PrefabAsset: {fileID: 0}
