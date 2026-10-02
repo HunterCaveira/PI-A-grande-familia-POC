@@ -13,6 +13,7 @@ public class Menu : MonoBehaviour
     [SerializeField] private Scrollbar scrollbarMusica;
     [SerializeField] public GameObject painelGeral;
     [SerializeField] public GameObject painelSom;
+    [SerializeField] public GameObject painelControle;
 
     public void NovoJogo()
     {
@@ -33,6 +34,7 @@ public class Menu : MonoBehaviour
         Creditos.SetActive(false);
         painelGeral.SetActive(false);
         painelSom.SetActive(false);
+        painelControle.SetActive(false);
 
     }
     public void Credito()
@@ -59,10 +61,19 @@ public class Menu : MonoBehaviour
     {
         painelSom.SetActive(true);
         painelGeral.SetActive(false);
+        painelControle.SetActive(false);
     }
     public void TrocarGeral()
     {
         painelGeral.SetActive(true);
+        painelSom.SetActive(false);
+        painelControle.SetActive(false);
+    }
+
+    public void TrocarControle()
+    {
+        painelControle.SetActive(true);
+        painelGeral.SetActive(false);
         painelSom.SetActive(false);
     }
 }
