@@ -6,17 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/Parque.unity
+    path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/HUD do jogo.unity
     guid: a3d6c804dfdf1b04fb851adf23227fde
   - enabled: 1
-    path: Assets/Scenes/COisas GAbriel.unity
-    guid: d9bc7ebad9a44434d9953a5eff925bf5
-  - enabled: 0
+    path: Assets/Scenes/TelaSelecaoPersonagem.unity
+    guid: 4e1e3a375e65f4b4688b3ce9bec5d9a6
+  - enabled: 1
     path: Assets/Scenes/Main Park.unity
     guid: 57f2cec3a9cafbe498677c5c0cdc45c9
+  - enabled: 0
+    path: Assets/Scenes/COisas GAbriel.unity
+    guid: d9bc7ebad9a44434d9953a5eff925bf5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

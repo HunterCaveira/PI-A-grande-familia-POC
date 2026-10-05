@@ -3975,7 +3975,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -540, y: 32}
+  m_AnchoredPosition: {x: -540, y: 38}
   m_SizeDelta: {x: 375.8979, y: 88.3352}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &745991623
@@ -4022,9 +4022,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1718411509}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
-        m_MethodName: NovoJogo
+      - m_Target: {fileID: 1718411510}
+        m_TargetAssemblyTypeName: GerenciadorDeTelasUI, Assembly-CSharp
+        m_MethodName: ClicarBotaoJogar
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8291,6 +8291,7 @@ GameObject:
   - component: {fileID: 1718411506}
   - component: {fileID: 1718411505}
   - component: {fileID: 1718411509}
+  - component: {fileID: 1718411510}
   m_Layer: 5
   m_Name: Menu inicial
   m_TagString: Untagged
@@ -8405,6 +8406,19 @@ MonoBehaviour:
   painelGeral: {fileID: 553815975}
   painelSom: {fileID: 446099774}
   painelControle: {fileID: 4008130}
+--- !u!114 &1718411510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718411504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de6bc1f89c9c0c3428b079f9fd58153e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeTelasUI
+  nomeCenaSelecao: TelaSelecaoPersonagem
 --- !u!1 &1754463051
 GameObject:
   m_ObjectHideFlags: 0
