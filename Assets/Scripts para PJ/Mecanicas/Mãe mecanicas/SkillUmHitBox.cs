@@ -28,35 +28,17 @@ public class SkillUmHitbox : MonoBehaviour
         }
 
         // 2. Aplica o Empurrão Adaptativo
-        if (other.TryGetComponent<ReceptorDeImpacto>(out ReceptorDeImpacto receptor))
+        // 2. Aplica o Empurrão chamando o EnemyController unificado
+        if (other.TryGetComponent<EnemyController>(out EnemyController inimigoCtrl))
         {
-            Vector3 direcao = Vector3.zero;
-
-            if (usarOrigemDoJogador)
-            {
-                // Opção 1: Direção calculada a partir do centro do Jogador (Afastamento radial limpo)
-                Transform jogadorTransform = transform.root;
-                direcao = (other.transform.position - jogadorTransform.position);
-            }
-            else
-            {
-                // Opção 2: Direção calculada dinamicamente com base em onde a Hitbox interceptou o inimigo
-                Vector3 pontoDeImpacto = other.ClosestPoint(transform.position);
-                direcao = (other.transform.position - pontoDeImpacto);
-            }
-
-            // Normaliza e limpa o eixo Y para o personagem não flutuar
-            direcao.y = 0;
+            Vector3 direcao = (other.transform.position - transform.root.position).normalized;
+            direcao.y = 0; // Mantém no chão
             direcao.Normalize();
 
-            // Se por algum motivo a direção zerar, usa a frente do jogador como segurança
-            if (direcao == Vector3.zero)
-            {
-                direcao = transform.root.forward;
-            }
+            float forcaEmpurrao = 10f;
+            float duracaoEmpurrao = 0.2f;
 
-            // Dispara o impulso no seu ReceptorDeImpacto
-            receptor.ReceberImpulso(direcao, forcaEmpurrao);
+            inimigoCtrl.ReceberEmpurrao(direcao, forcaEmpurrao, duracaoEmpurrao);
         }
     }
 }
