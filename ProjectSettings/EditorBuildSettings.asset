@@ -12,8 +12,19 @@ EditorBuildSettings:
     path: Assets/Scenes/HUD do jogo.unity
     guid: a3d6c804dfdf1b04fb851adf23227fde
   - enabled: 1
+<<<<<<< HEAD
     path: Assets/Scenes/TelaSelecaoPersonagem.unity
     guid: 4e1e3a375e65f4b4688b3ce9bec5d9a6
+=======
+    path: Assets/Scenes/HUD Server.unity
+    guid: 45db5169a6fbc0541afeca1030ca1027
+  - enabled: 1
+    path: Assets/Scenes/loading.unity
+    guid: f27585e78a51ea143a92d4fda44273cf
+  - enabled: 1
+    path: Assets/Scenes/HUD Criar server.unity
+    guid: 36bbc4f5bc610b24aae7ad6bc57a2813
+>>>>>>> lucas
   - enabled: 1
     path: Assets/Scenes/Main Park.unity
     guid: 57f2cec3a9cafbe498677c5c0cdc45c9
