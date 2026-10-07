@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee0ba9c09968ffc4d99f992e24fe009b, type: 3}
   m_Name: Pai
   m_EditorClassIdentifier: 
+  nomePersonagem: Pai
+  iconePersonagem: {fileID: 21300000, guid: 74153d364e2de0d408f1254950c7e845, type: 3}
+  prefabPersonagem: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
   vidaMaxima: 500
   velocidadeMovimento: 5
   forcaPulo: 3
