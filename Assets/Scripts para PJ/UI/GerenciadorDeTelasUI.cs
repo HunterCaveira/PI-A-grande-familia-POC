@@ -1,3 +1,5 @@
+using Photon.Pun;
+using TMPro;
 using UnityEngine; // Importa as ferramentas principais do motor da Unity.
 using UnityEngine.SceneManagement; // Importa a biblioteca responsável por gerenciar e carregar Cenas do projeto.
 
@@ -11,7 +13,25 @@ public class GerenciadorDeTelasUI : MonoBehaviour // Declara a classe pública Ge
 
     [SerializeField]
     private string nomeCenaSelecao = "SelecaoPersonagem"; // Nome exato do arquivo da cena de Seleção contido na pasta Assets/Scenes.
+    [Header("Exibição do Jogador Local")]
 
+    [SerializeField] private TextMeshProUGUI textoNicknameJogador; // Referência do texto onde será exibido o Nickname.
+
+    private void Start()
+    {
+        ExibirNicknameDoJogador(); // Atualiza a interface com o nome digitado na HUD Server.
+      
+    }
+
+    private void ExibirNicknameDoJogador()
+    {
+        if (textoNicknameJogador != null)
+        {
+            // Lê o Nickname gravado no PhotonNetwork (ou exibe um nome padrão se testado diretamente)
+            string nick = string.IsNullOrEmpty(PhotonNetwork.NickName) ? "Jogador Local" : PhotonNetwork.NickName;
+            textoNicknameJogador.text = $"NICK: {nick}";
+        }
+    }
 
     // ==========================================
     // 2. MÉTODOS PÚBLICOS DE NAVEGAÇÃO

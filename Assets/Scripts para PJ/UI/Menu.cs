@@ -17,7 +17,8 @@ public class Menu : MonoBehaviour
 
     public void NovoJogo()
     {
-        SceneManager.LoadScene(1);
+        // Carrega a cena da Hud Server onde o jogador irá digitar  nickname e escolher a sala
+        SceneManager.LoadScene("HUD Server");
 
     }
     public void opção()
