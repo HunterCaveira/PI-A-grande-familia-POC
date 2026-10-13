@@ -9929,7 +9929,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1718411509}
         m_TargetAssemblyTypeName: Menu, Assembly-CSharp
-        m_MethodName: sair
+        m_MethodName: Sair
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
