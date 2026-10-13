@@ -8397,14 +8397,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20675f5082b019b4f89452e44053a7e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "Configura\xE7\xE3o": {fileID: 553815975}
+  "configura\xE7\xE3o": {fileID: 1279749548}
   menuPrincipal: {fileID: 1297447598}
-  Creditos: {fileID: 771830051}
-  sliderVolume: {fileID: 0}
-  scrollbarMusica: {fileID: 0}
+  creditos: {fileID: 575223041}
   painelGeral: {fileID: 553815975}
   painelSom: {fileID: 446099774}
   painelControle: {fileID: 4008130}
+  sliderVolume: {fileID: 1776597785}
+  scrollbarMusica: {fileID: 0}
 --- !u!1 &1754463051
 GameObject:
   m_ObjectHideFlags: 0
