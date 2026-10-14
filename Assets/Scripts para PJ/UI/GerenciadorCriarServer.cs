@@ -1,123 +1,142 @@
-using UnityEngine; // Importa a estrutura fundamental da Unity.
-using UnityEngine.UI; // Importa os componentes basicos de interface de usuario.
-using TMPro; // Importa componentes de suporte ao TextMeshPro.
-using UnityEngine.SceneManagement; // Importa o gerenciador de cenas.
-using Photon.Pun; // Importa as extensoes do Photon Unity Networking.
-using Photon.Realtime; // Importa classes e opcoes de sala do Photon.
-using ExitGames.Client.Photon; // Importa Hashtable para propriedades customizadas do Photon.
+using UnityEngine; // Importa os componentes e classes nativas da Unity.
+using UnityEngine.UI; // Importa os elementos base de UI da Unity.
+using TMPro; // Importa suporte completo para componentes TextMeshPro.
+using UnityEngine.SceneManagement; // Importa o gerenciamento de Cenas.
+using Photon.Pun; // Importa as ferramentas principais do Photon PUN 2.
+using Photon.Realtime; // Importa opções de salas e estados de rede Photon.
+using ExitGames.Client.Photon; // Importa a estrutura Hashtable do Photon para senhas.
 
-// A classe herda de MonoBehaviourPunCallbacks para receber respostas de criacao de sala do Photon.
+// A classe herda de MonoBehaviourPunCallbacks para escutar atualizações de criação de sala no Photon.
 public class GerenciadorCriarServer : MonoBehaviourPunCallbacks
 {
     // ==========================================
-    // 1. MAPEAMENTO DE ELEMENTOS DA INTERFACE (UI)
+    // 1. MAPEAMENTO DE ELEMENTOS DA UI
     // ==========================================
+
+    [Header("Exibição do Jogador")]
+    [SerializeField] private TextMeshProUGUI textoNicknameJogador; // Texto no topo que exibe o Nickname do jogador.
 
     [Header("Configuração de Sala Pública")]
-    [SerializeField] private TMP_InputField campoNomeSalaPublica; // Campo OBRIGATÓRIO do nome para Sala Pública.
+    [SerializeField] private TMP_InputField campoNomeSalaPublica; // InputField OBRIGATÓRIO do nome para Sala Pública.
 
     [Header("Configuração de Sala Privada")]
-    [SerializeField] private TMP_InputField campoNomeSalaPrivada; // Campo OBRIGATÓRIO do nome para Sala Privada.
-    [SerializeField] private TMP_InputField campoSenhaSalaPrivada; // Campo OBRIGATÓRIO da senha para Sala Privada.
+    [SerializeField] private TMP_InputField campoNomeSalaPrivada; // InputField OBRIGATÓRIO do nome para Sala Privada.
+    [SerializeField] private TMP_InputField campoSenhaSalaPrivada; // InputField OBRIGATÓRIO da senha para Sala Privada.
 
-    [Header("Texto de Feedback ao Jogador")]
-    [SerializeField] private TextMeshProUGUI textoAvisoStatus; // Componente de texto para exibir erros e alertas.
+    [Header("Textos de Mensagens de Alerta")]
+    [SerializeField] private TextMeshProUGUI textoAvisoStatus; // Componente de texto para mensagens de erro/alerta.
 
 
     // ==========================================
-    // 2. INICIALIZAÇÃO
+    // 2. INICIALIZAÇÃO E EXIBIÇÃO DE NICKNAME
     // ==========================================
 
     private void Start()
     {
-        // Garante a sincronizacao de troca de ecrã/cena para a sala inteira.
+        // Garante que a troca de cena efetuada pelo Host seja replicada para toda a sala.
         PhotonNetwork.AutomaticallySyncScene = true;
 
-        ExibirAviso(""); // Limpa avisos residuais da tela ao carregar.
+        // Atualiza a interface exibindo o Nickname do jogador recuperado do PhotonNetwork.
+        ExibirNicknameDoJogador();
+
+        // Limpa avisos residuais de alertas na tela.
+        ExibirAviso("");
+    }
+
+    /// <summary>
+    /// Lê o Nickname gravado no PhotonNetwork e exibe no elemento de texto no topo da interface.
+    /// </summary>
+    private void ExibirNicknameDoJogador()
+    {
+        if (textoNicknameJogador != null)
+        {
+            string nick = string.IsNullOrEmpty(PhotonNetwork.NickName) ? "Familiar" : PhotonNetwork.NickName;
+            textoNicknameJogador.text = $"{nick}"; // Atribui o texto formatado no topo.
+        }
     }
 
 
     // ==========================================
-    // 3. MÉTODOS PÚBLICOS DOS BOTÕES
+    // 3. MÉTODOS PÚBLICOS DE CRIAÇÃO DE SALAS
     // ==========================================
 
     /// <summary>
-    /// Ação do botão "Criar Sala Publica". Exige estritamente o Nome da Sala.
+    /// Ação do botão "Criar Sala Publica". Exige obrigatoriamente o Nome da Sala.
     /// </summary>
     public void ClicarCriarSalaPublica()
     {
         Debug.Log("[CRIAR SERVER] Validando criação de Sala Pública...");
 
-        // VALIDAÇÃO ESTRITA: O nome da sala pública é OBRIGATÓRIO.
+        // MENSAGEM DE ALERTA 1: Valida se o nome da sala pública foi preenchido.
         if (campoNomeSalaPublica == null || string.IsNullOrWhiteSpace(campoNomeSalaPublica.text))
         {
-            ExibirAviso("É OBRIGATÓRIO digitar o nome para a Sala Pública!");
-            Debug.LogWarning("[CRIAR SERVER] Tentativa de criar Sala Pública sem nome!");
-            return; // Interrompe a execucao e nao cria a sala.
+            ExibirAviso("ATENÇÃO: É OBRIGATÓRIO digitar um nome para a Sala Pública!");
+            Debug.LogWarning("[CRIAR SERVER] Criação bloqueada: Nome da Sala Pública vazio!");
+            return; // Bloqueia a execução e não cria a sala.
         }
 
-        string nomeSala = campoNomeSalaPublica.text.Trim(); // Formata o texto removendo espacos sobressalentes.
+        string nomeSala = campoNomeSalaPublica.text.Trim(); // Formata o texto.
 
-        // Parametros de configuracao da Sala Publica.
+        // Define as regras para a criação da Sala Pública no Photon.
         RoomOptions opcoesPublicas = new RoomOptions
         {
-            MaxPlayers = 10,  // Suporta ate 10 jogadores (5v5).
-            IsVisible = true, // Visivel na lista publica do Lobby para todos os jogadores.
-            IsOpen = true     // Aberta para receber novas conexoes.
+            MaxPlayers = 10,  // Permite até 10 jogadores (5v5).
+            IsVisible = true, // Torna a sala pública e listável para todos no Lobby.
+            IsOpen = true     // Permite novas conexões.
         };
 
         ExibirAviso("Criando sala pública...");
-        PhotonNetwork.CreateRoom(nomeSala, opcoesPublicas); // Solicita a criacao ao Photon.
+        PhotonNetwork.CreateRoom(nomeSala, opcoesPublicas); // Envia o pedido de criação ao Photon.
     }
 
     /// <summary>
-    /// Ação do botão "Criar Sala Privada". Exige estritamente Nome da Sala E Senha.
+    /// Ação do botão "Criar Sala Privada". Exige obrigatoriamente Nome E Senha.
     /// </summary>
     public void ClicarCriarSalaPrivada()
     {
         Debug.Log("[CRIAR SERVER] Validando criação de Sala Privada...");
 
-        // VALIDAÇÃO ESTRITA 1: O nome da sala privada é OBRIGATÓRIO.
+        // MENSAGEM DE ALERTA 2: Valida se o nome da sala privada foi preenchido.
         if (campoNomeSalaPrivada == null || string.IsNullOrWhiteSpace(campoNomeSalaPrivada.text))
         {
-            ExibirAviso("É OBRIGATÓRIO digitar o nome para a Sala Privada!");
-            Debug.LogWarning("[CRIAR SERVER] Tentativa de criar Sala Privada sem nome!");
-            return; // Interrompe a execucao.
+            ExibirAviso("ATENÇÃO: É OBRIGATÓRIO digitar um nome para a Sala Privada!");
+            Debug.LogWarning("[CRIAR SERVER] Criação bloqueada: Nome da Sala Privada vazio!");
+            return; // Bloqueia a execução.
         }
 
-        // VALIDAÇÃO ESTRITA 2: A senha da sala privada é OBRIGATÓRIA.
+        // MENSAGEM DE ALERTA 3: Valida se a senha da sala privada foi preenchida.
         if (campoSenhaSalaPrivada == null || string.IsNullOrWhiteSpace(campoSenhaSalaPrivada.text))
         {
-            ExibirAviso("É OBRIGATÓRIO digitar uma senha para a Sala Privada!");
-            Debug.LogWarning("[CRIAR SERVER] Tentativa de criar Sala Privada sem senha!");
-            return; // Interrompe a execucao.
+            ExibirAviso("ATENÇÃO: É OBRIGATÓRIO digitar uma senha para a Sala Privada!");
+            Debug.LogWarning("[CRIAR SERVER] Criação bloqueada: Senha da Sala Privada vazia!");
+            return; // Bloqueia a execução.
         }
 
         string nomeSala = campoNomeSalaPrivada.text.Trim();
         string senhaSala = campoSenhaSalaPrivada.text.Trim();
 
-        // Tabela de propriedades customizadas do Photon para guardar a Senha associada a sala.
+        // Cria a Hashtable do Photon para armazenar a senha de acesso da sala privada.
         Hashtable propriedadesCustomizadas = new Hashtable
         {
-            { "Senha", senhaSala } // Associa a chave 'Senha' ao valor digitado.
+            { "Senha", senhaSala } // Grava a chave 'Senha'.
         };
 
-        // Parametros de configuracao da Sala Privada.
+        // Define as regras para a criação da Sala Privada no Photon.
         RoomOptions opcoesPrivadas = new RoomOptions
         {
-            MaxPlayers = 10, // Suporta ate 10 jogadores.
-            IsVisible = false, // Oculta da lista publica geral para privacidade.
-            IsOpen = true, // Permite entrada de quem souber o nome e a senha.
-            CustomRoomProperties = propriedadesCustomizadas, // Grava a hashtable com a senha.
-            CustomRoomPropertiesForLobby = new string[] { "Senha" } // Expoe a chave no Lobby para validacao.
+            MaxPlayers = 10, // Permite até 10 jogadores.
+            IsVisible = false, // Oculta da lista pública geral de salas para garantir privacidade.
+            IsOpen = true, // Aberta para quem souber o nome e a senha.
+            CustomRoomProperties = propriedadesCustomizadas, // Anexa as propriedades customizadas.
+            CustomRoomPropertiesForLobby = new string[] { "Senha" } // Torna a senha acessível na busca.
         };
 
         ExibirAviso("Criando sala privada...");
-        PhotonNetwork.CreateRoom(nomeSala, opcoesPrivadas); // Solicita a criacao ao Photon.
+        PhotonNetwork.CreateRoom(nomeSala, opcoesPrivadas); // Envia o pedido de criação ao Photon.
     }
 
     /// <summary>
-    /// Ação do botão "Volta" / "Voltar" para retornar à tela de HUD Server.
+    /// Ação do botão "Volta" para retornar à cena HUD Server.
     /// </summary>
     public void ClicarVoltarHUDServer()
     {
@@ -126,34 +145,34 @@ public class GerenciadorCriarServer : MonoBehaviourPunCallbacks
 
 
     // ==========================================
-    // 4. MÉTODOS AUXILIARES E RESPOSTAS DO PHOTON
+    // 4. MÉTODOS AUXILIARES E RESPOSTAS DA REDE
     // ==========================================
 
     /// <summary>
-    /// Exibe mensagens de alerta e erro na ecrã de forma protegida.
+    /// Exibe mensagens de alerta e erros na interface de forma protegida.
     /// </summary>
     private void ExibirAviso(string mensagem)
     {
         if (textoAvisoStatus != null)
         {
-            textoAvisoStatus.text = mensagem;
-            textoAvisoStatus.gameObject.SetActive(!string.IsNullOrEmpty(mensagem));
+            textoAvisoStatus.text = mensagem; // Define a nova string de aviso.
+            textoAvisoStatus.gameObject.SetActive(!string.IsNullOrEmpty(mensagem)); // Exibe o texto apenas se houver conteúdo.
         }
     }
 
     /// <summary>
-    /// Callback executado quando a sala e criada e o jogador entra nela com sucesso.
+    /// Callback executado quando a sala é criada e o jogador entra nela com sucesso.
     /// </summary>
     public override void OnJoinedRoom()
     {
         Debug.Log($"[PHOTON] Criou e entrou na sala '{PhotonNetwork.CurrentRoom.Name}' com sucesso!");
 
-        // Transiciona a sala inteira para a cena de Seleção de Personagem.
+        // Transiciona todos os jogadores conectados na sala para a cena de Seleção de Personagem.
         PhotonNetwork.LoadLevel("TelaSelecaoPersonagem");
     }
 
     /// <summary>
-    /// Callback executado caso falhe ao criar a sala (ex: nome ja existente na nuvem).
+    /// Callback executado caso falhe ao criar a sala (ex: nome já existente na nuvem).
     /// </summary>
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
