@@ -696,11 +696,6 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 4150468671446003424, guid: b86892946cb8c814a992859a53c537c6, type: 3}
   m_PrefabInstance: {fileID: 1089679414}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &371799264 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8582110962135716271, guid: b86892946cb8c814a992859a53c537c6, type: 3}
-  m_PrefabInstance: {fileID: 1089679414}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &421895677 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8679724967051123735, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
@@ -2367,18 +2362,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 424125047345888763, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: gerenciadorDeEquipamentos
-      value: 
-      objectReference: {fileID: 1249818824483034012}
-    - target: {fileID: 508915671573769425, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: atributos
-      value: 
-      objectReference: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
-    - target: {fileID: 2367715122335947157, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3830666090240463568, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
       propertyPath: 'renderersDoInimigo.Array.data[0]'
       value: 
@@ -2388,21 +2371,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 371799260}
     - target: {fileID: 5587900924599140731, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: pontoDisparoNaMao
-      value: 
-      objectReference: {fileID: 78924384}
-    - target: {fileID: 5587900924599140731, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
       propertyPath: projetilPreCriado
       value: 
       objectReference: {fileID: 756358354}
-    - target: {fileID: 5587900924599140731, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: pontoAlvoInvisivel
-      value: 
-      objectReference: {fileID: 371799264}
-    - target: {fileID: 5587900924599140731, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
-      propertyPath: mascaraDeTiro.m_Bits
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6853679216801116128, guid: 79a6c2725737f66499c26b35a87de2fb, type: 3}
       propertyPath: playerCamera
       value: 
@@ -2664,17 +2635,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 78924384}
     - target: {fileID: 1700505490436216265, guid: 96d56bb116c891a47b2e3aff6f00634e, type: 3}
-      propertyPath: porcentagemReducao
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1700505490436216265, guid: 96d56bb116c891a47b2e3aff6f00634e, type: 3}
       propertyPath: gerenciadorDeEquipamentos
       value: 
       objectReference: {fileID: 1249818824483034012}
-    - target: {fileID: 1806932283101260023, guid: 96d56bb116c891a47b2e3aff6f00634e, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3181312955111139070, guid: 96d56bb116c891a47b2e3aff6f00634e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -173.57951

@@ -432,15 +432,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillMae3
   slotIndex: 1
-  tempoCooldown: 3
+  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   alcanceDoTiro: 100
   mascaraDeTiro:
     serializedVersion: 2
     m_Bits: 0
   playerCamera: {fileID: 0}
   tempoDeEsperaDisparo: 0.5
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+  tempoCooldown: 3
+  gerenciadorDeEquipamentos: {fileID: 7934693577347635876}
   pontoDisparoNaMao: {fileID: 6565916445348019624}
   projetilPreCriado: {fileID: 0}
-  gerenciadorDeEquipamentos: {fileID: 0}

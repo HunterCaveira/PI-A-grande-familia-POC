@@ -1,25 +1,31 @@
-using UnityEngine;
+using UnityEngine; // Importa as ferramentas principais do motor da Unity.
 
 public class ProjetilLentidao : MonoBehaviour
 {
+    // ==========================================
+    // 1. CONFIGURAÇÕES DO PROJÉTIL
+    // ==========================================
+
     [Header("Configurações do Projétil")]
     [SerializeField] private float velocidadeProjetil = 25f;
     [SerializeField] private float tempoDeVida = 5f;
 
     [Header("Posição de Espera (Teleporte ao Desativar)")]
-    [Tooltip("Arraste um GameObject vazio que servirá como 'base' ou 'estoque' para onde o projétil vai ao ser desativado.")]
+    [Tooltip("Ponto de estoque/espera na cena para onde o projétil se move ao desativar.")]
     [SerializeField] private Transform pontoDeEspera;
 
     [Header("Efeito de Lentidão")]
-    [SerializeField, Range(0f, 1f)] private float porcentagemReducao = 0.5f; // 50% de lentidão
-    [SerializeField] private float duracaoLentidao = 3f;
+    [SerializeField, Range(0f, 1f)] private float porcentagemReducaoVelocidade = 0.5f; // Ex: 0.5 = 50% de lentidão.
+    [SerializeField] private float duracaoLentidao = 3.0f; // Tempo que a lentidão permanece no alvo em segundos.
 
-    [Header("Referência ao Gerenciador")]
+    [Header("Controle de Referências e Time")]
     [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
+
+    private int timeAtacante = -1;
+    private GameObject donoDoProjetil;
 
     private void Awake()
     {
-        // Caso não tenha sido arrastado no Inspector, busca automaticamente na cena/personagem
         if (gerenciadorDeEquipamentos == null)
         {
             gerenciadorDeEquipamentos = FindFirstObjectByType<GerenciadorDeEquipamentos>();
@@ -28,47 +34,64 @@ public class ProjetilLentidao : MonoBehaviour
 
     private void OnEnable()
     {
-        // Sempre que o projétil é ativado, cancela o timer anterior e agenda a desativação pelo tempo
         CancelInvoke(nameof(DesativarProjetil));
         Invoke(nameof(DesativarProjetil), tempoDeVida);
     }
 
     private void Update()
     {
-        // Move o projétil continuamente para frente
         transform.Translate(Vector3.forward * velocidadeProjetil * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Se colidir com o inimigo, aplica a lentidão
-        if (other.TryGetComponent<EnemyController>(out EnemyController enemyController))
+        // 1. Ignora colisão com o próprio jogador que disparou
+        if (donoDoProjetil != null && other.gameObject == donoDoProjetil) return;
+
+        // 2. Checa o Sistema de Vida do alvo para validação de time (Fogo Amigo)
+        if (other.TryGetComponent<Sistemadevida>(out Sistemadevida sistemaVidaAlvo))
         {
-            enemyController.AplicarLentidao(porcentagemReducao, duracaoLentidao);
+            if (sistemaVidaAlvo.TimeID == this.timeAtacante)
+            {
+                return; // Se for do mesmo time, ignora
+            }
+        }
+
+        // 3. Caso o alvo seja um Jogador com MovimentodoPlayer
+        if (other.TryGetComponent<MovimentodoPlayer>(out MovimentodoPlayer movimentoPlayer))
+        {
+            movimentoPlayer.AplicarLentidao(porcentagemReducaoVelocidade, duracaoLentidao);
+            DesativarProjetil();
+        }
+        // 4. Caso o alvo seja um Inimigo com EnemyController (usa o método nativo do script que você enviou)
+        else if (other.TryGetComponent<EnemyController>(out EnemyController enemyController))
+        {
+            enemyController.AplicarLentidao(porcentagemReducaoVelocidade, duracaoLentidao);
+            DesativarProjetil();
         }
     }
 
-    /// <summary>
-    /// Teleporta o projétil para o local de espera predefinido, o desativa e reativa a arma principal.
-    /// </summary>
+    public void Inicializar(int teamID, GameObject dono)
+    {
+        this.timeAtacante = teamID;
+        this.donoDoProjetil = dono;
+    }
+
     private void DesativarProjetil()
     {
         CancelInvoke(nameof(DesativarProjetil));
 
-        // Teleporta para o ponto de espera antes de sumir
         if (pontoDeEspera != null)
         {
             transform.position = pontoDeEspera.position;
             transform.rotation = pontoDeEspera.rotation;
         }
 
-        // Volta para a arma principal (Slot 0) se o gerenciador existir
         if (gerenciadorDeEquipamentos != null)
         {
             gerenciadorDeEquipamentos.TrocarEquipamento(0);
         }
 
-        // Desativa o objeto da cena
         gameObject.SetActive(false);
     }
 }

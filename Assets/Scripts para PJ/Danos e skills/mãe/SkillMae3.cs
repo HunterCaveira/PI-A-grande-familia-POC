@@ -1,53 +1,72 @@
-using System.Collections;
-using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections; // Importa suporte a Corrotinas (IEnumerator e WaitForSeconds).
+using UnityEngine; // Importa as ferramentas principais do motor da Unity.
+using UnityEngine.InputSystem; // Importa o novo Input System.
 
-public class SkillMae3 : MonoBehaviour, IasUI
+public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI para o HUD/UI
 {
-    [Header("Configurações do Slot (IasUI)")]
-    [SerializeField] private int slotIndex = 3; // Slot 3 (Tecla F)
-    [SerializeField] private float tempoCooldown = 3f;
-    private float proximoUsoPermitido = 0f;
+    // ==========================================
+    // 1. CONFIGURAÇÃO DO SLOT E UI
+    // ==========================================
 
-    [Header("Configurações de Mira (Baseado na Pistola)")]
+    [Header("Configuração do Slot e UI")]
+    [SerializeField] private int slotIndex = 3; // Slot 3 (Tecla F)
+    public int SlotIndex => slotIndex;
+
+    [SerializeField] private Sprite fotoPronta;
+    public Sprite FotoPronta => fotoPronta;
+
+    [SerializeField] private Sprite fotoRecarregando;
+    public Sprite FotoRecarregando => fotoRecarregando;
+
+    public float TempoProximouso { get; set; } = 0f;
+
+
+    // ==========================================
+    // 2. CONFIGURAÇÕES DE MIRA E DISPARO
+    // ==========================================
+
+    [Header("Configurações de Mira e Alcance")]
     [SerializeField] private float alcanceDoTiro = 100f;
     [SerializeField] private LayerMask mascaraDeTiro;
     [Tooltip("Arraste a câmera que orbita o personagem aqui (ou deixe vazio para pegar a Camera.main)")]
     [SerializeField] private Camera playerCamera;
 
-    [Header("Configurações da Fase de Espera (Wind-up)")]
-    [Tooltip("Tempo em segundos que o personagem fica 'preparando' o disparo antes de lançar o projétil.")]
-    [SerializeField] private float tempoDeEsperaDisparo = 0.5f;
-    private bool estaCarregando = false;
 
-    [Header("Imagens da UI (Ícones)")]
-    [SerializeField] private Sprite fotoPronta;
-    [SerializeField] private Sprite fotoRecarregando;
+    // ==========================================
+    // 3. TEMPOS E CONTROLES (WIND-UP E COOLDOWN)
+    // ==========================================
 
-    [Header("Referências de Posição")]
-    [SerializeField] private Transform pontoDisparoNaMao;
+    [Header("Tempo de Espera e Cooldown")]
+    [SerializeField] private float tempoDeEsperaDisparo = 0.5f; // Tempo preparando o disparo antes de lançar o projétil.
+    [SerializeField] private float tempoCooldown = 5.0f; // Tempo de recarga após o uso.
 
-    [Header("Referência do Projétil da Cena")]
-    [SerializeField] private GameObject projetilPreCriado;
+    private bool emUsoOuAnimacao = false; // Trava booleana de execução interna.
 
-    [Header("Referência ao Gerenciador")]
+
+    // ==========================================
+    // 4. REFERÊNCIAS
+    // ==========================================
+
+    [Header("Referências")]
     [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
+    [SerializeField] private Transform pontoDisparoNaMao; // Ponto na mão ativado pela tecla F.
+    [SerializeField] private GameObject projetilPreCriado; // O projétil de lentidão na cena.
 
-    public int SlotIndex => slotIndex;
-    public float TempoProximouso => proximoUsoPermitido;
-    public Sprite FotoPronta => fotoPronta;
-    public Sprite FotoRecarregando => fotoRecarregando;
 
-    void Awake()
+    // ==========================================
+    // 5. CICLO DE VIDA DA UNITY
+    // ==========================================
+
+    private void Awake()
     {
         if (playerCamera == null)
             playerCamera = Camera.main;
 
         if (gerenciadorDeEquipamentos == null)
-            gerenciadorDeEquipamentos = FindFirstObjectByType<GerenciadorDeEquipamentos>();
+            gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
     }
 
-    void Start()
+    private void Start()
     {
         if (projetilPreCriado != null)
         {
@@ -60,27 +79,46 @@ public class SkillMae3 : MonoBehaviour, IasUI
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // O clique do mouse só dispara se o ponto de disparo estiver ativo na mão
+        // O clique do mouse só dispara se o ponto de disparo estiver ativo na mão e a habilidade não estiver em wind-up
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (pontoDisparoNaMao != null && pontoDisparoNaMao.gameObject.activeSelf)
+            if (pontoDisparoNaMao != null && pontoDisparoNaMao.gameObject.activeSelf && !emUsoOuAnimacao)
             {
-                TentarDisparar();
+                if (EstaPronta())
+                {
+                    StartCoroutine(RotinaFaseDeEsperaDisparo());
+                }
             }
         }
     }
 
-    /// <summary>
-    /// Chamado pelo GerenciadorDeEquipamentos ao pressionar a tecla F.
-    /// Ativa o ponto de disparo na mão.
-    /// </summary>
-    public void AtivarHabilidade()
+    private void OnDisable()
     {
-        if (!PodeUsar() || estaCarregando)
+        CancelarHabilidadeForcado();
+    }
+
+
+    // ==========================================
+    // 6. MÉTODOS DA INTERFACE (IasUI)
+    // ==========================================
+
+    public bool EstaPronta()
+    {
+        return Time.time >= TempoProximouso && !emUsoOuAnimacao;
+    }
+
+    public bool PodeUsar()
+    {
+        return EstaPronta();
+    }
+
+    public void AtivarHabilidade() // Chamado pelo GerenciadorDeEquipamentos ao apertar F.
+    {
+        if (!EstaPronta())
         {
-            Debug.Log("[SkillMae3] Habilidade em Cooldown ou já está preparando o disparo!");
+            Debug.LogWarning($"[SKILL 3] Habilidade em recarga! Disponível em: {TempoProximouso - Time.time:F1}s");
             return;
         }
 
@@ -89,66 +127,56 @@ public class SkillMae3 : MonoBehaviour, IasUI
             pontoDisparoNaMao.gameObject.SetActive(true);
         }
 
-        Debug.Log("[SkillMae3] Ponto de disparo ativado! Clique com o mouse para atirar.");
+        Debug.Log("[SKILL 3] Ponto de disparo ativado pela tecla F! Clique com o mouse para atirar.");
     }
 
-    private void TentarDisparar()
+    public void CancelarHabilidade()
     {
-        if (estaCarregando || !PodeUsar()) return;
-
-        StartCoroutine(FaseDeEsperaDisparoRoutine());
-        proximoUsoPermitido = Time.time + tempoCooldown;
+        CancelarHabilidadeForcado();
     }
 
-    private IEnumerator FaseDeEsperaDisparoRoutine()
+    private void CancelarHabilidadeForcado()
     {
-        estaCarregando = true;
-        Debug.Log("[SkillMae3] Iniciando fase de espera/preparação...");
+        StopAllCoroutines();
+        emUsoOuAnimacao = false;
 
+        if (pontoDisparoNaMao != null)
+        {
+            pontoDisparoNaMao.gameObject.SetActive(false);
+        }
+    }
+
+
+    // ==========================================
+    // 7. CORROTINA DE DISPARO (WIND-UP)
+    // ==========================================
+
+    private IEnumerator RotinaFaseDeEsperaDisparo()
+    {
+        emUsoOuAnimacao = true;
+        Debug.Log("[SKILL 3] Iniciando fase de preparação do disparo...");
+
+        // Aguarda o tempo de wind-up configurado
         yield return new WaitForSeconds(tempoDeEsperaDisparo);
 
+        // Verifica se o ponto de disparo ainda continua ativo após a espera
         if (pontoDisparoNaMao != null && pontoDisparoNaMao.gameObject.activeSelf)
         {
             DispararComPrecisao();
         }
         else
         {
-            Debug.LogWarning("[SkillMae3] Disparo cancelado: O ponto de disparo foi desativado durante a espera!");
+            Debug.LogWarning("[SKILL 3] Disparo cancelado: O ponto de disparo foi desativado durante a espera!");
         }
 
-        estaCarregando = false;
+        TempoProximouso = Time.time + tempoCooldown; // Define o cooldown
+        emUsoOuAnimacao = false;
     }
 
-    public void CancelarHabilidade()
-    {
-        if (estaCarregando)
-        {
-            StopAllCoroutines();
-            estaCarregando = false;
-        }
 
-        if (pontoDisparoNaMao != null)
-        {
-            pontoDisparoNaMao.gameObject.SetActive(false);
-        }
-
-        Debug.Log("[SkillMae3] Habilidade cancelada.");
-    }
-
-    public bool PodeUsar()
-    {
-        return Time.time >= proximoUsoPermitido && !estaCarregando;
-    }
-
-    public bool EstaPronta()
-    {
-        return Time.time >= proximoUsoPermitido && !estaCarregando;
-    }
-
-    public bool EstaAtiva()
-    {
-        return (projetilPreCriado != null && projetilPreCriado.activeInHierarchy) || estaCarregando;
-    }
+    // ==========================================
+    // 8. LÓGICA DE MIRA E LANÇAMENTO DO PROJÉTIL
+    // ==========================================
 
     private void DispararComPrecisao()
     {
@@ -170,13 +198,12 @@ public class SkillMae3 : MonoBehaviour, IasUI
         // 2. Calcula a direção exata do cano da mão até o ponto mirado pela câmera
         Vector3 direcaoDoTiro = (pontoAcerto - pontoDisparoNaMao.position).normalized;
 
-        // Evita divisão por zero caso o alvo esteja colado no cano
         if (Vector3.Distance(pontoDisparoNaMao.position, pontoAcerto) < 1f)
         {
             direcaoDoTiro = playerCamera.transform.forward;
         }
 
-        // 3. Posiciona e ativa o projétil
+        // 3. Configura e ativa o projétil de lentidão
         if (projetilPreCriado.activeInHierarchy)
         {
             projetilPreCriado.SetActive(false);
@@ -184,11 +211,23 @@ public class SkillMae3 : MonoBehaviour, IasUI
 
         projetilPreCriado.transform.position = pontoDisparoNaMao.position;
         projetilPreCriado.transform.rotation = Quaternion.LookRotation(direcaoDoTiro);
+
+        // Passa o TimeID para o projétil evitar fogo amigo (se houver o script ProjetilLentidao)
+        if (projetilPreCriado.TryGetComponent<ProjetilLentidao>(out ProjetilLentidao scriptProjetil))
+        {
+            int meuTimeID = -1;
+            if (TryGetComponent<Sistemadevida>(out Sistemadevida minhaVida))
+            {
+                meuTimeID = minhaVida.TimeID;
+            }
+            scriptProjetil.Inicializar(meuTimeID, this.gameObject);
+        }
+
         projetilPreCriado.SetActive(true);
 
-        // 4. Desativa o ponto de disparo na mão imediatamente após atirar
+        // 4. Desativa o ponto de disparo na mão imediatamente após o tiro
         pontoDisparoNaMao.gameObject.SetActive(false);
 
-        Debug.Log("[SkillMae3] Projétil disparado com cálculo de mira preciso!");
+        Debug.Log("[SKILL 3] Projétil de lentidão disparado com sucesso!");
     }
 }

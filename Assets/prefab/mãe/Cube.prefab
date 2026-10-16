@@ -128,6 +128,6 @@ MonoBehaviour:
   velocidadeProjetil: 25
   tempoDeVida: 5
   pontoDeEspera: {fileID: 0}
-  porcentagemReducao: 0
-  duracaoLentidao: 30
+  porcentagemReducaoVelocidade: 0.5
+  duracaoLentidao: 5
   gerenciadorDeEquipamentos: {fileID: 0}
