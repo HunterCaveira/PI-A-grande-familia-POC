@@ -52,6 +52,12 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
 
     public void TrocarEquipamento(int novoIndice)
     {
+        // Se pressionar a mesma tecla da habilidade ativa, alterna de volta para a Arma Principal (0)
+        if (novoIndice == indiceEquipamentoAtual)
+        {
+            novoIndice = 0;
+        }
+
         // TRAVA DE COOLDOWN: Se não for a arma principal (índice 0) e a habilidade NÃO estiver pronta, cancela a troca
         if (novoIndice != 0 && !PodeTrocarParaHabilidade(novoIndice))
         {
@@ -60,12 +66,6 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
 
         // Cancela projeções de outras habilidades antes de alternar
         CancelarTodasAsHabilidades();
-
-        // Se pressionar a mesma tecla da habilidade ativa, alterna de volta para a Arma Principal (0)
-        if (novoIndice == indiceEquipamentoAtual)
-        {
-            novoIndice = 0;
-        }
 
         // Atualiza as malhas 3D filhas em 'pontoMaos' (Slot 0, 1, 2, 3...)
         if (pontoMaos != null)
@@ -92,7 +92,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
         {
             if (hab.SlotIndex == slotIndex)
             {
-                return hab.PodeUsar(); // CORRIGIDO: Usa PodeUsar() do contrato ISkills
+                return hab.PodeUsar();
             }
         }
 
