@@ -88,9 +88,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2565911842256669533, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_Name
+      value: E Skill
+      objectReference: {fileID: 0}
+    - target: {fileID: 7781935735720035653, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7984770155519934624, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8257735182339763080, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
+      propertyPath: m_Name
+      value: F skill
       objectReference: {fileID: 0}
     - target: {fileID: 8833786251273572721, guid: 9a2a725d8a4e20b40b96ecf7a23297f2, type: 3}
       propertyPath: m_Name

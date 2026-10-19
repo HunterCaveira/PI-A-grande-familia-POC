@@ -377,7 +377,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
   m_Name: 
@@ -484,9 +484,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
+  slotIndex: 3
+  fotoPronta: {fileID: 21300000, guid: 717c2d2799ae8f147913049e0fdf9539, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
-  duracaoDoEfeito: 3
+  duracaoDoEfeito: 20
   tempoAnimacaoConsumo: 2
   tempoCooldown: 1
   gerenciadorDeEquipamentos: {fileID: 2588890255097247149}
@@ -1347,10 +1350,10 @@ MonoBehaviour:
   espalhamentoVertical: 2
   mascaraDeTiro:
     serializedVersion: 2
-    m_Bits: 243
+    m_Bits: 755
   lineRenderer: {fileID: 0}
   duracaoLinha: -0.03
-  meuPoolDeBalas: {fileID: 9070837241424634178}
+  meuPoolDeBalas: {fileID: 0}
   danoPorTiro: 20
   tipoDeDano: 0
   nomeDaArma: Pistola
@@ -1518,17 +1521,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2851361683365819924, guid: f8eeef6e76007e948b352719dfd7db1b, type: 3}
   m_PrefabInstance: {fileID: 215844123232332587}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9070837241424634178 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9159410693506697833, guid: f8eeef6e76007e948b352719dfd7db1b, type: 3}
-  m_PrefabInstance: {fileID: 215844123232332587}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddf223dc5acba26479a17f8658c0eeac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &594938616542535257
 PrefabInstance:
   m_ObjectHideFlags: 0
