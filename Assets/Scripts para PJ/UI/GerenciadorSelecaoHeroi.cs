@@ -89,8 +89,12 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
 
             if (textoPublicaOuPrivada != null)
             {
-                string tipo = PhotonNetwork.CurrentRoom.IsVisible ? "SALA PÚBLICA" : "SALA PRIVADA"; // Determina o tipo.
-                textoPublicaOuPrivada.text = tipo; // Exibe o tipo de sala.
+                // CORREÇÃO: Verifica se a sala possui a propriedade "Senha" gravada nela.
+                bool ehPrivada = PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("Senha");
+
+                // Se tiver senha, é Privada. Se não tiver, é Pública.
+                string tipo = ehPrivada ? "SALA PRIVADA" : "SALA PÚBLICA";
+                textoPublicaOuPrivada.text = tipo; // Exibe o tipo de sala corrigido na tela.
             }
         }
     }
