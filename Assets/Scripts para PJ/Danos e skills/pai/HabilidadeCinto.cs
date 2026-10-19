@@ -1,5 +1,5 @@
 using UnityEngine; // Importa a biblioteca principal do motor da Unity.
-
+using Photon.Pun; // Importa a biblioteca do Photon PUN para multiplayer.
 public class HabilidadeCinto : MonoBehaviour, IasUI // Script da habilidade do Cinto herdando de MonoBehaviour e implementando ISkills.
 {
     // ==========================================
