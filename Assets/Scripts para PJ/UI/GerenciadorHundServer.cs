@@ -1,177 +1,269 @@
-using System.Collections.Generic; // Permite o uso de listas de dados C#.
-using UnityEngine; // Importa os componentes principais da Unity.
-using UnityEngine.UI; // Importa suporte a elementos clássicos de UI.
-using TMPro; // Importa suporte para componentes TextMeshPro.
-using UnityEngine.SceneManagement; // Importa o gerenciador de troca de Cenas.
-using Photon.Pun; // Importa o ecossistema principal do Photon PUN 2.
-using Photon.Realtime; // Importa manipuladores de salas e estados de rede do Photon.
+using System.Collections.Generic; // Permite o uso de Dicionários e Listas.
+using UnityEngine; // Importa a engine Unity.
+using UnityEngine.UI; // Importa a UI nativa.
+using TMPro; // Importa os textos TextMeshPro.
+using UnityEngine.SceneManagement; // Importa controle de cenas.
+using Photon.Pun; // Importa ferramentas do Photon.
+using Photon.Realtime; // Importa classes de conexão do Photon.
 
-// A classe herda de MonoBehaviourPunCallbacks para escutar respostas do servidor Photon.
 public class GerenciadorHUDServer : MonoBehaviourPunCallbacks
 {
     // ==========================================
-    // 1. MAPEAMENTO DE ELEMENTOS DA UI
+    // 1. MAPEAMENTO DA INTERFACE BÁSICA
     // ==========================================
-
     [Header("Campos de Entrada (UI)")]
-    [SerializeField] private TMP_InputField campoNickname; // InputField onde o jogador digita o apelido.
-    [SerializeField] private TextMeshProUGUI textoAvisoErro; // Texto usado para exibir alertas e erros.
+    [SerializeField] private TMP_InputField campoNickname; // Onde o jogador digita o apelido
+    [SerializeField] private TextMeshProUGUI textoAvisoErro; // Texto para erros gerais
 
-    [Header("Painéis da Cena")]
-    [SerializeField] private GameObject painelTelaDoServer; // Painel com botões 'Criar Server' e 'Entrar Server'.
-    [SerializeField] private GameObject painelAcharServer; // Painel contendo a lista de salas abertas.
-
+    [Header("Painéis Principais")]
+    [SerializeField] private GameObject painelTelaDoServer; // Tela inicial (Criar/Entrar)
+    [SerializeField] private GameObject painelAcharServer; // Painel da Lista de Salas
 
     // ==========================================
-    // 2. INICIALIZAÇÃO E PRESERVAÇÃO DE NICKNAME
+    // 2. ELEMENTOS DA LISTA DE SALAS
     // ==========================================
+    [Header("Gerenciador da Lista de Salas")]
+    [SerializeField] private Transform containerListaSalas; // O objeto que vai organizar as salas (Content do ScrollView ou LayoutGroup)
+    [SerializeField] private GameObject prefabSlotSala; // O prefab que possui o script SlotSalaUI
 
+    // ==========================================
+    // 3. ELEMENTOS DO PAINEL DE SENHA
+    // ==========================================
+    [Header("Painel de Senha (Sala Privada)")]
+    [SerializeField] private GameObject painelPedirSenha; // Painel popup de senha
+    [SerializeField] private TMP_InputField campoSenhaDigitada; // Input onde o jogador tenta adivinhar a senha
+    [SerializeField] private TextMeshProUGUI textoAvisoSenha; // Texto de erro de senha incorreta
+
+    // Variáveis de controle interno para a sala que o jogador clicou
+    private Dictionary<string, RoomInfo> cacheDeSalas = new Dictionary<string, RoomInfo>();
+    private string salaSelecionadaAtual;
+    private string senhaRealDaSalaSelecionada;
+
+    // ==========================================
+    // INICIALIZAÇÃO
+    // ==========================================
     private void Start()
     {
-        // Garante a sincronização automática de cenas para a sala inteira no Photon.
         PhotonNetwork.AutomaticallySyncScene = true;
 
-        // Se o jogador já havia preenchido um Nickname no Photon anteriormente, mantém visível no InputField.
+        // Esconde o painel de senha ao iniciar
+        if (painelPedirSenha != null) painelPedirSenha.SetActive(false);
+
         if (campoNickname != null && !string.IsNullOrEmpty(PhotonNetwork.NickName))
         {
-            campoNickname.text = PhotonNetwork.NickName; // Restaura o Nickname salvo no campo de texto.
+            campoNickname.text = PhotonNetwork.NickName;
         }
 
-        // Garante a conexão inicial com a nuvem do Photon caso ainda não esteja conectado.
         if (!PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.ConnectUsingSettings(); // Conecta utilizando as credenciais do PhotonServerSettings.
-            ExibirAviso("Conectando ao servidor Photon...");
+            PhotonNetwork.ConnectUsingSettings();
+            ExibirAvisoGeral("Conectando ao servidor Photon...");
         }
         else if (PhotonNetwork.InLobby)
         {
-            ExibirAviso(""); // Limpa avisos de carregamento se já estiver no Lobby.
+            ExibirAvisoGeral("");
         }
     }
 
-
-    // ==========================================
-    // 3. CALLBACKS NATIVOS DO PHOTON (REDE)
-    // ==========================================
-
-    /// <summary>
-    /// Callback executado quando a conexão física com o Servidor Master é concluída.
-    /// </summary>
     public override void OnConnectedToMaster()
     {
-        Debug.Log("[HUD SERVER] Conectado ao Servidor Master com sucesso!");
-
-        // Entra no Lobby padrão se ainda não estiver no processo de entrada ou já dentro dele.
+        // Sempre que conectar ao Master, entra no Lobby para ter acesso à lista de salas
         if (!PhotonNetwork.InLobby && PhotonNetwork.NetworkClientState != ClientState.JoiningLobby)
         {
-            PhotonNetwork.JoinLobby(); // Solicita entrada no Lobby para receber atualizações de salas.
+            PhotonNetwork.JoinLobby();
+        }
+    }
+
+    public override void OnJoinedLobby()
+    {
+        ExibirAvisoGeral(""); // Limpa avisos
+        cacheDeSalas.Clear(); // Limpa a lista cacheada anterior
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        cacheDeSalas.Clear(); // Limpa as salas caso a internet caia
+    }
+
+    // ==========================================
+    // RECEBIMENTO E ATUALIZAÇÃO DA LISTA DE SALAS
+    // ==========================================
+
+    /// <summary>
+    /// O Photon dispara isso sozinho toda vez que uma sala é criada, destruída ou altera número de jogadores.
+    /// </summary>
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        // Atualiza nosso dicionário local com as alterações mais recentes
+        foreach (RoomInfo info in roomList)
+        {
+            // Se a sala foi fechada ou ficou invisível, removemos da lista
+            if (info.RemovedFromList || !info.IsVisible)
+            {
+                cacheDeSalas.Remove(info.Name);
+            }
+            else
+            {
+                // Adiciona ou atualiza as informações da sala
+                cacheDeSalas[info.Name] = info;
+            }
+        }
+
+        // Se o painel da lista estiver aberto, redesenhamos a UI
+        if (painelAcharServer != null && painelAcharServer.activeSelf)
+        {
+            DesenharListaDeSalas();
         }
     }
 
     /// <summary>
-    /// Callback executado quando a entrada no Lobby é confirmada pela rede.
+    /// Destrói os objetos antigos e cria os novos slots de sala na interface.
     /// </summary>
-    public override void OnJoinedLobby()
+    private void DesenharListaDeSalas()
     {
-        Debug.Log("[HUD SERVER] Entrou no Lobby com sucesso e está pronto!");
-        ExibirAviso(""); // Limpa alertas da interface.
+        // Se o container não estiver referenciado, ignora
+        if (containerListaSalas == null || prefabSlotSala == null) return;
+
+        // 1. Limpa todos os botões antigos da tela
+        foreach (Transform filho in containerListaSalas)
+        {
+            Destroy(filho.gameObject);
+        }
+
+        // 2. Instancia um botão novo para cada sala registrada no Cache
+        foreach (RoomInfo sala in cacheDeSalas.Values)
+        {
+            // Instancia o prefab como filho do Container
+            GameObject novoSlotObj = Instantiate(prefabSlotSala, containerListaSalas);
+
+            // Pega o script SlotSalaUI do prefab e configura enviando os dados da sala
+            SlotSalaUI slotScript = novoSlotObj.GetComponent<SlotSalaUI>();
+            if (slotScript != null)
+            {
+                slotScript.ConfigurarSlot(sala, this);
+            }
+        }
+    }
+
+    // ==========================================
+    // LÓGICA DE ENTRAR NA SALA CLICADA (PÚBLICA / PRIVADA)
+    // ==========================================
+
+    /// <summary>
+    /// Chamado pelo botão instanciado na lista quando o jogador clica numa sala.
+    /// </summary>
+    public void TentarEntrarNaSalaSelecionada(RoomInfo sala)
+    {
+        // Verifica se a sala clicada é privada (tem a chave "Senha" guardada)
+        if (sala.CustomProperties.ContainsKey("Senha"))
+        {
+            // É PRIVADA! Salva os dados dela internamente e abre o painel para pedir a senha
+            salaSelecionadaAtual = sala.Name;
+            senhaRealDaSalaSelecionada = (string)sala.CustomProperties["Senha"];
+
+            campoSenhaDigitada.text = ""; // Limpa tentativas anteriores
+            textoAvisoSenha.text = ""; // Limpa erros de senha anteriores
+            painelPedirSenha.SetActive(true); // Exibe o popup na tela
+        }
+        else
+        {
+            // É PÚBLICA! Entra direto.
+            ExibirAvisoGeral("Entrando na sala pública...");
+            PhotonNetwork.JoinRoom(sala.Name);
+        }
+    }
+
+    /// <summary>
+    /// Ação do botão "Confirmar" dentro do popup de pedir senha.
+    /// </summary>
+    public void ClicarConfirmarSenha()
+    {
+        // Verifica se o que o jogador digitou é igual à senha real da sala selecionada
+        if (campoSenhaDigitada.text.Trim() == senhaRealDaSalaSelecionada)
+        {
+            // Senha correta!
+            textoAvisoSenha.text = "<color=green>Senha Correta! Entrando...</color>";
+            PhotonNetwork.JoinRoom(salaSelecionadaAtual); // Tenta entrar no Photon
+        }
+        else
+        {
+            // Senha Incorreta! Avisa e não deixa entrar.
+            textoAvisoSenha.text = "<color=red>Senha Incorreta!</color>";
+        }
+    }
+
+    /// <summary>
+    /// Ação do botão "Cancelar" dentro do popup de pedir senha.
+    /// </summary>
+    public void ClicarFecharPainelSenha()
+    {
+        painelPedirSenha.SetActive(false); // Esconde o popup
     }
 
 
     // ==========================================
-    // 4. MÉTODOS AUXILIARES E VALIDAÇÕES
+    // MÉTODOS BÁSICOS DO MENU (COMO ANTES)
     // ==========================================
 
-    /// <summary>
-    /// Altera a mensagem do texto de aviso na tela de forma protegida contra exceções nulas.
-    /// </summary>
-    private void ExibirAviso(string mensagem)
+    private void ExibirAvisoGeral(string mensagem)
     {
         if (textoAvisoErro != null)
         {
-            textoAvisoErro.text = mensagem; // Atribui o texto informado.
-            textoAvisoErro.gameObject.SetActive(!string.IsNullOrEmpty(mensagem)); // Exibe apenas se não for vazio.
+            textoAvisoErro.text = mensagem;
+            textoAvisoErro.gameObject.SetActive(!string.IsNullOrEmpty(mensagem));
         }
     }
 
-    /// <summary>
-    /// Valida se o Nickname obrigatório foi preenchido e se o cliente está pronto na rede.
-    /// </summary>
-    private bool ValidarNicknameEConexao()
+    private bool ValidarNickname()
     {
-        // 1. Valida se o campo de entrada do Nickname está em branco ou nulo.
         if (campoNickname == null || string.IsNullOrWhiteSpace(campoNickname.text))
         {
-            ExibirAviso("Digite seu nome de Familiar antes de continuar!"); // Exibe alerta em vermelho na UI.
-            Debug.LogWarning("[HUD SERVER] Tentativa de prosseguir sem preencher o Nickname!");
-            return false; // Interrompe o fluxo da ação.
+            ExibirAvisoGeral("Digite seu nome de Familiar antes de continuar!");
+            return false;
         }
 
-        // 2. Valida se a conexão com os servidores do Photon está ativa.
         if (!PhotonNetwork.IsConnectedAndReady)
         {
-            ExibirAviso("Aguarde a conexão com o servidor Photon...");
-            return false; // Bloqueia a ação até concluir a conexão.
+            ExibirAvisoGeral("Aguarde a conexão com o servidor...");
+            return false;
         }
 
-        // Persiste o apelido tratado no perfil Photon do jogador local para ser reutilizado em todas as telas.
         PhotonNetwork.NickName = campoNickname.text.Trim();
-        ExibirAviso(""); // Limpa os avisos da tela.
-        return true; // Libera o avanço da ação.
+        ExibirAvisoGeral("");
+        return true;
     }
 
-
-    // ==========================================
-    // 5. AÇÕES PÚBLICAS DOS BOTÕES DA UI
-    // ==========================================
-
-    /// <summary>
-    /// Ação do botão "Criar Server".
-    /// </summary>
     public void ClicarCriarServer()
     {
-        Debug.Log("[HUD SERVER] Botão 'Criar Server' clicado!");
-
-        if (!ValidarNicknameEConexao()) return; // Aborta caso o Nickname seja inválido.
-
-        // Avança para a cena de criação da sala.
+        if (!ValidarNickname()) return;
         SceneManager.LoadScene("Criar Server");
     }
 
-    /// <summary>
-    /// Ação do botão "Server" / "Entrar Server".
-    /// </summary>
-    public void ClicarEntrarServer()
+    public void ClicarEntrarServer() // Abre o painel Achar Server
     {
-        Debug.Log("[HUD SERVER] Botão 'Entrar Server' clicado!");
+        if (!ValidarNickname()) return;
 
-        if (!ValidarNicknameEConexao()) return; // Aborta caso o Nickname seja inválido.
+        painelTelaDoServer.SetActive(false);
+        painelAcharServer.SetActive(true);
 
-        // Transiciona a visualização para o painel de busca de servidores (Achar Server).
-        if (painelTelaDoServer != null) painelTelaDoServer.SetActive(false);
-        if (painelAcharServer != null) painelAcharServer.SetActive(true);
+        // Assim que abre o painel de achar server, força o desenho das salas que já estavam cacheadas
+        DesenharListaDeSalas();
     }
 
-    /// <summary>
-    /// Ação do botão "Voltar" dentro do painel da lista de servidores.
-    /// </summary>
-    public void ClicarVoltarParaTelaServer()
+    public void ClicarVoltarParaTelaServer() // Fecha o Achar Server
     {
-        // Retorna a visualização para os botões iniciais.
-        if (painelAcharServer != null) painelAcharServer.SetActive(false);
-        if (painelTelaDoServer != null) painelTelaDoServer.SetActive(true);
+        painelAcharServer.SetActive(false);
+        painelTelaDoServer.SetActive(true);
     }
 
-    /// <summary>
-    /// Ação do botão "Voltar" principal para o menu do jogo.
-    /// </summary>
     public void ClicarVoltarMenu()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.Disconnect(); // Encerra a conexão ativamente ao sair.
-        }
+        if (PhotonNetwork.IsConnected) PhotonNetwork.Disconnect();
+        SceneManager.LoadScene("HUD do jogo");
+    }
 
-        SceneManager.LoadScene("HUD do jogo"); // Retorna para o Menu Principal.
+    public override void OnJoinedRoom()
+    {
+        PhotonNetwork.LoadLevel("TelaSelecaoPersonagem");
     }
 }
