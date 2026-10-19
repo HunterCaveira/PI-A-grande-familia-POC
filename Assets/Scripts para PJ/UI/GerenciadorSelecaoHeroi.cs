@@ -277,7 +277,7 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
             // Se o jogador for o Dono da Sala (Master Client), aplica a cor Dourada/Amarela via RichText e tag de Líder
             if (p.IsMasterClient)
             {
-                nickFormatado = $"<color=#FFD700>★ {nickBase} (LÍDER)</color>";
+                nickFormatado = $"<color=#FFD700>{nickBase} (LÍDER)</color>";
             }
 
             // Posiciona o jogador na coluna do Time 1

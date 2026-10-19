@@ -33,7 +33,7 @@ public class GerenciadorCriarServer : MonoBehaviourPunCallbacks
         if (textoNicknameJogador != null)
         {
             string nick = string.IsNullOrEmpty(PhotonNetwork.NickName) ? "Familiar" : PhotonNetwork.NickName;
-            textoNicknameJogador.text = $"Crie Sua Sala: {nick}";
+            textoNicknameJogador.text = $"{nick}";
         }
     }
 

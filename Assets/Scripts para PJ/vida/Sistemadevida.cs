@@ -1,129 +1,172 @@
-using System; // Importa suporte para delegates e eventos (Action).
-using UnityEngine; // Importa a biblioteca de componentes da Unity.
+using System; // Importa suporte para eventos (Action).
+using UnityEngine; // Importa a biblioteca base da Unity.
+using Photon.Pun; // IMPORTANTE: Importa as ferramentas de rede do Photon.
 
-public class Sistemadevida : MonoBehaviour // Declara a classe pública Sistemadevida herdando de MonoBehaviour.
+// 1. A classe agora herda de MonoBehaviourPun para usar o photonView
+public class Sistemadevida : MonoBehaviourPun, IPunObservable
 {
     // ==========================================
     // 1. ATRIBUTOS E VARIÁVEIS
     // ==========================================
 
-    [Header("Configurações do Herói")] // Seção do Inspector da Unity.
-    [SerializeField] private AtributosPersonagem dadosDoHeroi; // Referência à ficha de atributos para ler a vida máxima.
+    [Header("Configurações do Herói")]
+    [SerializeField] private AtributosPersonagem dadosDoHeroi;
 
-    [Header("PvP e Partida")] // Seção de identificação de partidas no Inspector.
-    [SerializeField] private int timeID = 1; // ID do time para controle de Fogo Amigo.
+    [Header("PvP e Partida")]
+    [SerializeField] private int timeID = 1;
 
-    [SerializeField] public float vidaAtual; // Quantidade atual de pontos de vida mantida em memória.
+    [SerializeField] public float vidaAtual;
 
-    public int TimeID => timeID; // Propriedade pública de apenas leitura para consultar o ID de time do herói.
-
-    // Propriedade pública para armazenar a taxa de mitigação/redução de dano sofrido (0f = 0%, 0.3f = 30%)
+    public int TimeID => timeID;
     public float PorcentagemReducaoDano { get; set; } = 0f;
 
-    // EVENTO: Transmite (vidaAtual, vidaMaxima) para scripts da UI ouvirem e atualizarem as barras na tela
     public event Action<float, float> OnVidaMudou;
 
 
     // ==========================================
-    // 2. CICLO DE VIDA DA UNITY
+    // 2. INICIALIZAÇÃO
     // ==========================================
 
-    private void Awake() // Método invocado assim que o objeto é carregado na memória da cena.
+    private void Awake()
     {
-        if (dadosDoHeroi != null) // SE a ficha de atributos foi atribuída no Inspector.
+        // 1. Inicializa a vida máxima baseada na ficha
+        if (dadosDoHeroi != null)
         {
-            vidaAtual = dadosDoHeroi.vidaMaxima; // Inicializa a vida atual com o valor máximo configurado na ficha.
+            vidaAtual = dadosDoHeroi.vidaMaxima;
+        }
+
+        // 2. CORREÇÃO MULTIPLAYER: Descobre o time verdadeiro do dono deste personagem
+        // Lê as propriedades customizadas do jogador que é dono deste PhotonView
+        if (photonView != null && photonView.Owner != null)
+        {
+            if (photonView.Owner.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
+            {
+                timeID = (int)timeObj; // Sobrescreve o timeID do Inspector com o time real (1 ou 2)
+                Debug.Log($"[SISTEMA DE VIDA] O jogador {photonView.Owner.NickName} nasceu no Time {timeID}");
+            }
         }
     }
 
-    private void Start() // Chamado antes da primeira atualização de frame.
+    private void Start()
     {
-        NotificarMudancaDeVida(); // Dispara o evento inicial para preencher as barras de vida na UI do jogo.
+        NotificarMudancaDeVida();
     }
 
 
     // ==========================================
-    // 3. MÉTODOS PÚBLICOS DE GERENCIAMENTO DE FICHA
+    // 3. MÉTODOS DE DANO E REDE (MULTIPLAYER)
     // ==========================================
 
-    /// <summary>
-    /// Permite trocar a referência da ficha de atributos ativa em tempo de execução (Usado pelo Tônico).
-    /// </summary>
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
     {
         if (novaFicha != null)
         {
-            dadosDoHeroi = novaFicha; // Atualiza a referência da ficha para a duplicada ou a original.
-            NotificarMudancaDeVida(); // Recalcula os valores e atualiza a UI.
-            Debug.Log($"[SISTEMA DE VIDA] Ficha de atributos atualizada! Vida máxima da ficha: {dadosDoHeroi.vidaMaxima}");
+            dadosDoHeroi = novaFicha;
+            NotificarMudancaDeVida();
         }
     }
 
-
-    // ==========================================
-    // 4. PROCESSAMENTO DE DANO E MORTE
-    // ==========================================
-
-    public void ReceberDano(InformacaoDano dano) // Método público invocado quando o herói sofre um golpe contendo os dados do dano.
+    /// <summary>
+    /// Calcula o dano localmente e avisa TODOS OS COMPUTADORES para aplicarem a perda de vida.
+    /// </summary>
+    public void ReceberDano(InformacaoDano dano)
     {
-        if (vidaAtual <= 0) return; // SE o herói já estiver morto, ignora novos processamentos de dano.
+        if (vidaAtual <= 0) return;
 
-        // Lógica de Fogo Amigo: Checa se o atacante é um aliado do mesmo time
+        // Lógica de Fogo Amigo
         if (dano.atacante != null && dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
         {
-            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject) // SE for do mesmo time e não for dano próprio.
+            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject)
             {
-                return; // Cancela e ignora a recepção de dano.
+                return; // Ignora o dano (Fogo amigo)
             }
         }
 
-        // Calcula o dano final aplicando o desconto da PorcentagemReducaoDano (Ex: se for 0.3, multiplica o dano por 0.7)
+        // Calcula o dano final descontando a armadura/mitigação
         float danoFinal = dano.quantidade * (1f - PorcentagemReducaoDano);
 
-        // Subtrai o dano mitigado da vida atual do herói
+        // MULTIPLAYER: Em vez de descontar a vida só aqui, manda a ordem de dano para TODOS na sala!
+        photonView.RPC("AplicarDanoPelaRede", RpcTarget.All, danoFinal);
+    }
+
+    /// <summary>
+    /// [PunRPC] é uma função que roda simultaneamente no computador de todos os jogadores da sala.
+    /// </summary>
+    [PunRPC]
+    private void AplicarDanoPelaRede(float danoFinal)
+    {
+        if (vidaAtual <= 0) return; // Evita morte dupla
+
+        // Subtrai a vida e garante que não fica menor que zero
         vidaAtual -= danoFinal;
-        vidaAtual = Mathf.Max(vidaAtual, 0f); // Garante que a vida nunca fique menor do que zero.
+        vidaAtual = Mathf.Max(vidaAtual, 0f);
 
-        NotificarMudancaDeVida(); // Notifica a interface gráfica (UI) sobre a perda de vida.
+        NotificarMudancaDeVida(); // Atualiza a barra de vida flutuante do personagem na tela
 
-        if (vidaAtual <= 0) // SE a vida atual zerar após a dedução.
+        // APENAS o computador que é "dono" deste personagem chama a lógica de morrer e respawnar,
+        // para evitar que 5 computadores tentem renascer o mesmo jogador ao mesmo tempo.
+        if (vidaAtual <= 0 && photonView.IsMine)
         {
-            Morrer(); // Dispara a função de eliminação do herói.
+            Morrer();
         }
     }
 
-    public void Renascer() // Método invocado no momento do respawn.
+    /// <summary>
+    /// Avisa todos os computadores que este jogador renasceu com a vida cheia.
+    /// </summary>
+    public void Renascer()
     {
-        if (dadosDoHeroi != null) // SE a ficha de atributos for válida.
+        photonView.RPC("RenascerPelaRede", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void RenascerPelaRede()
+    {
+        if (dadosDoHeroi != null)
         {
-            vidaAtual = dadosDoHeroi.vidaMaxima; // Restaura os pontos de vida total.
-            PorcentagemReducaoDano = 0f; // Reseta qualquer modificador de mitigação ativo.
-            NotificarMudancaDeVida(); // Notifica a UI sobre a restauração da vida.
+            vidaAtual = dadosDoHeroi.vidaMaxima;
+            PorcentagemReducaoDano = 0f;
+            NotificarMudancaDeVida();
         }
     }
 
-    private void NotificarMudancaDeVida() // Método privado auxiliar de disparo de eventos.
+    private void NotificarMudancaDeVida()
     {
-        // Dispara o evento OnVidaMudou passando (vidaAtual, vidaMaxima) apenas se houver algum script escutando (?.Invoke)
         if (dadosDoHeroi != null)
         {
             OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
         }
     }
 
-    private void Morrer() // Lógica de tratamento da morte e envio para a fila de respawn.
+    private void Morrer()
     {
-        Debug.Log($"{gameObject.name} foi eliminado!"); // Exibe mensagem no Console da Unity.
+        Debug.Log($"{gameObject.name} foi eliminado!");
 
-        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>(); // Procura a instância do GerenciadorRespawn na cena.
+        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
 
-        if (gerenciador != null) // SE o gerenciador for encontrado na cena.
+        if (gerenciador != null)
         {
-            gerenciador.ProcessarMorte(this.gameObject); // Envia o GameObject do jogador eliminado para o gerenciador.
+            gerenciador.ProcessarMorte(this.gameObject);
         }
-        else // SENÃO (se o gerenciador de respawn não for encontrado).
+    }
+
+    // ==========================================
+    // 4. SINCRONIZAÇÃO CONTÍNUA (GARANTIA)
+    // ==========================================
+
+    /// <summary>
+    /// Garante que se alguém entrar atrasado na sala, veja a vida atualizada deste jogador.
+    /// </summary>
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
         {
-            Debug.LogWarning("Nenhum GerenciadorRespawn encontrado na cena!"); // Emite um aviso no Console.
+            stream.SendNext(vidaAtual); // O Dono envia a sua vida
+        }
+        else
+        {
+            vidaAtual = (float)stream.ReceiveNext(); // Os outros leem a vida
+            NotificarMudancaDeVida(); // Atualizam as barrinhas
         }
     }
 }
