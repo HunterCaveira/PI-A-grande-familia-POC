@@ -20,6 +20,9 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública Movim
     [Header("Ficha de Atributos")]
     [SerializeField] private AtributosPersonagem atributos; // Referência para o ScriptableObject da ficha de atributos do herói.
 
+    // PROPRIEDADE PÚBLICA EXPOSTA (Permite que o ProjetilLentidao acesse a ficha atual)
+    public AtributosPersonagem AtributosAtuais => atributos;
+
 
     // ==========================================
     // 2. CICLO DE VIDA DA UNITY
@@ -61,13 +64,13 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública Movim
     // ==========================================
 
     /// <summary>
-    /// Permite trocar a ficha de atributos ativa em tempo de execução (Usado pelo Tônico para trocar entre a ficha original e a duplicada).
+    /// Permite trocar a ficha de atributos ativa em tempo de execução (Usado pelo Tônico e pela Lentidão).
     /// </summary>
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
     {
         if (novaFicha != null)
         {
-            atributos = novaFicha; // Atribui a nova ficha (duplicada com buff ou restaurada original).
+            atributos = novaFicha; // Atribui a nova ficha (duplicada com buff/debuff ou restaurada original).
             Debug.Log($"[MOVIMENTO PLAYER] Ficha de atributos atualizada! Nova velocidade base: {atributos.velocidadeMovimento} | % Speed: {atributos.porcentagemSpeed}%");
         }
     }
@@ -136,5 +139,35 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe pública Movim
 
         // Desloca o CharacterController no mundo considerando o intervalo de tempo entre frames (deltaTime)
         characterController.Move(movimentoFinal * Time.deltaTime);
+    }
+    public void AplicarLentidao(float porcentagemReducao, float duracao)
+    {
+        StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
+    }
+
+    private System.Collections.IEnumerator RotinaAplicarLentidao(float porcentagemReducao, float duracao)
+    {
+        AtributosPersonagem fichaOriginal = atributos;
+        if (fichaOriginal == null) yield break;
+
+        // Cria a duplicata em memória
+        AtributosPersonagem fichaDebuffada = Instantiate(fichaOriginal);
+        fichaDebuffada.velocidadeMovimento = fichaOriginal.velocidadeMovimento * (1f - porcentagemReducao);
+
+        // Aplica a nova ficha com velocidade reduzida
+        atributos = fichaDebuffada;
+        Debug.Log($"[MOVIMENTO PLAYER] Sofreu lentidão! Velocidade reduzida para: {atributos.velocidadeMovimento}");
+
+        // Aguarda a duração do efeito
+        yield return new WaitForSeconds(duracao);
+
+        // Restaura a ficha original e destrói a temporária
+        atributos = fichaOriginal;
+        if (fichaDebuffada != null)
+        {
+            Destroy(fichaDebuffada);
+        }
+
+        Debug.Log("[MOVIMENTO PLAYER] Efeito de lentidão acabou. Velocidade restaurada.");
     }
 }
