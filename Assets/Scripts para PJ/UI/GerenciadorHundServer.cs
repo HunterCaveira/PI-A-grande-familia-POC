@@ -44,8 +44,9 @@ public class GerenciadorHUDServer : MonoBehaviourPunCallbacks
     // ==========================================
     private void Start()
     {
-        PhotonNetwork.GameVersion = "1.0";
+        // Garante que o Photon sincroniza as mudanças de cena para todos na sala obrigatoriamente
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.GameVersion = "1.0";
 
         // Esconde o painel de senha ao iniciar
         if (painelPedirSenha != null) painelPedirSenha.SetActive(false);

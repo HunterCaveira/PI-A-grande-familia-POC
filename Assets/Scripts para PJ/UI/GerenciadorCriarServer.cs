@@ -88,7 +88,7 @@ public class GerenciadorCriarServer : MonoBehaviourPunCallbacks
         RoomOptions opcoesPrivadas = new RoomOptions
         {
             MaxPlayers = 10,
-            IsVisible = true, // ALTERADO: Agora é true para aparecer na lista do Lobby!
+            IsVisible = true, // Visível no Lobby
             IsOpen = true,
             CustomRoomProperties = propriedadesCustomizadas,
             CustomRoomPropertiesForLobby = new string[] { "Senha" } // Exposto para a lista saber que tem senha
@@ -103,13 +103,31 @@ public class GerenciadorCriarServer : MonoBehaviourPunCallbacks
         SceneManager.LoadScene("HUD Server");
     }
 
+    // ==========================================
+    // CALLBACKS DE REDE DO PHOTON
+    // ==========================================
+
+    public override void OnCreatedRoom()
+    {
+        Debug.Log("[PHOTON] Sala criada com sucesso pelo Master Client.");
+        ExibirAviso("Sala criada! Entrando...");
+    }
+
     public override void OnJoinedRoom()
     {
+        Debug.Log("[PHOTON] Jogador entrou na sala com sucesso.");
+        // Carrega automaticamente a cena seguinte para todos na sala (graças ao AutomaticallySyncScene = true)
         PhotonNetwork.LoadLevel("TelaSelecaoPersonagem");
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
+        Debug.LogWarning($"[PHOTON] Falha ao criar sala: {message}");
         ExibirAviso("ERRO: O nome desta sala já está em uso!");
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        Debug.Log($"[PHOTON] Novo jogador entrou na sala: {newPlayer.NickName}");
     }
 }

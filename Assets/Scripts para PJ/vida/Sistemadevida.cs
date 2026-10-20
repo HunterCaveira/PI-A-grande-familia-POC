@@ -17,7 +17,13 @@ public class Sistemadevida : MonoBehaviourPun, IPunObservable
 
     [SerializeField] public float vidaAtual;
 
-    public int TimeID => timeID;
+    // CORREÇÃO: Permitido get e set público para que o script de respawn possa alterar o time livremente
+    public int TimeID
+    {
+        get => timeID;
+        set => timeID = value;
+    }
+
     public float PorcentagemReducaoDano { get; set; } = 0f;
 
     public event Action<float, float> OnVidaMudou;
