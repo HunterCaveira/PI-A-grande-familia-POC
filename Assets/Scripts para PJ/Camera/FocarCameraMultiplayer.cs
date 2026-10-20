@@ -1,35 +1,29 @@
 using UnityEngine;
 using Photon.Pun;
-#if CINEMACHINE_3_OR_NEWER || UNITY_6_0_OR_NEWER
-using Unity.Cinemachine; // Namespace do Cinemachine 3 (Unity 6)
-#else
-using Cinemachine; // Namespace antigo
-#endif
+using Unity.Cinemachine; // Namespace oficial do Cinemachine na Unity 6
 
-// Herda de MonoBehaviourPun para podermos usar o photonView.IsMine
 public class FocarCameraMultiplayer : MonoBehaviourPun
 {
     [Header("Configuração de Alvo")]
-    [Tooltip("Arraste aqui o objeto que a câmera deve focar (ex: o próprio Pai ou um ponto no peito/cabeça). Se deixar vazio, foca no pé.")]
+    [Tooltip("Arraste aqui o objeto que a câmera deve focar. Se deixar vazio, foca no próprio jogador.")]
     public Transform alvoDaCamera;
 
     void Start()
     {
-        // REGRA DE OURO DO MULTIPLAYER: A câmera SÓ foca se este boneco for O SEU!
+        // A câmera SÓ foca se este boneco for o seu!
         if (photonView.IsMine)
         {
-            // Se você esqueceu de arrastar um alvo no Inspector, ele foca no próprio objeto do script
             if (alvoDaCamera == null)
             {
                 alvoDaCamera = this.transform;
             }
 
-            // Procura a sua câmera FreeLook que está solta na cena
-            CinemachineFreeLook cameraNaCena = FindFirstObjectByType<CinemachineFreeLook>();
+            // Procura a câmera Cinemachine FreeLook na cena (Unity 6)
+            CinemachineCamera cameraNaCena = FindFirstObjectByType<CinemachineCamera>();
 
             if (cameraNaCena != null)
             {
-                // Conecta o Tracking Target (Follow e LookAt) da câmera ao seu boneco
+                // Conecta os alvos da câmera
                 cameraNaCena.Follow = alvoDaCamera;
                 cameraNaCena.LookAt = alvoDaCamera;
 
@@ -37,7 +31,7 @@ public class FocarCameraMultiplayer : MonoBehaviourPun
             }
             else
             {
-                Debug.LogWarning("<color=orange>[CÂMERA] Nenhuma Cinemachine FreeLook encontrada na cena Main Park!</color>");
+                Debug.LogWarning("<color=orange>[CÂMERA] Nenhuma Cinemachine Camera encontrada na cena Main Park!</color>");
             }
         }
     }
