@@ -1,19 +1,20 @@
 using UnityEngine;
-using System.Collections;
-using UnityEngine.UIElements;
+using Photon.Pun; // Adicionado
 
-public class Cursor : MonoBehaviour
+// O NOME FOI ALTERADO: Lembre-se de renomear o arquivo .cs no Windows para "ControleCursor.cs"
+public class ControleCursor : MonoBehaviourPun
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // MULTIPLAYER: Somente o jogador local trava o próprio mouse
+        if (!photonView.IsMine) return;
+
         UnityEngine.Cursor.visible = false;
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

@@ -5,7 +5,7 @@ using Photon.Pun;
 
 public class Respawn : MonoBehaviourPunCallbacks
 {
-    // Singleton simples para ser acessado facilmente de qualquer lugar
+    // Singleton para ser acessado de qualquer script (ex: no momento da morte no Sistemadevida)
     public static Respawn Instancia { get; private set; }
 
     [Header("Pontos de Spawn no Mapa")]
@@ -24,37 +24,53 @@ public class Respawn : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// Método chamado quando alguém morre. Deve ser executado apenas pelo dono do boneco ou via PhotonView.
+    /// Método público chamado quando o jogador local morre.
     /// </summary>
-    public void SolicitarRespawn(int timeID, string nomePrefabHeroi)
+    /// <param name="bonecoAntigo">O GameObject do herói que foi destruído/eliminado.</param>
+    public void SolicitarRespawn(GameObject bonecoAntigo)
     {
-        StartCoroutine(RotinaRespawn(timeID, nomePrefabHeroi));
+        StartCoroutine(RotinaRespawn(bonecoAntigo));
     }
 
-    private IEnumerator RotinaRespawn(int timeID, string nomePrefabHeroi)
+    private IEnumerator RotinaRespawn(GameObject bonecoAntigo)
     {
-        // 1. Aguarda o tempo de respawn enquanto o jogador está morto/observando
+        // 1. Destrói o boneco antigo na rede se ele pertencer a este cliente local
+        if (bonecoAntigo != null)
+        {
+            PhotonView pv = bonecoAntigo.GetComponent<PhotonView>();
+            if (pv != null && pv.IsMine)
+            {
+                PhotonNetwork.Destroy(bonecoAntigo);
+            }
+        }
+
+        // 2. Aguarda a contagem regressiva de respawn
         yield return new WaitForSeconds(tempoParaRespawn);
 
-        // 2. Escolhe o ponto de spawn correto baseado no time
+        // 3. Lê as configurações do jogador local salvas na transição (HeroiIndice e TimeJogador)
+        int heroiIndice = 0;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("HeroiIndice"))
+        {
+            heroiIndice = (int)PhotonNetwork.LocalPlayer.CustomProperties["HeroiIndice"];
+        }
+
+        int timeID = 1;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("TimeJogador"))
+        {
+            timeID = (int)PhotonNetwork.LocalPlayer.CustomProperties["TimeJogador"];
+        }
+
+        string nomePrefabHeroi = (heroiIndice == 0) ? "Pai" : "Mae";
+
+        // 4. Seleciona o ponto de spawn correto baseado no time
         Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
+        Vector3 posicaoSpawn = pontoEscolhido != null ? pontoEscolhido.position : Vector3.zero;
+        Quaternion rotacaoSpawn = pontoEscolhido != null ? pontoEscolhido.rotation : Quaternion.identity;
 
-        if (pontoEscolhido == null)
-        {
-            pontoEscolhido = this.transform; // Fallback se a lista estiver vazia
-        }
+        // 5. Instancia um novo personagem limpo na rede através da pasta Resources
+        GameObject novoBoneco = PhotonNetwork.Instantiate(nomePrefabHeroi, posicaoSpawn, rotacaoSpawn);
 
-        // 3. Instancia um novo personagem limpo na rede através do Photon
-        // O prefab renasce na posição e rotação exata da base do seu time
-        GameObject novoBoneco = PhotonNetwork.Instantiate(nomePrefabHeroi, pontoEscolhido.position, pontoEscolhido.rotation);
-
-        // 4. Garante que o novo boneco recebe o TimeID correto na ficha
-        if (novoBoneco.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
-        {
-            vida.TimeID = timeID;
-        }
-
-        Debug.Log($"[RESPAWN] Jogador renasceu com sucesso no Time {timeID}!");
+        Debug.Log($"[RESPAWN] Jogador renasceu com sucesso! Prefab: {nomePrefabHeroi} | Time {timeID}");
     }
 
     private Transform ObterPontoDeSpawn(int timeID)
@@ -63,7 +79,6 @@ public class Respawn : MonoBehaviourPunCallbacks
 
         if (listaPontos == null || listaPontos.Count == 0) return null;
 
-        // Escolhe um ponto aleatório dentro do conjunto de pontos do time
         int indiceAleatorio = Random.Range(0, listaPontos.Count);
         return listaPontos[indiceAleatorio];
     }

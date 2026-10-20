@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 434966116}
   - component: {fileID: 434966115}
   m_Layer: 0
-  m_Name: Image (1)
+  m_Name: painel dos nomes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1075,7 +1075,7 @@ GameObject:
   - component: {fileID: 625075272}
   - component: {fileID: 625075271}
   m_Layer: 0
-  m_Name: Image
+  m_Name: 'fundo '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3220,7 +3220,7 @@ GameObject:
   - component: {fileID: 1420715706}
   - component: {fileID: 1420715705}
   m_Layer: 0
-  m_Name: Image
+  m_Name: backgound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

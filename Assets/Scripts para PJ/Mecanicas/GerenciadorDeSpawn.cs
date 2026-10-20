@@ -1,30 +1,34 @@
-using UnityEngine; // Importa bibliotecas base da Unity
-using Photon.Pun; // Importa Photon PUN
-using Photon.Realtime; // Importa configurações de rede
+using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class GerenciadorDeSpawn : MonoBehaviour
 {
     [Header("Pastas e Prefabs")]
-    [Tooltip("Nomes exatos dos prefabs na pasta Resources. Ex: 0 = Pai, 1 = Mae")]
-    [SerializeField] private string[] nomesPrefabsPersonagens;
+    [Tooltip("Nomes exatos dos prefabs dentro da pasta Assets/Resources. Ex: 0 = Pai, 1 = Mae")]
+    [SerializeField] private string[] nomesPrefabsPersonagens = new string[] { "Pai", "Mae" };
 
     [Header("Pontos de Nascimento (Transforms)")]
-    [SerializeField] private Transform[] pontosSpawnTime1; // Locais onde o Time 1 nasce
-    [SerializeField] private Transform[] pontosSpawnTime2; // Locais onde o Time 2 nasce
+    [SerializeField] private Transform[] pontosSpawnTime1; // Locais de spawn do Time 1
+    [SerializeField] private Transform[] pontosSpawnTime2; // Locais de spawn do Time 2
 
-    private void Start()
+    void Start()
     {
-        // Assim que a cena carrega, se estivermos conectados, manda criar o boneco
-        if (PhotonNetwork.IsConnectedAndReady)
+        if (PhotonNetwork.InRoom)
         {
+            Debug.Log($"[REDE] Conectado na Sala: {PhotonNetwork.CurrentRoom.Name} | Total de Jogadores: {PhotonNetwork.CurrentRoom.PlayerCount}");
             InstanciarMeuPersonagem();
+        }
+        else
+        {
+            Debug.LogError("[REDE ERROR] O jogador não está em nenhuma sala do Photon!");
         }
     }
 
     private void InstanciarMeuPersonagem()
     {
         // 1. DESCOBRE O TIME DO JOGADOR LOCAL
-        int meuTime = 1; // Padrão é Time 1
+        int meuTime = 1; // Padrão caso não esteja definido
         if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
         {
             meuTime = (int)timeObj;
@@ -37,28 +41,39 @@ public class GerenciadorDeSpawn : MonoBehaviour
             indiceHeroi = (int)heroiObj;
         }
 
-        // 3. ESCOLHE O PONTO DE SPAWN COM BASE NO TIME
-        Transform pontoDeSpawn = this.transform; // Ponto de fallback (onde o GameManager está)
-
-        if (meuTime == 1 && pontosSpawnTime1.Length > 0)
+        // Seguranca: Garante que o índice não estoure os limites do array de nomes de prefabs
+        if (nomesPrefabsPersonagens == null || nomesPrefabsPersonagens.Length == 0)
         {
-            // Pega um ponto aleatório da lista do Time 1
+            Debug.LogError("[SPAWN ERROR] Array 'nomesPrefabsPersonagens' está vazio no Inspector!");
+            return;
+        }
+
+        indiceHeroi = Mathf.Clamp(indiceHeroi, 0, nomesPrefabsPersonagens.Length - 1);
+
+        // 3. ESCOLHE O PONTO DE SPAWN COM BASE NO TIME
+        Transform pontoDeSpawn = this.transform; // Fallback padrao
+
+        if (meuTime == 1 && pontosSpawnTime1 != null && pontosSpawnTime1.Length > 0)
+        {
             int randomPos = Random.Range(0, pontosSpawnTime1.Length);
             pontoDeSpawn = pontosSpawnTime1[randomPos];
         }
-        else if (meuTime == 2 && pontosSpawnTime2.Length > 0)
+        else if (meuTime == 2 && pontosSpawnTime2 != null && pontosSpawnTime2.Length > 0)
         {
-            // Pega um ponto aleatório da lista do Time 2
             int randomPos = Random.Range(0, pontosSpawnTime2.Length);
             pontoDeSpawn = pontosSpawnTime2[randomPos];
         }
 
         // 4. INSTANCIA O PERSONAGEM NA REDE
-        // Atenção: O prefab precisa OBRIGATORIAMENTE estar dentro de uma pasta chamada "Resources"
         string prefabParaSpawnar = nomesPrefabsPersonagens[indiceHeroi];
 
-        PhotonNetwork.Instantiate(prefabParaSpawnar, pontoDeSpawn.position, pontoDeSpawn.rotation);
+        // PhotonNetwork.Instantiate busca o prefab obrigatoriamente dentro de Assets/Resources/
+        GameObject personagemInstanciado = PhotonNetwork.Instantiate(
+            prefabParaSpawnar,
+            pontoDeSpawn.position,
+            pontoDeSpawn.rotation
+        );
 
-        Debug.Log($"[SPAWN] Instanciou {prefabParaSpawnar} na posição do Time {meuTime}");
+        Debug.Log($"<color=green>[SPAWN] Instanciou {prefabParaSpawnar} para o Time {meuTime} na posição: {pontoDeSpawn.position}</color>");
     }
 }

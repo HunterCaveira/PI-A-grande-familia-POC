@@ -1,54 +1,76 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Pun;
 
-public class GerenciadorRespawn : MonoBehaviour
+public class GerenciadorRespawn : MonoBehaviourPun
 {
-    [SerializeField] protected tiroPistola Tiropistola;
     [Header("Configurações de Respawn")]
-    [SerializeField] private Transform[] pontosDeSpawn;
+    [SerializeField] private Transform[] pontosDeSpawnTime1;
+    [SerializeField] private Transform[] pontosDeSpawnTime2;
     [SerializeField] private float tempoParaRenascer = 3f;
-
-    private void Start()
-    {
-        if(pontosDeSpawn == null || pontosDeSpawn.Length == 0)
-        {
-            Debug.LogError("[GerenciadorRespawn] Nenhum ponto de spawn atribuído no Inspector!");
-            return;
-        }
-
-
-       Tiropistola.gameObject.SendMessage("Reload");
-    }
 
     public void ProcessarMorte(GameObject jogador)
     {
-        StartCoroutine(RotinaRespawn(jogador));
+        PhotonView pv = jogador.GetComponent<PhotonView>();
+        if (pv != null && pv.IsMine)
+        {
+            StartCoroutine(RotinaRespawn(jogador, pv));
+        }
     }
 
-    private IEnumerator RotinaRespawn(GameObject jogador)
+    private IEnumerator RotinaRespawn(GameObject jogador, PhotonView pv)
     {
-        // 1. Oculta e desativa o jogador durante a contagem
-        jogador.SetActive(false);
+        // Oculta o herói em todos os clientes
+        pv.RPC("SincronizarVisibilidadePlayerRPC", RpcTarget.All, false);
 
-        // 2. Aguarda o tempo configurado
         yield return new WaitForSeconds(tempoParaRenascer);
 
-        // 3. Seleciona um ponto de spawn aleatório da lista
-        if (pontosDeSpawn.Length > 0)
+        int timeId = 1;
+        if (jogador.TryGetComponent<Sistemadevida>(out Sistemadevida vidaComp))
         {
-            Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
+            timeId = vidaComp.TimeID;
+        }
+
+        Transform[] listaPontos = (timeId == 1) ? pontosDeSpawnTime1 : pontosDeSpawnTime2;
+
+        if (listaPontos != null && listaPontos.Length > 0)
+        {
+            Transform spawnEscolhido = listaPontos[Random.Range(0, listaPontos.Length)];
+
+            // Desativa o CharacterController no momento da relocalização
+            CharacterController controller = jogador.GetComponent<CharacterController>();
+            if (controller != null) controller.enabled = false;
+
             jogador.transform.position = spawnEscolhido.position;
             jogador.transform.rotation = spawnEscolhido.rotation;
+
+            if (controller != null) controller.enabled = true;
         }
 
-        // 4. Reativa o GameObject e restaura a vida
-        jogador.SetActive(true);
+        // Torna o herói visível e restaura os atributos em todos os clientes
+        pv.RPC("SincronizarVisibilidadePlayerRPC", RpcTarget.All, true);
 
-        if (jogador.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
+        if (vidaComp != null)
         {
-            vida.Renascer();
-           
-
+            vidaComp.Renascer();
         }
+
+        // Recarrega a arma localmente
+        tiroPistola arma = jogador.GetComponentInChildren<tiroPistola>();
+        if (arma != null)
+        {
+            arma.SendMessage("Reload", SendMessageOptions.DontRequireReceiver);
+        }
+    }
+
+    [PunRPC]
+    public void SincronizarVisibilidadePlayerRPC(bool visivel)
+    {
+        // Alterna a visibilidade visual do GameObject
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        foreach (var rend in renderers) rend.enabled = visivel;
+
+        SkinnedMeshRenderer[] skinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (var skRend in skinnedRenderers) skRend.enabled = visivel;
     }
 }

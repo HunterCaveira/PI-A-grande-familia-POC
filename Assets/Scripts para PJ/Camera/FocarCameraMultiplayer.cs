@@ -1,6 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
-using Unity.Cinemachine; // Namespace oficial do Cinemachine na Unity 6
+using Unity.Cinemachine;
 
 public class FocarCameraMultiplayer : MonoBehaviourPun
 {
@@ -10,7 +10,7 @@ public class FocarCameraMultiplayer : MonoBehaviourPun
 
     void Start()
     {
-        // A câmera SÓ foca se este boneco for o seu!
+        // Perfeito! O IsMine já está aqui.
         if (photonView.IsMine)
         {
             if (alvoDaCamera == null)
@@ -18,12 +18,10 @@ public class FocarCameraMultiplayer : MonoBehaviourPun
                 alvoDaCamera = this.transform;
             }
 
-            // Procura a câmera Cinemachine FreeLook na cena (Unity 6)
             CinemachineCamera cameraNaCena = FindFirstObjectByType<CinemachineCamera>();
 
             if (cameraNaCena != null)
             {
-                // Conecta os alvos da câmera
                 cameraNaCena.Follow = alvoDaCamera;
                 cameraNaCena.LookAt = alvoDaCamera;
 

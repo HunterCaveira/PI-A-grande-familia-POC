@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun; // Importa as bibliotecas principais do Photon
+using Photon.Pun;
 using Photon.Realtime;
 
-// 1. A classe agora herda de MonoBehaviourPun e implementa IPunObservable para sincronizar variáveis
 public class Dominacao : MonoBehaviourPun, IPunObservable
 {
     [Header("Configurações do Território")]
@@ -16,25 +15,18 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
     public GameObject uiConflito;
 
     [Header("Progresso Salvo (Sincronizado na Rede)")]
-    [Tooltip("Tempo acumulado pelo Time 1")]
     public float progressoTime1 = 0f;
-
-    [Tooltip("Tempo acumulado pelo Time 2")]
     public float progressoTime2 = 0f;
-
     public int timeTentandoDominar = 0;
     public bool emDisputa = false;
 
-    // Lista controlada EXCLUSIVAMENTE pelo Master Client
     private List<Sistemadevida> jogadoresNaArea = new List<Sistemadevida>();
 
     private void Update()
     {
-        // 2. APENAS O MASTER CLIENT processa a lógica, o tempo e as colisões.
-        // Isso evita que o lag (latência) de diferentes jogadores cause dessincronização.
+        // APENAS O MASTER CLIENT processa a lógica de domínio
         if (PhotonNetwork.IsMasterClient)
         {
-            // Limpa jogadores mortos ou destruídos
             jogadoresNaArea.RemoveAll(jogador => jogador == null || jogador.vidaAtual <= 0);
 
             if (jogadoresNaArea.Count > 0)
@@ -43,17 +35,12 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
             }
             else
             {
-                // Se a área está vazia, o Master Client reseta a zona
                 timeTentandoDominar = 0;
                 emDisputa = false;
-                timeDonoDoTerritorio = 0;
-                progressoTime1 = 0f;
-                progressoTime2 = 0f;
             }
         }
 
-        // 3. TODOS OS JOGADORES (inclusive os clientes) rodam a atualização da UI,
-        // baseando-se nos valores que o Master Client calculou e sincronizou.
+        // Atualização gráfica da interface
         AtualizarInterface();
     }
 
@@ -62,7 +49,6 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
         int timeEncontrado = -1;
         bool conflitoDetectado = false;
 
-        // Varre a lista inteira para ver se há mais de um time diferente
         foreach (Sistemadevida jogador in jogadoresNaArea)
         {
             if (timeEncontrado == -1)
@@ -78,7 +64,6 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
 
         emDisputa = conflitoDetectado;
 
-        // Se está em disputa, ninguém ganha progresso
         if (emDisputa)
         {
             timeTentandoDominar = 0;
@@ -87,10 +72,8 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
 
         timeTentandoDominar = timeEncontrado;
 
-        // Se o time atual já for o dono do território, ignora
         if (timeEncontrado == timeDonoDoTerritorio) return;
 
-        // Soma o progresso apenas para o time isolado correto
         if (timeEncontrado == 1)
         {
             progressoTime1 += Time.deltaTime;
@@ -144,7 +127,6 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
         if (timeDonoDoTerritorio == 2 && uiTime2 != null) uiTime2.SetActive(true);
     }
 
-    // 4. Os Triggers também só importam para o Master Client, que cuida da lista.
     private void OnTriggerEnter(Collider quemEntrou)
     {
         if (!PhotonNetwork.IsMasterClient) return;
@@ -168,12 +150,10 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
         }
     }
 
-    // 5. O MÉTODO DE SINCRONIZAÇÃO: Transmite os dados matemáticos continuamente na rede.
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            // O Master Client "Escreve" os dados oficiais na rede.
             stream.SendNext(timeDonoDoTerritorio);
             stream.SendNext(progressoTime1);
             stream.SendNext(progressoTime2);
@@ -182,7 +162,6 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
         }
         else
         {
-            // Os outros jogadores "Leem" os dados da rede e atualizam suas variáveis locais.
             timeDonoDoTerritorio = (int)stream.ReceiveNext();
             progressoTime1 = (float)stream.ReceiveNext();
             progressoTime2 = (float)stream.ReceiveNext();

@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
-public class GerenciadorDeEquipamentos : MonoBehaviour
+public class GerenciadorDeEquipamentos : MonoBehaviourPun
 {
     [Header("Configurações Visuais das Mãos")]
     [SerializeField] private Transform pontoMaos;
@@ -14,60 +15,69 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
     private int indiceEquipamentoAtual = 0;
     private int proximoIndicePendente = -1;
 
-    // Guarda os scripts de habilidade do personagem que usam ISkills
     private IasUI[] habilidadesDoPersonagem;
 
     void Awake()
     {
-        // Busca automaticamente todos os scripts de habilidade no mesmo personagem
         habilidadesDoPersonagem = GetComponents<IasUI>();
     }
 
     void Update()
     {
-        // 1. Leitura das teclas e agendamento na fila (Buffer)
+        // Apenas o jogador dono processa comandos de teclado localmente
+        if (!photonView.IsMine) return;
+
         if (Keyboard.current != null)
         {
             if (Keyboard.current.qKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 1; // Tecla Q -> Habilidade Slot 1
+                proximoIndicePendente = 1;
             }
             else if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 2; // Tecla E -> Habilidade Slot 2
+                proximoIndicePendente = 2;
             }
             else if (Keyboard.current.fKey.wasPressedThisFrame)
             {
-                proximoIndicePendente = 3; // Tecla F -> Habilidade Slot 3
+                proximoIndicePendente = 3;
             }
         }
 
-        // 2. Executa a troca se o relógio liberou e há algo pendente no buffer
         if (Time.time >= tempoLiberadoParaTrocar && proximoIndicePendente != -1)
         {
             TrocarEquipamento(proximoIndicePendente);
-            proximoIndicePendente = -1; // Limpa o agendamento
+            proximoIndicePendente = -1;
         }
     }
 
     public void TrocarEquipamento(int novoIndice)
     {
-        // Se pressionar a mesma tecla da habilidade ativa, alterna de volta para a Arma Principal (0)
+        if (!photonView.IsMine) return;
+
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
         }
 
-        // TRAVA DE COOLDOWN: Se não for a arma principal (índice 0) e a habilidade NÃO estiver pronta, cancela a troca
         if (novoIndice != 0 && !PodeTrocarParaHabilidade(novoIndice))
         {
             return;
         }
 
-        // Cancela projeções de outras habilidades antes de alternar
         CancelarTodasAsHabilidades();
 
-        // Atualiza as malhas 3D filhas em 'pontoMaos' (Slot 0, 1, 2, 3...)
+        // Atualiza a malha 3D visual da mão em todos os computadores da sala
+        photonView.RPC("SincronizarTrocaEquipamentoRPC", RpcTarget.All, novoIndice);
+
+        AtivarHabilidadePorSlot(novoIndice);
+
+        indiceEquipamentoAtual = novoIndice;
+        tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
+    }
+
+    [PunRPC]
+    private void SincronizarTrocaEquipamentoRPC(int novoIndice)
+    {
         if (pontoMaos != null)
         {
             for (int i = 0; i < pontoMaos.childCount; i++)
@@ -75,13 +85,6 @@ public class GerenciadorDeEquipamentos : MonoBehaviour
                 pontoMaos.GetChild(i).gameObject.SetActive(i == novoIndice);
             }
         }
-
-        // Dispara o código de ativação da habilidade escolhida
-        AtivarHabilidadePorSlot(novoIndice);
-
-        // Atualiza a variável do item ativo e grava a trava de tempo da animação
-        indiceEquipamentoAtual = novoIndice;
-        tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
     }
 
     private bool PodeTrocarParaHabilidade(int slotIndex)
