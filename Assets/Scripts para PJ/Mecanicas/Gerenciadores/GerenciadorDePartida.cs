@@ -1,18 +1,17 @@
 using UnityEngine;
-using TMPro; // Biblioteca obrigatória para mexer com TextMeshPro
+using TMPro;
+using Photon.Pun;
 
-public class GerenciadorDePartida : MonoBehaviour
+public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 {
     [Header("Interface (UI)")]
-    [Tooltip("Arraste o objeto de Texto (TextMeshPro) do Canvas aqui")]
     public TextMeshProUGUI textoCronometro;
     public TextMeshProUGUI dominaçãoRoxo;
     public TextMeshProUGUI dominaçãoAmarelo;
 
     [Header("Telas de Fim de Jogo")]
-    [Tooltip("Arraste as imagens/telas do Canvas que vão aparecer no fim da partida")]
-    public GameObject imagemVitoriaTime1;
-    public GameObject imagemVitoriaTime2; // Pode ser a imagem de "Derrota" caso o jogador seja o Time 1
+    public GameObject imagemVitoria;
+    public GameObject imagemDerrota;
     public GameObject imagemEmpate;
 
     [Header("Configurações da Partida")]
@@ -31,9 +30,8 @@ public class GerenciadorDePartida : MonoBehaviour
     {
         tempoRestante = tempoDePartida;
 
-        // Garante que todas as imagens comecem desativadas (invisíveis)
-        if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(false);
-        if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(false);
+        if (imagemVitoria != null) imagemVitoria.SetActive(false);
+        if (imagemDerrota != null) imagemDerrota.SetActive(false);
         if (imagemEmpate != null) imagemEmpate.SetActive(false);
     }
 
@@ -41,14 +39,12 @@ public class GerenciadorDePartida : MonoBehaviour
     {
         if (partidaAcabou) return;
 
-        // 1. Cronômetro rodando para trás
-        tempoRestante -= Time.deltaTime;
-
-        // 2. Pontuação do território (SÓ SOMA SE NÃO ESTIVER EM DISPUTA)
-        if (areaDeDominacao != null)
+        // Apenas o Master Client calcula a pontuação oficial
+        if (PhotonNetwork.IsMasterClient)
         {
-            // Se a área estiver em disputa, nenhum time ganha pontos de controle total
-            if (!areaDeDominacao.emDisputa)
+            tempoRestante -= Time.deltaTime;
+
+            if (areaDeDominacao != null && !areaDeDominacao.emDisputa)
             {
                 if (areaDeDominacao.timeDonoDoTerritorio == 1)
                 {
@@ -59,19 +55,16 @@ public class GerenciadorDePartida : MonoBehaviour
                     tempoTotalTime2 += Time.deltaTime;
                 }
             }
+
+            if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+            {
+                photonView.RPC("FinalizarPartidaRPC", RpcTarget.All, tempoTotalTime1, tempoTotalTime2);
+            }
         }
 
-        // 3. Atualiza os textos da tela com os tempos novos
         AtualizarRelogiosNaTela();
-
-        // 4. Fim de partida (Corrigido o '== 100' para '>=' para evitar bugs de ponto flutuante)
-        if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
-        {
-            FinalizarPartida();
-        }
     }
 
-    // Gerencia a atualização de todos os textos de tempo da interface
     private void AtualizarRelogiosNaTela()
     {
         if (textoCronometro != null)
@@ -81,46 +74,70 @@ public class GerenciadorDePartida : MonoBehaviour
 
         if (dominaçãoRoxo != null)
         {
-            dominaçãoRoxo.text = string.Format($"{Mathf.Round(tempoTotalTime1)} %");
+            dominaçãoRoxo.text = $"{Mathf.Round(tempoTotalTime1)} %";
         }
 
         if (dominaçãoAmarelo != null)
         {
-            dominaçãoAmarelo.text = string.Format($"{Mathf.Round(tempoTotalTime2)} %");
+            dominaçãoAmarelo.text = $"{Mathf.Round(tempoTotalTime2)} %";
         }
     }
 
-    // Função que transforma segundos em formato de relógio (Minutos:Segundos)
     private string FormatarTempo(float tempoEmSegundos)
     {
-        int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
-        int segundos = Mathf.FloorToInt(tempoEmSegundos % 60);
+        int minutos = Mathf.FloorToInt(Mathf.Max(tempoEmSegundos, 0f) / 60);
+        int segundos = Mathf.FloorToInt(Mathf.Max(tempoEmSegundos, 0f) % 60);
         return string.Format("{0:00}:{1:00}", minutos, segundos);
     }
 
-    private void FinalizarPartida()
+    [PunRPC]
+    private void FinalizarPartidaRPC(float pontosFinalTime1, float pontosFinalTime2)
     {
         partidaAcabou = true;
         tempoRestante = 0f;
-        AtualizarRelogiosNaTela(); // Crava o relógio no 00:00 visualmente e atualiza pontuação final
+        tempoTotalTime1 = pontosFinalTime1;
+        tempoTotalTime2 = pontosFinalTime2;
 
-        Debug.Log($"Fim! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
+        AtualizarRelogiosNaTela();
 
-        // Compara os tempos e exibe a imagem correspondente
-        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
+        // Determina o time do jogador local através do CustomProperties
+        int meuTime = 1;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("TimeJogador"))
         {
-            Debug.Log("Time 1 Venceu!");
-            if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
+            meuTime = (int)PhotonNetwork.LocalPlayer.CustomProperties["TimeJogador"];
         }
-        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f)
+
+        int timeVencedor = 0;
+        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f) timeVencedor = 1;
+        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f) timeVencedor = 2;
+
+        if (timeVencedor == 0)
         {
-            Debug.Log("Time 2 Venceu!");
-            if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(true);
+            if (imagemEmpate != null) imagemEmpate.SetActive(true);
+        }
+        else if (timeVencedor == meuTime)
+        {
+            if (imagemVitoria != null) imagemVitoria.SetActive(true);
         }
         else
         {
-            Debug.Log("Empate!");
-            if (imagemEmpate != null) imagemEmpate.SetActive(true);
+            if (imagemDerrota != null) imagemDerrota.SetActive(true);
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(tempoRestante);
+            stream.SendNext(tempoTotalTime1);
+            stream.SendNext(tempoTotalTime2);
+        }
+        else
+        {
+            tempoRestante = (float)stream.ReceiveNext();
+            tempoTotalTime1 = (float)stream.ReceiveNext();
+            tempoTotalTime2 = (float)stream.ReceiveNext();
         }
     }
 }

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class Dominacao : MonoBehaviour
+public class Dominacao : MonoBehaviourPun, IPunObservable
 {
     [Header("Configurações do Território")]
     public int timeDonoDoTerritorio = 0;
@@ -12,14 +14,9 @@ public class Dominacao : MonoBehaviour
     public GameObject uiTime2;
     public GameObject uiConflito;
 
-    [Header("Progresso Salvo (Tempos Independentes)")]
-    [Tooltip("Tempo acumulado pelo Time 1")]
+    [Header("Progresso Salvo (Sincronizado na Rede)")]
     public float progressoTime1 = 0f;
-
-    [Tooltip("Tempo acumulado pelo Time 2")]
     public float progressoTime2 = 0f;
-
-    // Mostra quem está ativamente na área somando pontos agora (útil para a UI)
     public int timeTentandoDominar = 0;
     public bool emDisputa = false;
 
@@ -27,28 +24,23 @@ public class Dominacao : MonoBehaviour
 
     private void Update()
     {
-        // Limpa jogadores mortos ou destruídos
-        // IMPORTANTE: Troque "vidaAtual <= 0" pela sua variável real de morte
-        jogadoresNaArea.RemoveAll(jogador => jogador == null || jogador.vidaAtual <= 0);
-
-        if (jogadoresNaArea.Count > 0)
+        // APENAS O MASTER CLIENT processa a lógica de domínio
+        if (PhotonNetwork.IsMasterClient)
         {
-            ProcessarCaptura();
-        }
-        else
-        {
-            // === AQUI ENTRA O SEU RACIOCÍNIO ===
-            // Se a área está completamente vazia:
+            jogadoresNaArea.RemoveAll(jogador => jogador == null || jogador.vidaAtual <= 0);
 
-            timeTentandoDominar = 0;
-            emDisputa = false;
-
-            // 1. Remove o dono atual da área (volta a ser neutra)
-            timeDonoDoTerritorio = 0;
-            progressoTime1 = 0f;
-            progressoTime2 = 0f;
+            if (jogadoresNaArea.Count > 0)
+            {
+                ProcessarCaptura();
+            }
+            else
+            {
+                timeTentandoDominar = 0;
+                emDisputa = false;
+            }
         }
 
+        // Atualização gráfica da interface
         AtualizarInterface();
     }
 
@@ -57,7 +49,6 @@ public class Dominacao : MonoBehaviour
         int timeEncontrado = -1;
         bool conflitoDetectado = false;
 
-        // 1. PRIMEIRO: Varre a lista inteira para ver se há mais de um time diferente
         foreach (Sistemadevida jogador in jogadoresNaArea)
         {
             if (timeEncontrado == -1)
@@ -71,23 +62,18 @@ public class Dominacao : MonoBehaviour
             }
         }
 
-        // 2. Atualiza a flag global de disputa
         emDisputa = conflitoDetectado;
 
-        // 3. SE ESTÁ EM DISPUTA, PARA TUDO AQUI! Ninguém ganha progresso.
         if (emDisputa)
         {
             timeTentandoDominar = 0;
             return;
         }
 
-        // Se chegou aqui, só existe UM time na área (ou todos são do mesmo time)
         timeTentandoDominar = timeEncontrado;
 
-        // Se o time atual já for o dono do território, não precisa somar progresso
         if (timeEncontrado == timeDonoDoTerritorio) return;
 
-        // 4. Soma o progresso apenas para o time isolado correto
         if (timeEncontrado == 1)
         {
             progressoTime1 += Time.deltaTime;
@@ -107,19 +93,15 @@ public class Dominacao : MonoBehaviour
             }
         }
     }
-    // Função separada para organizar o que acontece quando alguém ganha
+
     private void DominarTerritorio(int novoDono)
     {
         timeDonoDoTerritorio = novoDono;
-
-        // Quando um time domina a área, zeramos o progresso de ambos
-        // para que a próxima disputa comece do zero.
         progressoTime1 = 0f;
         progressoTime2 = 0f;
-
         timeTentandoDominar = 0;
 
-        Debug.Log("Vitória! Território dominado pelo time: " + timeDonoDoTerritorio);
+        Debug.Log("[DOMINAÇÃO] Território dominado pelo time: " + timeDonoDoTerritorio);
     }
 
     private void AtualizarInterface()
@@ -147,6 +129,8 @@ public class Dominacao : MonoBehaviour
 
     private void OnTriggerEnter(Collider quemEntrou)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         Sistemadevida scriptDoJogador = quemEntrou.GetComponent<Sistemadevida>();
 
         if (scriptDoJogador != null && scriptDoJogador.vidaAtual > 0 && !jogadoresNaArea.Contains(scriptDoJogador))
@@ -157,11 +141,32 @@ public class Dominacao : MonoBehaviour
 
     private void OnTriggerExit(Collider quemSaiu)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         Sistemadevida scriptDoJogador = quemSaiu.GetComponent<Sistemadevida>();
         if (scriptDoJogador != null && jogadoresNaArea.Contains(scriptDoJogador))
         {
             jogadoresNaArea.Remove(scriptDoJogador);
-            
         }
     }
-}   
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(timeDonoDoTerritorio);
+            stream.SendNext(progressoTime1);
+            stream.SendNext(progressoTime2);
+            stream.SendNext(timeTentandoDominar);
+            stream.SendNext(emDisputa);
+        }
+        else
+        {
+            timeDonoDoTerritorio = (int)stream.ReceiveNext();
+            progressoTime1 = (float)stream.ReceiveNext();
+            progressoTime2 = (float)stream.ReceiveNext();
+            timeTentandoDominar = (int)stream.ReceiveNext();
+            emDisputa = (bool)stream.ReceiveNext();
+        }
+    }
+}
