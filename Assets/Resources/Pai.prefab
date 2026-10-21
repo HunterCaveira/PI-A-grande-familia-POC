@@ -785,8 +785,6 @@ GameObject:
   - component: {fileID: 1507123214049052803}
   - component: {fileID: 9047799671779093050}
   - component: {fileID: 8998468276080411575}
-  - component: {fileID: 3418736416881459576}
-  - component: {fileID: 8843237462665020718}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -1081,10 +1079,11 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 1
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 8364777955370474253}
-  - {fileID: 3418736416881459576}
+  - {fileID: 5713144513402195500}
+  - {fileID: 3519219772137445324}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1109,34 +1108,6 @@ MonoBehaviour:
   - {fileID: 567622879855236882}
   - {fileID: 1507123214049052803}
   alvoDaCamera: {fileID: 5303254661701746715}
---- !u!114 &3418736416881459576
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformView
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
---- !u!114 &8843237462665020718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aca51059152ddf54985842d515f4e80f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
 --- !u!1 &3985524919501369782
 GameObject:
   m_ObjectHideFlags: 0
@@ -1601,6 +1572,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+--- !u!114 &5713144513402195500 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6724128768717663173, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+  m_PrefabInstance: {fileID: 1304299892225205737}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7283448348307874844 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
@@ -1879,6 +1861,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
   m_PrefabInstance: {fileID: 7892031412724710409}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3519219772137445324 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6724128768717663173, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+  m_PrefabInstance: {fileID: 7892031412724710409}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9125204465633456153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9125204465633456153 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
