@@ -32,8 +32,6 @@ public class Andando : MonoBehaviour
                 direction.Normalize();
 
             transform.Translate(direction * playerSpeed * Time.deltaTime, Space.World);
-        }
-
-        
+        }        
     }
 }

@@ -1,123 +1,171 @@
-using UnityEngine;
-using Photon.Pun; // Adicionado para Multiplayer
+using UnityEngine; // Importa a biblioteca da Unity para acessar MonoBehaviour, CharacterController, Vector3, etc.
 
-[RequireComponent(typeof(CharacterController))]
-public class MovimentodoPlayer : MonoBehaviourPun // Herda de MonoBehaviourPun
+[RequireComponent(typeof(CharacterController))] // Garante a inclusï¿½o automï¿½tica do componente CharacterController no GameObject do jogador.
+public class MovimentodoPlayer : MonoBehaviour // Declara a classe pï¿½blica MovimentodoPlayer herdando de MonoBehaviour.
 {
-    private CharacterController characterController;
-    private AcoesPlayer acoesPlay;
+    // ==========================================
+    // 1. VARIï¿½VEIS E REFERï¿½NCIAS
+    // ==========================================
 
-    [Header("Configurações de Movimento")]
-    [SerializeField] private float velocidade;
-    [SerializeField] private float gravidade = -9.81f;
-    [SerializeField] private float forcaPulo = 2f;
-    [SerializeField] private float velocidadeVertical;
-    private float velocidadeAtual;
+    private CharacterController characterController; // Referï¿½ncia privada para o componente fï¿½sico de movimento da Unity.
+    private AcoesPlayer acoesPlay; // Referï¿½ncia privada para a classe de mapa de controles (New Input System).
+
+    [Header("Configuraï¿½ï¿½es de Movimento")] // Organizaï¿½ï¿½o das seï¿½ï¿½es no Inspector.
+    [SerializeField] private float velocidade; // Variï¿½vel privada de fallback exibida no Inspector para caso nï¿½o haja ficha de atributos.
+    [SerializeField] private float gravidade = -9.81f; // Forï¿½a de gravidade aplicada ao eixo vertical Y.
+    [SerializeField] private float forcaPulo = 2f; // Forï¿½a base de impulso para o pulo do herï¿½i.
+    [SerializeField] private float velocidadeVertical; // Guarda a velocidade acumulada de queda/pulo no eixo Y.
+    private float velocidadeAtual; // Guarda o valor final de velocidade calculada no frame atual (andando ou correndo).
 
     [Header("Ficha de Atributos")]
-    [SerializeField] private AtributosPersonagem atributos;
+    [SerializeField] private AtributosPersonagem atributos; // Referï¿½ncia para o ScriptableObject da ficha de atributos do herï¿½i.
+
+    // PROPRIEDADE Pï¿½BLICA EXPOSTA (Permite que o ProjetilLentidao acesse a ficha atual)
     public AtributosPersonagem AtributosAtuais => atributos;
 
-    private void Awake()
+    [Header("AnimaÃ§Ã£o")]
+    [SerializeField] private Animator playerAnimation;
+
+    // ==========================================
+    // 2. CICLO DE VIDA DA UNITY
+    // ==========================================
+
+    private void Awake() // Mï¿½todo chamado assim que o script ï¿½ carregado na memï¿½ria.
     {
-        acoesPlay = new AcoesPlayer();
+        acoesPlay = new AcoesPlayer(); // Cria uma nova instï¿½ncia da classe gerada pelo New Input System.
     }
 
-    void Start()
+    void Start() // Mï¿½todo chamado no primeiro frame de execuï¿½ï¿½o do jogo.
     {
-        characterController = GetComponent<CharacterController>();
+        characterController = GetComponent<CharacterController>(); // Busca e atribui o componente CharacterController do GameObject.
 
-        // MULTIPLAYER: Se for um clone da rede, desativa a física local para evitar colisões fantasmas e sai
-        if (!photonView.IsMine)
-        {
-            characterController.enabled = false;
-            return;
-        }
-
+        // Registra o evento de acionamento do botï¿½o de pulo para disparar a funï¿½ï¿½o SolicitarPulo
         acoesPlay.MovimentoPlayer.Pular.started += ctx => SolicitarPulo();
     }
 
-    private void OnEnable()
+    private void OnEnable() // Executado quando o GameObject ï¿½ ativado na cena.
     {
-        if (photonView != null && !photonView.IsMine) return; // Trava Multiplayer
-        acoesPlay.MovimentoPlayer.Enable();
+        acoesPlay.MovimentoPlayer.Enable(); // Ativa os ouvintes de teclado/controle do New Input System.
     }
 
-    private void OnDisable()
+    private void OnDisable() // Executado quando o GameObject ï¿½ desativado na cena.
     {
-        acoesPlay.MovimentoPlayer.Disable();
+        acoesPlay.MovimentoPlayer.Disable(); // Desativa os ouvintes de controle para poupar recursos.
     }
 
-    void Update()
+    void Update() // Executado a cada frame do jogo.
     {
-        if (!photonView.IsMine) return; // MULTIPLAYER: Apenas o dono se move
-
-        AplicarGravidade();
-        Correr();
-        Andar();
+        AplicarGravidade(); // Executa o cï¿½lculo da fï¿½sica de queda e aderï¿½ncia ao chï¿½o.
+        Correr(); // Determina a velocidade atual com base na ficha e na tecla de corrida.
+        Andar(); // Executa o movimento fï¿½sico tridimensional no mapa.
     }
 
+
+    // ==========================================
+    // 3. Mï¿½TODOS Pï¿½BLICOS DE GERENCIAMENTO DE FICHA
+    // ==========================================
+
+    /// <summary>
+    /// Permite trocar a ficha de atributos ativa em tempo de execuï¿½ï¿½o (Usado pelo Tï¿½nico e pela Lentidï¿½o).
+    /// </summary>
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
     {
         if (novaFicha != null)
         {
-            atributos = novaFicha;
+            atributos = novaFicha; // Atribui a nova ficha (duplicada com buff/debuff ou restaurada original).
+            Debug.Log($"[MOVIMENTO PLAYER] Ficha de atributos atualizada! Nova velocidade base: {atributos.velocidadeMovimento} | % Speed: {atributos.porcentagemSpeed}%");
         }
     }
 
-    void AplicarGravidade()
+
+    // ==========================================
+    // 4. Lï¿½GICA DE MOVIMENTO E Fï¿½SICA
+    // ==========================================
+
+    void AplicarGravidade() // Trata o cï¿½lculo da forï¿½a da gravidade e estado tocando o chï¿½o.
     {
-        if (characterController.isGrounded && velocidadeVertical < 0)
+        if (characterController.isGrounded && velocidadeVertical < 0) // SE o herï¿½i estiver encostando firme no solo.
         {
-            velocidadeVertical = -2f;
+            velocidadeVertical = -2f; // Fixa a aceleraï¿½ï¿½o vertical em um valor baixo negativo para prender o herï¿½i ao chï¿½o.
         }
-        else
+        else // SENï¿½O (se estiver no ar caindo ou pulando).
         {
-            velocidadeVertical += gravidade * Time.deltaTime;
+            velocidadeVertical += gravidade * Time.deltaTime; // Acumula a atraï¿½ï¿½o da gravidade no tempo.
         }
     }
 
-    void SolicitarPulo()
+    void SolicitarPulo() // Funï¿½ï¿½o responsï¿½vel por calcular e aplicar a forï¿½a do pulo.
     {
-        if (characterController.isGrounded)
+        if (characterController.isGrounded) // SE o personagem estiver pisando no chï¿½o.
         {
+            // Lï¿½ a forï¿½a do pulo direto da ficha de atributos (ou usa a variï¿½vel do Inspector como fallback)
             float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
-            velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade);
+            velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade); // Aplica a fï¿½rmula matemï¿½tica de aceleraï¿½ï¿½o do pulo.
         }
     }
 
-    void Correr()
+    void Correr() // Determina a velocidade de deslocamento horizontal.
     {
-        float velocidadeBase = 5f;
+        float velocidadeBase = 5f; // Valor padrï¿½o de fallback.
 
         if (atributos != null)
         {
+            // Calcula a velocidade somando o valor base com a porcentagemSpeed configurada na ficha
             velocidadeBase = atributos.velocidadeMovimento + (atributos.velocidadeMovimento * (atributos.porcentagemSpeed / 100f));
         }
 
-        if (acoesPlay.MovimentoPlayer.Correr.IsPressed())
+        bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed(); // Verifica se a tecla de corrida estï¿½ pressionada.
+
+        if (botaoCorrerPressionado) // SE estiver correndo.
         {
-            velocidadeAtual = velocidadeBase * 2f;
+            velocidadeAtual = velocidadeBase * 2f; // Dobra a velocidade base.
         }
-        else
+        else // SENï¿½O (caminhada normal).
         {
-            velocidadeAtual = velocidadeBase;
+            velocidadeAtual = velocidadeBase; // Aplica a velocidade base normal.
         }
     }
 
+    
     void Andar()
     {
-        Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
-        Vector3 direcao = (transform.right * leituraInput.x) + (transform.forward * leituraInput.y);
-        Vector3 movimentoHorizontal = direcao * velocidadeAtual;
-        Vector3 movimentoFinal = new Vector3(movimentoHorizontal.x, velocidadeVertical, movimentoHorizontal.z);
+        Vector2 leituraInput =
+            acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
 
+        // Calcula a direÃ§Ã£o relativa Ã  orientaÃ§Ã£o atual do personagem.
+        Vector3 direcao =
+            (transform.right * leituraInput.x) +
+            (transform.forward * leituraInput.y);
+
+        // Evita movimento diagonal mais rÃ¡pido.
+        if (direcao.magnitude > 1f)
+            direcao.Normalize();
+
+        // Calcula o movimento horizontal.
+        Vector3 movimentoHorizontal = direcao * velocidadeAtual;
+
+        // Adiciona a velocidade vertical da gravidade e do pulo.
+        Vector3 movimentoFinal = new Vector3(
+            movimentoHorizontal.x,
+            velocidadeVertical,
+            movimentoHorizontal.z
+        );
+
+        // Move o personagem respeitando as colisÃµes.
         characterController.Move(movimentoFinal * Time.deltaTime);
+
+        // Identifica se existe entrada de movimento.
+        bool andando = leituraInput.sqrMagnitude > 0.01f;
+
+        // Atualiza a animaÃ§Ã£o.
+        if (playerAnimation != null)
+        {
+            playerAnimation.SetInteger("Andando", andando ? 1 : 0);
+        }
     }
 
     public void AplicarLentidao(float porcentagemReducao, float duracao)
     {
-        if (!photonView.IsMine) return; // Apenas o dono gerencia sua própria lentidão localmente
         StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
     }
 
@@ -126,14 +174,24 @@ public class MovimentodoPlayer : MonoBehaviourPun // Herda de MonoBehaviourPun
         AtributosPersonagem fichaOriginal = atributos;
         if (fichaOriginal == null) yield break;
 
+        // Cria a duplicata em memï¿½ria
         AtributosPersonagem fichaDebuffada = Instantiate(fichaOriginal);
         fichaDebuffada.velocidadeMovimento = fichaOriginal.velocidadeMovimento * (1f - porcentagemReducao);
 
+        // Aplica a nova ficha com velocidade reduzida
         atributos = fichaDebuffada;
+        Debug.Log($"[MOVIMENTO PLAYER] Sofreu lentidï¿½o! Velocidade reduzida para: {atributos.velocidadeMovimento}");
 
+        // Aguarda a duraï¿½ï¿½o do efeito
         yield return new WaitForSeconds(duracao);
 
+        // Restaura a ficha original e destrï¿½i a temporï¿½ria
         atributos = fichaOriginal;
-        if (fichaDebuffada != null) Destroy(fichaDebuffada);
+        if (fichaDebuffada != null)
+        {
+            Destroy(fichaDebuffada);
+        }
+
+        Debug.Log("[MOVIMENTO PLAYER] Efeito de lentidï¿½o acabou. Velocidade restaurada.");
     }
 }

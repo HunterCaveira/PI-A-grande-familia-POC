@@ -4,23 +4,6 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/HUD do jogo.unity
-    guid: a3d6c804dfdf1b04fb851adf23227fde
-  - enabled: 1
-    path: Assets/Scenes/HUD Server.unity
-    guid: 45db5169a6fbc0541afeca1030ca1027
-  - enabled: 1
-    path: Assets/Scenes/Criar Server.unity
-    guid: de3ce62de6708d94ba77b9a77236a498
-  - enabled: 1
-    path: Assets/Scenes/TelaSelecaoPersonagem.unity
-    guid: 4e1e3a375e65f4b4688b3ce9bec5d9a6
-  - enabled: 1
-    path: Assets/Scenes/Main Park.unity
-    guid: 57f2cec3a9cafbe498677c5c0cdc45c9
-  m_configObjects:
-    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_Scenes: []
+  m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

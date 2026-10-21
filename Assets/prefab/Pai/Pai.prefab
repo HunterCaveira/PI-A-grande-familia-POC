@@ -260,8 +260,7 @@ GameObject:
   - component: {fileID: 2588890255097247149}
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
-  - component: {fileID: 7497931222453018765}
-  - component: {fileID: 1849147595969471756}
+  - component: {fileID: 9109185544430400059}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -357,6 +356,7 @@ MonoBehaviour:
   forcaPulo: 2
   velocidadeVertical: 2
   atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
+  playerAnimation: {fileID: 9109185544430400059}
 --- !u!114 &849392077082758349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,46 +539,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
   cameraTarget: {fileID: 7566779434684666353}
---- !u!114 &7497931222453018765
-MonoBehaviour:
+--- !u!95 &9109185544430400059
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 1
-  ObservedComponents:
-  - {fileID: 8305240971407860968}
-  - {fileID: 1849147595969471756}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &1849147595969471756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformView
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
+  m_Avatar: {fileID: 9000000, guid: 4ea0bd7b94598674f8408c1adc90ad0f, type: 3}
+  m_Controller: {fileID: 9100000, guid: f6283eca98ac16f4a8ee10b470e9fa7c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3853642255824957655
 GameObject:
   m_ObjectHideFlags: 0

@@ -2926,6 +2926,7 @@ MonoBehaviour:
   forcaPulo: 2
   velocidadeVertical: 1
   atributos: {fileID: 0}
+  playerAnimation: {fileID: 0}
 --- !u!114 &1949026800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3233,7 +3234,7 @@ PrefabInstance:
       objectReference: {fileID: 282577201}
     - target: {fileID: 1054882671250957864, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 113
+      value: 116
       objectReference: {fileID: 0}
     - target: {fileID: 1068253683487931859, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3269,7 +3270,7 @@ PrefabInstance:
       objectReference: {fileID: 247647152}
     - target: {fileID: 1704930204785065689, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 866
+      value: 869
       objectReference: {fileID: 0}
     - target: {fileID: 1784482859957681671, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
@@ -3305,7 +3306,7 @@ PrefabInstance:
       objectReference: {fileID: 1175934824}
     - target: {fileID: 1972919457167580688, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 866
+      value: 869
       objectReference: {fileID: 0}
     - target: {fileID: 2096188682957345504, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Name
@@ -3349,7 +3350,7 @@ PrefabInstance:
       objectReference: {fileID: 103551970}
     - target: {fileID: 2666273496662376560, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 278
+      value: 281
       objectReference: {fileID: 0}
     - target: {fileID: 2774986188035190613, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3457,7 +3458,7 @@ PrefabInstance:
       objectReference: {fileID: 678173984}
     - target: {fileID: 4530712795372859255, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 382
+      value: 385
       objectReference: {fileID: 0}
     - target: {fileID: 4575037806838811102, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_LocalPosition.x
