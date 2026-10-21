@@ -5,12 +5,11 @@ using Photon.Pun;
 
 public class Respawn : MonoBehaviourPunCallbacks
 {
-    // Singleton simples para ser acessado facilmente de qualquer lugar
     public static Respawn Instancia { get; private set; }
 
-    [Header("Pontos de Spawn no Mapa")]
-    [SerializeField] private List<Transform> pontosSpawnTime1;
-    [SerializeField] private List<Transform> pontosSpawnTime2;
+    [Header("Pontos de Spawn no Mapa (Automáticos)")]
+    [SerializeField] private List<Transform> pontosSpawnTime1 = new List<Transform>();
+    [SerializeField] private List<Transform> pontosSpawnTime2 = new List<Transform>();
 
     [Header("Regras de Partida")]
     [SerializeField] private float tempoParaRespawn = 5f;
@@ -23,9 +22,31 @@ public class Respawn : MonoBehaviourPunCallbacks
             Destroy(gameObject);
     }
 
-    /// <summary>
-    /// Método chamado quando alguém morre. Deve ser executado apenas pelo dono do boneco ou via PhotonView.
-    /// </summary>
+    private void Start()
+    {
+        BuscarPontosDeSpawnAutomaticos();
+    }
+
+    private void BuscarPontosDeSpawnAutomaticos()
+    {
+        pontosSpawnTime1.Clear();
+        pontosSpawnTime2.Clear();
+
+        GameObject[] todosObjetos = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        foreach (GameObject obj in todosObjetos)
+        {
+            if (obj.name.Contains("Ponto de Respawn2"))
+            {
+                pontosSpawnTime2.Add(obj.transform);
+            }
+            else if (obj.name.Contains("Ponto de Respawn"))
+            {
+                pontosSpawnTime1.Add(obj.transform);
+            }
+        }
+    }
+
     public void SolicitarRespawn(int timeID, string nomePrefabHeroi)
     {
         StartCoroutine(RotinaRespawn(timeID, nomePrefabHeroi));
@@ -33,28 +54,25 @@ public class Respawn : MonoBehaviourPunCallbacks
 
     private IEnumerator RotinaRespawn(int timeID, string nomePrefabHeroi)
     {
-        // 1. Aguarda o tempo de respawn enquanto o jogador está morto/observando
         yield return new WaitForSeconds(tempoParaRespawn);
 
-        // 2. Escolhe o ponto de spawn correto baseado no time
-        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
+        // MODIFICAÇÃO: Ignora o nome recebido e utiliza obrigatoriamente "Pai" da pasta Resources
+        string prefabFinal = "Pai";
 
+        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
         if (pontoEscolhido == null)
         {
-            pontoEscolhido = this.transform; // Fallback se a lista estiver vazia
+            pontoEscolhido = this.transform;
         }
 
-        // 3. Instancia um novo personagem limpo na rede através do Photon
-        // O prefab renasce na posição e rotação exata da base do seu time
-        GameObject novoBoneco = PhotonNetwork.Instantiate(nomePrefabHeroi, pontoEscolhido.position, pontoEscolhido.rotation);
+        GameObject novoBoneco = PhotonNetwork.Instantiate(prefabFinal, pontoEscolhido.position, pontoEscolhido.rotation);
 
-        // 4. Garante que o novo boneco recebe o TimeID correto na ficha
-        if (novoBoneco.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
+        if (novoBoneco != null && novoBoneco.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
         {
             vida.TimeID = timeID;
         }
 
-        Debug.Log($"[RESPAWN] Jogador renasceu com sucesso no Time {timeID}!");
+        Debug.Log($"<color=cyan>[RESPAWN] Jogador renasceu com sucesso como '{prefabFinal}' no Time {timeID}!</color>");
     }
 
     private Transform ObterPontoDeSpawn(int timeID)
@@ -63,7 +81,6 @@ public class Respawn : MonoBehaviourPunCallbacks
 
         if (listaPontos == null || listaPontos.Count == 0) return null;
 
-        // Escolhe um ponto aleatório dentro do conjunto de pontos do time
         int indiceAleatorio = Random.Range(0, listaPontos.Count);
         return listaPontos[indiceAleatorio];
     }

@@ -37,7 +37,7 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
     // Chaves de rede
     private const string CHAVE_TIME = "TimeJogador";
     private const string CHAVE_HEROI = "HeroiIndice";
-    private const string CHAVE_PREFAB = "NomePrefabBase"; // NOVA CHAVE: Guarda o nome do Prefab!
+    private const string CHAVE_PREFAB = "NomePrefabBase"; // Guarda o nome do Prefab para o GerenciadorDeSpawn instanciar
 
     private void Start()
     {
@@ -51,10 +51,18 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
             SetarTimeLocal(1);
         }
 
-        // Se o jogador entrou e ainda não escolheu herói, define o primeiro da lista como padrão
+        // Se o jogador entrou e ainda não escolheu herói, define o primeiro da lista como padrão (ou "Pai" da pasta Resources)
         if (PhotonNetwork.InRoom && ObterHeroiDoJogador(PhotonNetwork.LocalPlayer) == -1)
         {
-            if (listaFichasHerois.Count > 0) ClicarSelecionarHeroi(0);
+            if (listaFichasHerois.Count > 0)
+            {
+                ClicarSelecionarHeroi(0);
+            }
+            else
+            {
+                // Fallback seguro caso a lista esteja vazia: define diretamente o "Pai" da pasta Resources
+                DefinirPrefabPadraoNaRede("Pai");
+            }
         }
 
         AtualizarTodaAInterfaceRede();
@@ -82,8 +90,8 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
     {
         if (indiceHeroi < 0 || indiceHeroi >= listaFichasHerois.Count) return;
 
-        // O SEGREDO ESTÁ AQUI: Pega o nome do Prefab direto da ficha (Ex: "Pai")
-        string nomeDoPrefab = "Pai"; // Segurança padrão
+        // BUSCA O NOME DO PREFAB DIRETO DA FICHA (Ou define "Pai" como base padrão da pasta Resources)
+        string nomeDoPrefab = "Pai";
         if (listaFichasHerois[indiceHeroi] != null && listaFichasHerois[indiceHeroi].prefabPersonagem != null)
         {
             nomeDoPrefab = listaFichasHerois[indiceHeroi].prefabPersonagem.name;
@@ -92,16 +100,37 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
         Hashtable propriedadeHeroi = new Hashtable
         {
             { CHAVE_HEROI, indiceHeroi },
-            { CHAVE_PREFAB, nomeDoPrefab } // Envia a palavra "Pai" para a nuvem!
+            { CHAVE_PREFAB, nomeDoPrefab } // Envia o nome do prefab da pasta Resources para a nuvem do Photon
         };
 
         PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeHeroi);
-        ExibirAviso($"Familiar '{listaFichasHerois[indiceHeroi].nomePersonagem}' selecionado!");
+        ExibirAviso($"Personagem '{nomeDoPrefab}' selecionado!");
+    }
+
+    private void DefinirPrefabPadraoNaRede(string nomePrefab)
+    {
+        Hashtable propriedadeHeroi = new Hashtable
+        {
+            { CHAVE_HEROI, 0 },
+            { CHAVE_PREFAB, nomePrefab }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeHeroi);
     }
 
     public void ClicarIniciarPartidaMaster()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+
+        // Garante que se algum jogador porventura entrou sem selecionar propriedades, ele herda o padrão "Pai" da pasta Resources antes de carregar a cena
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            if (!p.CustomProperties.ContainsKey(CHAVE_PREFAB))
+            {
+                Hashtable propPadrao = new Hashtable { { CHAVE_PREFAB, "Pai" } };
+                p.SetCustomProperties(propPadrao);
+            }
+        }
+
         Debug.Log("[SELEÇÃO] Dono da sala iniciou a partida. Carregando cena 'Main Park'...");
         PhotonNetwork.LoadLevel("Main Park");
     }

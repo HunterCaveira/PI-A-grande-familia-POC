@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using Photon.Pun;
 
-public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
+public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 {
     [Header("Configurações da Câmera e Raio")]
     [SerializeField] private Camera cameraPrincipal;
@@ -22,6 +23,7 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
     [Header("Prefabs da Parede")]
     [SerializeField] private GameObject prefabParedeFantasma;
     [SerializeField] private GameObject prefabParedeReal;
+    [SerializeField] private string nomePrefabRede = "ParedeReal";
 
     [Header("Regras de Uso (Cooldown e Limites)")]
     [SerializeField] private float tempoDeVida = 10f;
@@ -29,7 +31,7 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
     [SerializeField] private float tempoCooldown = 5f;
 
     [Header("Configuração do Slot")]
-    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
+    [SerializeField] private int slotIndex = 1;
     public int SlotIndex => slotIndex;
 
     [Header("Imagens da UI")]
@@ -41,41 +43,40 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
     [Header("Tempo de Recarga para UI")]
     [SerializeField] private float tempoDeRecarga = 4f;
     private float tempoProximouso = 0f;
-    public float TempoProximouso => tempoProximoUso;
+    public float TempoProximouso => tempoProximouso;
 
     private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
-    private float tempoProximoUso = 0f;
     private List<GameObject> paredesAtivas = new List<GameObject>();
 
     private void Awake()
     {
-        // Encontra o gerenciador de equipamentos automaticamente no mesmo GameObject
         gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
     }
 
     void Update()
     {
-        // Move e ajusta a parede fantasma enquanto o modo de posicionamento estiver ativo
+        if (photonView != null && !photonView.IsMine) return;
+
         if (modoPosicionamentoAtivo)
         {
             PosicionarECriarParede();
         }
     }
 
-    // --- MÉTODOS DA INTERFACE IHABILIDADE ---
     public bool PodeUsar()
     {
         return Time.time >= tempoProximouso;
     }
+
     public bool EstaPronta()
     {
-        // Retorna 'true' se o tempo atual do jogo for maior ou igual ao tempo liberado pós-cooldown
-        return Time.time >= tempoProximoUso;
+        return Time.time >= tempoProximouso;
     }
 
     public void AtivarHabilidade()
     {
-        // Se estiver em cooldown, aborta e força o gerenciador a manter a Arma (0)
+        if (photonView != null && !photonView.IsMine) return;
+
         if (!EstaPronta())
         {
             if (gerenciadorDeEquipamentos != null)
@@ -91,11 +92,6 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
         {
             prefabParedeFantasma.SetActive(modoPosicionamentoAtivo);
         }
-        if (PodeUsar())
-        {
-            tempoProximouso = Time.time + tempoDeRecarga;
-            Debug.Log("Parede ativada!");
-        }
     }
 
     public void CancelarHabilidade()
@@ -107,8 +103,6 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
             prefabParedeFantasma.SetActive(false);
         }
     }
-
-    // --- LÓGICA DE POSICIONAMENTO E CRIAÇÃO ---
 
     private void PosicionarECriarParede()
     {
@@ -131,30 +125,39 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
 
             prefabParedeFantasma.transform.position = posicaoAjustadaNoChao;
 
-            // Confirmação de criação ao clicar com o Botão Direito do Mouse
             if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             {
                 paredesAtivas.RemoveAll(parede => parede == null);
 
                 if (paredesAtivas.Count >= limiteParedes)
                 {
-                    Destroy(paredesAtivas[0]);
+                    if (paredesAtivas[0] != null)
+                    {
+                        PhotonView pvParedeAntiga = paredesAtivas[0].GetComponent<PhotonView>();
+                        if (pvParedeAntiga != null && pvParedeAntiga.IsMine)
+                        {
+                            PhotonNetwork.Destroy(paredesAtivas[0]);
+                        }
+                        else
+                        {
+                            Destroy(paredesAtivas[0]);
+                        }
+                    }
                     paredesAtivas.RemoveAt(0);
                 }
 
-                GameObject paredeCriada = Instantiate(prefabParedeReal, posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation);
-                paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
+                GameObject paredeCriada = PhotonNetwork.Instantiate(nomePrefabRede, posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation);
 
-                paredesAtivas.Add(paredeCriada);
-                Destroy(paredeCriada, tempoDeVida);
+                if (paredeCriada != null)
+                {
+                    paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
+                    paredesAtivas.Add(paredeCriada);
+                    StartCoroutine(DestruirParedeAposTempo(paredeCriada, tempoDeVida));
+                }
 
-                // Aplica o Cooldown
-                tempoProximoUso = Time.time + tempoCooldown;
-
-                // Cancela o modo fantasma
+                tempoProximouso = Time.time + tempoCooldown;
                 CancelarHabilidade();
 
-                // RETORNO AUTOMÁTICO PARA A ARMA (Slot 0) após instanciar no chão
                 if (gerenciadorDeEquipamentos != null)
                 {
                     gerenciadorDeEquipamentos.TrocarEquipamento(0);
@@ -163,10 +166,23 @@ public class HabilidadeParede : MonoBehaviour, IHabilidade , IasUI
         }
         else
         {
-            // Oculta a fantasma se olhar para fora do chão/céu
             if (prefabParedeFantasma.activeSelf)
             {
                 prefabParedeFantasma.SetActive(false);
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator DestruirParedeAposTempo(GameObject parede, float tempo)
+    {
+        yield return new WaitForSeconds(tempo);
+
+        if (parede != null)
+        {
+            PhotonView pv = parede.GetComponent<PhotonView>();
+            if (pv != null && pv.IsMine)
+            {
+                PhotonNetwork.Destroy(parede);
             }
         }
     }
