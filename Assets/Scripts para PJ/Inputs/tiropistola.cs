@@ -14,6 +14,7 @@ public class tiroPistola : MonoBehaviour
     [SerializeField] private float duracaoLinha = 0.05f;
 
     [Header("Pool de Balas")]
+    [Tooltip("Pode ser arrastado no Inspector ou deixado vazio para busca automática na cena")]
     public BalaPool meuPoolDeBalas;
 
     [Header("Dano da Arma")]
@@ -53,6 +54,17 @@ public class tiroPistola : MonoBehaviour
 
         if (playerCamera == null)
             playerCamera = Camera.main;
+
+        // BUSCA AUTOMÁTICA DO POOL DE BALAS CASO NÃO ESTEJA ARRASTADO
+        if (meuPoolDeBalas == null)
+        {
+            meuPoolDeBalas = Object.FindFirstObjectByType<BalaPool>();
+
+            if (meuPoolDeBalas == null)
+            {
+                Debug.LogWarning($"[tiroPistola] Nenhum objeto do tipo 'BalaPool' foi encontrado na cena!");
+            }
+        }
     }
 
     private void OnEnable()
@@ -92,6 +104,12 @@ public class tiroPistola : MonoBehaviour
 
     private void Atirar()
     {
+        if (meuPoolDeBalas == null)
+        {
+            Debug.LogError("[tiroPistola] Impossível atirar: 'meuPoolDeBalas' não foi encontrado na cena!");
+            return;
+        }
+
         preparadoParaAtirar = false;
 
         // O Ray sai do centro da tela (mira/crosshair) da câmera em terceira pessoa
@@ -123,8 +141,7 @@ public class tiroPistola : MonoBehaviour
             {
                 balaZerada = false;
             }
-            // Reduzimos o impacto do espalhamento multiplicando por um fator menor (ex: 0.05f)
-            // Assim, valores como 0.5 no Inspetor viram um desvio sutil e realista
+
             float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal) * 0.05f;
             float y = Random.Range(-espalhamentoVertical, espalhamentoVertical) * 0.05f;
 
@@ -132,22 +149,25 @@ public class tiroPistola : MonoBehaviour
             Vector3 direçãoFinal = (direçãoBase + vetorEspalhamento).normalized;
 
             GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
-            balaAtual.transform.position = pontoAtaque.position;
-            balaAtual.transform.forward = direçãoFinal;
-            balaAtual.SetActive(true);
-
-            if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
-                scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
-
-            if (balaAtual.TryGetComponent<Rigidbody>(out Rigidbody rb))
+            if (balaAtual != null)
             {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
+                balaAtual.transform.position = pontoAtaque.position;
+                balaAtual.transform.forward = direçãoFinal;
+                balaAtual.SetActive(true);
 
-                rb.AddForce(direçãoFinal * forçaTiro, ForceMode.Impulse);
+                if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
+                    scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
 
-                if (forçaCima > 0f)
-                    rb.AddForce(Vector3.up * forçaCima, ForceMode.Impulse);
+                if (balaAtual.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+
+                    rb.AddForce(direçãoFinal * forçaTiro, ForceMode.Impulse);
+
+                    if (forçaCima > 0f)
+                        rb.AddForce(Vector3.up * forçaCima, ForceMode.Impulse);
+                }
             }
 
             balasSobrando--;
@@ -172,8 +192,6 @@ public class tiroPistola : MonoBehaviour
         balasSobrando = tamanhoCarregador;
         recarregando = false;
     }
-
-    
 
     private System.Collections.IEnumerator DesenharRaio(Vector3 inicio, Vector3 fim)
     {

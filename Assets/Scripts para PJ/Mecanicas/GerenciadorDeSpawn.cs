@@ -1,64 +1,109 @@
-using UnityEngine; // Importa bibliotecas base da Unity
-using Photon.Pun; // Importa Photon PUN
-using Photon.Realtime; // Importa configuraÁıes de rede
+Ôªøusing System.Collections.Generic;
+using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class GerenciadorDeSpawn : MonoBehaviour
+public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 {
-    [Header("Pastas e Prefabs")]
-    [Tooltip("Nomes exatos dos prefabs na pasta Resources. Ex: 0 = Pai, 1 = Mae")]
-    [SerializeField] private string[] nomesPrefabsPersonagens;
-
-    [Header("Pontos de Nascimento (Transforms)")]
-    [SerializeField] private Transform[] pontosSpawnTime1; // Locais onde o Time 1 nasce
-    [SerializeField] private Transform[] pontosSpawnTime2; // Locais onde o Time 2 nasce
+    [Header("Pontos de Nascimento (Autom√°ticos)")]
+    [SerializeField] private List<Transform> pontosSpawnTime1 = new List<Transform>();
+    [SerializeField] private List<Transform> pontosSpawnTime2 = new List<Transform>();
 
     private void Start()
     {
-        // Assim que a cena carrega, se estivermos conectados, manda criar o boneco
-        if (PhotonNetwork.IsConnectedAndReady)
+        PhotonNetwork.IsMessageQueueRunning = true;
+        BuscarPontosDeSpawnAutomaticos();
+
+        if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
         {
             InstanciarMeuPersonagem();
         }
     }
 
+    public override void OnJoinedRoom()
+    {
+        InstanciarMeuPersonagem();
+    }
+
+    private void BuscarPontosDeSpawnAutomaticos()
+    {
+        pontosSpawnTime1.Clear();
+        pontosSpawnTime2.Clear();
+
+        GameObject[] todosObjetos = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        foreach (GameObject obj in todosObjetos)
+        {
+            if (obj.name.Contains("Ponto de Respawn2"))
+            {
+                pontosSpawnTime2.Add(obj.transform);
+            }
+            else if (obj.name.Contains("Ponto de Respawn"))
+            {
+                pontosSpawnTime1.Add(obj.transform);
+            }
+        }
+    }
+
     private void InstanciarMeuPersonagem()
     {
-        // 1. DESCOBRE O TIME DO JOGADOR LOCAL
-        int meuTime = 1; // Padr„o È Time 1
+        // ==========================================
+        // üõ°Ô∏è VERIFICA√á√ÉO RIGOROSA DO PHOTON
+        // Pergunta √† rede se EU (Jogador Local) j√° criei o meu her√≥i nesta cena.
+        // ==========================================
+        foreach (PhotonView view in Object.FindObjectsByType<PhotonView>(FindObjectsSortMode.None))
+        {
+            if (view.IsMine)
+            {
+                // Se j√° existe um PhotonView meu na cena, bloqueia novas cria√ß√µes com seguran√ßa
+                Debug.Log($"<color=orange>[SPAWN] O meu her√≥i ({view.gameObject.name}) j√° est√° ativo na cena. Nenhuma nova cria√ß√£o necess√°ria.</color>");
+                return;
+            }
+        }
+
+        // 1. Descobre de qual Time o jogador local faz parte
+        int meuTime = 1;
         if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
         {
             meuTime = (int)timeObj;
         }
 
-        // 2. DESCOBRE QUAL HER”I ELE ESCOLHEU
-        int indiceHeroi = 0; // Padr„o È 0 (Pai)
-        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("HeroiIndice", out object heroiObj))
+        // 2. L√™ qual foi o Her√≥i escolhido na Tela de Sele√ß√£o
+        string prefabParaSpawnar = "Pai";
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("NomePrefabBase", out object prefabObj))
         {
-            indiceHeroi = (int)heroiObj;
+            prefabParaSpawnar = (string)prefabObj;
         }
 
-        // 3. ESCOLHE O PONTO DE SPAWN COM BASE NO TIME
-        Transform pontoDeSpawn = this.transform; // Ponto de fallback (onde o GameManager est·)
-
-        if (meuTime == 1 && pontosSpawnTime1.Length > 0)
+        // Se for do Time 2, adiciona " 1" ao nome do prefab (ex: "Pai 1")
+        if (meuTime == 2)
         {
-            // Pega um ponto aleatÛrio da lista do Time 1
-            int randomPos = Random.Range(0, pontosSpawnTime1.Length);
-            pontoDeSpawn = pontosSpawnTime1[randomPos];
-        }
-        else if (meuTime == 2 && pontosSpawnTime2.Length > 0)
-        {
-            // Pega um ponto aleatÛrio da lista do Time 2
-            int randomPos = Random.Range(0, pontosSpawnTime2.Length);
-            pontoDeSpawn = pontosSpawnTime2[randomPos];
+            prefabParaSpawnar += " 1";
         }
 
-        // 4. INSTANCIA O PERSONAGEM NA REDE
-        // AtenÁ„o: O prefab precisa OBRIGATORIAMENTE estar dentro de uma pasta chamada "Resources"
-        string prefabParaSpawnar = nomesPrefabsPersonagens[indiceHeroi];
+        // 3. Define a posi√ß√£o de nascimento correta baseada no time
+        Transform pontoDeSpawn = this.transform;
+        if (meuTime == 1 && pontosSpawnTime1.Count > 0)
+        {
+            pontoDeSpawn = pontosSpawnTime1[Random.Range(0, pontosSpawnTime1.Count)];
+        }
+        else if (meuTime == 2 && pontosSpawnTime2.Count > 0)
+        {
+            pontoDeSpawn = pontosSpawnTime2[Random.Range(0, pontosSpawnTime2.Count)];
+        }
 
-        PhotonNetwork.Instantiate(prefabParaSpawnar, pontoDeSpawn.position, pontoDeSpawn.rotation);
+        // 4. Cria o seu boneco na rede de forma limpa e isolada
+        GameObject meuPersonagem = PhotonNetwork.Instantiate(
+            prefabParaSpawnar,
+            pontoDeSpawn.position,
+            pontoDeSpawn.rotation
+        );
 
-        Debug.Log($"[SPAWN] Instanciou {prefabParaSpawnar} na posiÁ„o do Time {meuTime}");
+        if (meuPersonagem != null && meuPersonagem.TryGetComponent<Sistemadevida>(out Sistemadevida sistemaVida))
+        {
+            sistemaVida.TimeID = meuTime;
+        }
+
+        Debug.Log($"<color=green>[SPAWN] SUCESSO! Meu personagem '{prefabParaSpawnar}' foi instanciado para o Time {meuTime}!</color>");
     }
 }

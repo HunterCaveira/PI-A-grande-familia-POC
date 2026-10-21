@@ -6,7 +6,7 @@ using TMPro;
 public class GerenciadorUI : MonoBehaviour
 {
     [Header("Referências")]
-    [Tooltip("Arraste o objeto do seu Jogador aqui")]
+    [Tooltip("Não precisa arrastar nada! O SetupJogadorMultiplayer vai preencher isso automaticamente.")]
     [SerializeField] private GameObject jogador;
 
     [Header("Imagens da UI na Tela")]
@@ -28,34 +28,44 @@ public class GerenciadorUI : MonoBehaviour
 
     void Start()
     {
-        pistolaRef = FindFirstObjectByType<tiroPistola>();
-        if (jogador == null)
-        {
-            Debug.LogWarning("O Jogador não foi atribuído no Gerenciador de UI!");
-            return;
-        }
-
-        // 1. Mapeia os slots fixos da UI
+        // 1. Mapeia os slots fixos da UI (Mas ainda não vincula ao jogador, pois ele pode não ter nascido ainda)
         slotsMap[1] = new SlotUIInfo { ImagemUI = imagemSlotQ }; // 1 = Q
         slotsMap[2] = new SlotUIInfo { ImagemUI = imagemSlotE }; // 2 = E
         slotsMap[3] = new SlotUIInfo { ImagemUI = imagemSlotF }; // 3 = F
+    }
 
-        // 2. PEGA automaticamente todas as habilidades que estão no Jogador
-        IasUI[] habilidadesDoJogador = jogador.GetComponents<IasUI>();
+    // =================================================================================
+    // ESTE É O MÉTODO QUE FALTAVA PARA RESOLVER O ERRO VERMELHO!
+    // Ele é chamado automaticamente pelo SetupJogadorMultiplayer quando você nasce na rede.
+    // =================================================================================
+    public void AtribuirJogadorLocal(GameObject jogadorLocal)
+    {
+        jogador = jogadorLocal;
 
-        // 3. Associa cada habilidade encontrada ao seu respectivo slot baseado no SlotIndex dela
+        if (jogador == null) return;
+
+        // MULTIPLAYER SEGURO: Procura a arma APENAS dentro do corpo do seu próprio personagem
+        pistolaRef = jogador.GetComponentInChildren<tiroPistola>();
+
+        // PEGA automaticamente todas as habilidades que estão no Jogador local
+        IasUI[] habilidadesDoJogador = jogador.GetComponentsInChildren<IasUI>();
+
+        // Associa cada habilidade encontrada ao seu respectivo slot baseado no SlotIndex dela
         foreach (var hab in habilidadesDoJogador)
         {
             if (slotsMap.ContainsKey(hab.SlotIndex))
             {
                 slotsMap[hab.SlotIndex].Habilidade = hab;
-                Debug.Log($"Habilidade encontrada e encaixada no Slot {hab.SlotIndex}!");
+                Debug.Log($"<color=yellow>[GerenciadorUI] Habilidade encontrada e encaixada no Slot {hab.SlotIndex}!</color>");
             }
         }
     }
 
     void Update()
     {
+        // Se o boneco ainda não nasceu na rede, não tenta atualizar a UI para evitar erros
+        if (jogador == null) return;
+
         // Atualiza a cor do texto da munição em tempo real
         AcabouMunição();
 
@@ -66,7 +76,7 @@ public class GerenciadorUI : MonoBehaviour
 
             if (slotInfo.Habilidade == null || slotInfo.ImagemUI == null) continue;
 
-            // CORREÇÃO: Utiliza o método EstaPronta() para respeitar tanto o tempo quanto as travas de animação/uso
+            // Utiliza o método EstaPronta() para respeitar tanto o tempo quanto as travas de animação/uso
             bool estaPronta = slotInfo.Habilidade.EstaPronta();
 
             if (estaPronta != slotInfo.UltimoEstadoPronto)
@@ -80,7 +90,7 @@ public class GerenciadorUI : MonoBehaviour
 
     public void AcabouMunição()
     {
-        if (pistolaRef == null) return;
+        if (pistolaRef == null || meuTexto == null) return;
 
         if (pistolaRef.balaZerada == true)
         {

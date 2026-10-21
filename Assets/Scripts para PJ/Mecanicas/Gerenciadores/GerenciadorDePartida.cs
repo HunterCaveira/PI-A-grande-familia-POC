@@ -1,7 +1,9 @@
 using UnityEngine;
-using TMPro; // Biblioteca obrigatória para mexer com TextMeshPro
+using TMPro;
+using Photon.Pun; // Importa o Photon para multiplayer
 
-public class GerenciadorDePartida : MonoBehaviour
+// 1. Mudamos para MonoBehaviourPun e adicionamos IPunObservable para sincronizar dados em tempo real
+public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 {
     [Header("Interface (UI)")]
     [Tooltip("Arraste o objeto de Texto (TextMeshPro) do Canvas aqui")]
@@ -12,7 +14,7 @@ public class GerenciadorDePartida : MonoBehaviour
     [Header("Telas de Fim de Jogo")]
     [Tooltip("Arraste as imagens/telas do Canvas que vão aparecer no fim da partida")]
     public GameObject imagemVitoriaTime1;
-    public GameObject imagemVitoriaTime2; // Pode ser a imagem de "Derrota" caso o jogador seja o Time 1
+    public GameObject imagemVitoriaTime2;
     public GameObject imagemEmpate;
 
     [Header("Configurações da Partida")]
@@ -29,64 +31,101 @@ public class GerenciadorDePartida : MonoBehaviour
 
     private void Start()
     {
-        tempoRestante = tempoDePartida;
-
         // Garante que todas as imagens comecem desativadas (invisíveis)
         if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(false);
         if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(false);
         if (imagemEmpate != null) imagemEmpate.SetActive(false);
+
+        // Apenas o líder (dono da sala) inicializa o tempo para todos
+        if (PhotonNetwork.IsMasterClient)
+        {
+            tempoRestante = tempoDePartida;
+            tempoTotalTime1 = 0f;
+            tempoTotalTime2 = 0f;
+        }
     }
 
     private void Update()
     {
         if (partidaAcabou) return;
 
-        // 1. Cronômetro rodando para trás
-        tempoRestante -= Time.deltaTime;
-
-        // 2. Pontuação do território (SÓ SOMA SE NÃO ESTIVER EM DISPUTA)
-        if (areaDeDominacao != null)
+        // 2. APENAS O LÍDER DA SALA (Master Client) FAZ A MATEMÁTICA E CONTAGEM
+        if (PhotonNetwork.IsMasterClient)
         {
-            // Se a área estiver em disputa, nenhum time ganha pontos de controle total
-            if (!areaDeDominacao.emDisputa)
+            // Cronômetro rodando para trás
+            tempoRestante -= Time.deltaTime;
+
+            // Pontuação do território
+            if (areaDeDominacao != null)
             {
-                if (areaDeDominacao.timeDonoDoTerritorio == 1)
+                if (!areaDeDominacao.emDisputa)
                 {
-                    tempoTotalTime1 += Time.deltaTime;
+                    if (areaDeDominacao.timeDonoDoTerritorio == 1)
+                    {
+                        tempoTotalTime1 += Time.deltaTime;
+                    }
+                    else if (areaDeDominacao.timeDonoDoTerritorio == 2)
+                    {
+                        tempoTotalTime2 += Time.deltaTime;
+                    }
                 }
-                else if (areaDeDominacao.timeDonoDoTerritorio == 2)
-                {
-                    tempoTotalTime2 += Time.deltaTime;
-                }
+            }
+
+            // Verifica as condições de fim de partida e avisa TODOS OS JOGADORES pela rede
+            if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+            {
+                photonView.RPC("RPC_FinalizarPartida", RpcTarget.All);
             }
         }
 
-        // 3. Atualiza os textos da tela com os tempos novos
+        // 3. TODOS os computadores atualizam as suas telas com os números recebidos do Líder
         AtualizarRelogiosNaTela();
+    }
 
-        // 4. Fim de partida (Corrigido o '== 100' para '>=' para evitar bugs de ponto flutuante)
-        if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+    // ==========================================
+    // MÉTODO OBRIGATÓRIO PARA O IPunObservable
+    // Sincroniza as variáveis de tempo 10x por segundo pela rede
+    // ==========================================
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
         {
-            FinalizarPartida();
+            // O Líder envia os dados dele para os outros
+            stream.SendNext(tempoRestante);
+            stream.SendNext(tempoTotalTime1);
+            stream.SendNext(tempoTotalTime2);
+        }
+        else
+        {
+            // Os outros jogadores (clientes) recebem e copiam os dados
+            tempoRestante = (float)stream.ReceiveNext();
+            tempoTotalTime1 = (float)stream.ReceiveNext();
+            tempoTotalTime2 = (float)stream.ReceiveNext();
         }
     }
 
-    // Gerencia a atualização de todos os textos de tempo da interface
+    // Gerencia a atualização de todos os textos da interface
     private void AtualizarRelogiosNaTela()
     {
+        // Proteção para o tempo não ficar negativo visualmente
+        float tempoVisual = Mathf.Max(0, tempoRestante);
+
         if (textoCronometro != null)
         {
-            textoCronometro.text = FormatarTempo(tempoRestante);
+            textoCronometro.text = FormatarTempo(tempoVisual);
         }
 
         if (dominaçãoRoxo != null)
         {
-            dominaçãoRoxo.text = string.Format($"{Mathf.Round(tempoTotalTime1)} %");
+            // Trava visualmente em 100% caso ultrapasse um pouco devido ao lag
+            float pctTime1 = Mathf.Clamp(Mathf.Round(tempoTotalTime1), 0f, 100f);
+            dominaçãoRoxo.text = string.Format($"{pctTime1} %");
         }
 
         if (dominaçãoAmarelo != null)
         {
-            dominaçãoAmarelo.text = string.Format($"{Mathf.Round(tempoTotalTime2)} %");
+            float pctTime2 = Mathf.Clamp(Mathf.Round(tempoTotalTime2), 0f, 100f);
+            dominaçãoAmarelo.text = string.Format($"{pctTime2} %");
         }
     }
 
@@ -98,28 +137,31 @@ public class GerenciadorDePartida : MonoBehaviour
         return string.Format("{0:00}:{1:00}", minutos, segundos);
     }
 
-    private void FinalizarPartida()
+    // ==========================================
+    // EVENTO DE FIM DE JOGO (Chamado em todos os PCs ao mesmo tempo)
+    // ==========================================
+    [PunRPC]
+    private void RPC_FinalizarPartida()
     {
+        if (partidaAcabou) return; // Evita que seja chamado duas vezes
+
         partidaAcabou = true;
         tempoRestante = 0f;
-        AtualizarRelogiosNaTela(); // Crava o relógio no 00:00 visualmente e atualiza pontuação final
+        AtualizarRelogiosNaTela();
 
         Debug.Log($"Fim! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
 
-        // Compara os tempos e exibe a imagem correspondente
+        // Compara os tempos e exibe a imagem correspondente para os jogadores
         if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
         {
-            Debug.Log("Time 1 Venceu!");
             if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
         }
         else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f)
         {
-            Debug.Log("Time 2 Venceu!");
             if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(true);
         }
         else
         {
-            Debug.Log("Empate!");
             if (imagemEmpate != null) imagemEmpate.SetActive(true);
         }
     }

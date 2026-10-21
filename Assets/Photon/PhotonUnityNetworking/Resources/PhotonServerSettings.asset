@@ -43,6 +43,7 @@ MonoBehaviour:
   - UpgradeScore
   - AplicarDanoPelaRede
   - RenascerPelaRede
+  - RPC_FinalizarPartida
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
