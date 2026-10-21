@@ -46,6 +46,10 @@ MonoBehaviour:
   - RPC_FinalizarPartida
   - RPC_AlternarFrasco
   - RPC_SincronizarMaos
+  - ReceberDanoRPC
+  - RenascerRPC
+  - SincronizarEscalaParedeRPC
+  - SincronizarVisibilidadePlayerRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
