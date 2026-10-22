@@ -46,6 +46,7 @@ MonoBehaviour:
   - RPC_FinalizarPartida
   - RPC_AlternarFrasco
   - RPC_SincronizarMaos
+  - RPC_AtirarSincronizado
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

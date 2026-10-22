@@ -54,13 +54,20 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 
     private void InstanciarMeuPersonagem()
     {
-        if (jaInstanciouNestaSessao) return;
-        jaInstanciouNestaSessao = true;
+        int meuTime = 1; // Padrão
 
-        int meuTime = 1;
         if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
         {
             meuTime = (int)timeObj;
+        }
+        else
+        {
+            // FALLBACK PARA TESTES: Se a propriedade não existir (teste direto no Main Park),
+            // o dono da sala (MasterClient) fica no Time 1 e os convidados (Builds) vão para o Time 2.
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                meuTime = 2;
+            }
         }
 
         // MODIFICAÇÃO: Força sempre o uso do prefab base "Pai" que está na pasta Resources para ambos os times

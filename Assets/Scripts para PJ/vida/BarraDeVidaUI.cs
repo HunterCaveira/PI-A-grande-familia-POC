@@ -1,39 +1,62 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun; // Necessário para acessar a rede
 
 public class BarraDeVidaUI : MonoBehaviour
 {
     [Header("Componentes de UI")]
-    [SerializeField] private Slider _sliderVida; // A imagem da barra (Fill)
+    [SerializeField] private Slider _sliderVida;
 
-    [Header("Referência")]
-    [SerializeField] private Sistemadevida sistemaDeVida;
+    private Sistemadevida sistemaDeVida;
+    private bool jogadorConectado = false;
 
-    private void OnEnable()
+    private void Update()
     {
-        // Se inscreve no evento de mudança de vida
-        if (sistemaDeVida != null)
+        // Se o boneco for destruído (morrer) ou ainda não tiver nascido, tenta buscar novamente
+        if (sistemaDeVida == null)
         {
-            sistemaDeVida.OnVidaMudou += AtualizarBarra;
+            jogadorConectado = false;
+            BuscarSistemaDeVidaLocal();
+        }
+    }
+
+    private void BuscarSistemaDeVidaLocal()
+    {
+        // Encontra todos os sistemas de vida ativos na cena (Unity 6)
+        Sistemadevida[] sistemasNaCena = Object.FindObjectsByType<Sistemadevida>(FindObjectsSortMode.None);
+
+        foreach (Sistemadevida sistema in sistemasNaCena)
+        {
+            PhotonView pv = sistema.GetComponent<PhotonView>();
+
+            // Verifica se o boneco encontrado pertence a este computador
+            if (pv != null && pv.IsMine)
+            {
+                sistemaDeVida = sistema;
+                sistemaDeVida.OnVidaMudou += AtualizarBarra;
+                jogadorConectado = true;
+
+                Debug.Log("<color=green>[UI] Barra de vida conectada ao jogador local!</color>");
+                break;
+            }
         }
     }
 
     private void OnDisable()
     {
-        // Cancela a inscrição quando o objeto for desativado para evitar vazamento de memória
+        // Cancela a inscrição quando a UI for desativada para evitar vazamento de memória
         if (sistemaDeVida != null)
         {
             sistemaDeVida.OnVidaMudou -= AtualizarBarra;
+            jogadorConectado = false;
         }
     }
 
-    // Este método é executado automaticamente quando o evento 'OnVidaMudou' é disparado
     private void AtualizarBarra(float vidaAtual, float vidaMaxima)
     {
         if (_sliderVida != null && vidaMaxima > 0)
         {
-            // O fillAmount da Unity aceita valores entre 0.0 e 1.0 (ex: 50 / 100 = 0.5)
-           _sliderVida.maxValue = vidaMaxima; // ISSO AQUI É NO START OU NO ON ENABLE
+            _sliderVida.maxValue = vidaMaxima;
             _sliderVida.value = vidaAtual;
         }
     }

@@ -1,9 +1,10 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
+using Photon.Pun; // Importa a biblioteca do Photon
 
-public class tiroPistola : MonoBehaviour
+public class tiroPistola : MonoBehaviourPun // Herda de MonoBehaviourPun para usar rede
 {
-    [Header("ConfiguraÁıes do Raycast")]
+    [Header("Configura√ß√µes do Raycast")]
     [SerializeField] private float alcanceDoTiro = 100f;
     [SerializeField] private float espalhamentoHorizontal = 0.5f;
     [SerializeField] private float espalhamentoVertical = 0.5f;
@@ -14,7 +15,7 @@ public class tiroPistola : MonoBehaviour
     [SerializeField] private float duracaoLinha = 0.05f;
 
     [Header("Pool de Balas")]
-    [Tooltip("Pode ser arrastado no Inspector ou deixado vazio para busca autom·tica na cena")]
+    [Tooltip("Pode ser arrastado no Inspector ou deixado vazio para busca autom√°tica na cena")]
     public BalaPool meuPoolDeBalas;
 
     [Header("Dano da Arma")]
@@ -22,18 +23,18 @@ public class tiroPistola : MonoBehaviour
     [SerializeField] private TipoDano tipoDeDano = TipoDano.Fisico;
     [SerializeField] private string nomeDaArma = "Pistola";
 
-    [Header("ProjÈtil")]
-    public float forÁaTiro;
-    [Tooltip("ForÁa extra para cima (arco da bala). Deixe 0 para tiro reto seguindo a mira")]
-    public float forÁaCima;
+    [Header("Proj√©til")]
+    public float for√ßaTiro;
+    [Tooltip("For√ßa extra para cima (arco da bala). Deixe 0 para tiro reto seguindo a mira")]
+    public float for√ßaCima;
 
     [Header("Status da Arma")]
     public float tempoEntreAtirar, tempoRecarga;
     public int tamanhoCarregador, tiroPorClick;
-    public bool permitirSegurarBot„o;
+    public bool permitirSegurarBot√£o;
 
-    [Header("ReferÍncias")]
-    [Tooltip("Arraste a c‚mera que orbita o personagem aqui (ou deixe vazio para pegar a Camera.main)")]
+    [Header("Refer√™ncias")]
+    [Tooltip("Arraste a c√¢mera que orbita o personagem aqui (ou deixe vazio para pegar a Camera.main)")]
     public Camera playerCamera;
     public Transform pontoAtaque;
     public GameObject muzzleFlash;
@@ -55,7 +56,7 @@ public class tiroPistola : MonoBehaviour
         if (playerCamera == null)
             playerCamera = Camera.main;
 
-        // BUSCA AUTOM¡TICA DO POOL DE BALAS CASO N√O ESTEJA ARRASTADO
+        // BUSCA AUTOM√ÅTICA DO POOL DE BALAS (Funciona em todos os clientes)
         if (meuPoolDeBalas == null)
         {
             meuPoolDeBalas = Object.FindFirstObjectByType<BalaPool>();
@@ -69,6 +70,9 @@ public class tiroPistola : MonoBehaviour
 
     private void OnEnable()
     {
+        // üîí MULTIPLAYER: Apenas o dono da arma liga os comandos do teclado
+        if (photonView != null && !photonView.IsMine) return;
+
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
         acoesPlayer.MovimentoPlayer.Recarregar.Enable();
         balasSobrando = tamanhoCarregador;
@@ -76,12 +80,18 @@ public class tiroPistola : MonoBehaviour
 
     private void OnDisable()
     {
-        acoesPlayer.MovimentoPlayer.Atirar.Disable();
-        acoesPlayer.MovimentoPlayer.Recarregar.Disable();
+        if (acoesPlayer != null)
+        {
+            acoesPlayer.MovimentoPlayer.Atirar.Disable();
+            acoesPlayer.MovimentoPlayer.Recarregar.Disable();
+        }
     }
 
     private void Update()
     {
+        // üîí MULTIPLAYER: Impede que o jogador controle as armas dos outros personagens
+        if (photonView != null && !photonView.IsMine) return;
+
         MyInput();
 
         if (ammunitionDisplay != null)
@@ -90,7 +100,7 @@ public class tiroPistola : MonoBehaviour
 
     private void MyInput()
     {
-        if (permitirSegurarBot„o)
+        if (permitirSegurarBot√£o)
             atirando = acoesPlayer.MovimentoPlayer.Atirar.IsPressed();
         else
             atirando = acoesPlayer.MovimentoPlayer.Atirar.WasPressedThisFrame();
@@ -106,77 +116,82 @@ public class tiroPistola : MonoBehaviour
     {
         if (meuPoolDeBalas == null)
         {
-            Debug.LogError("[tiroPistola] ImpossÌvel atirar: 'meuPoolDeBalas' n„o foi encontrado na cena!");
+            Debug.LogError("[tiroPistola] Imposs√≠vel atirar: 'meuPoolDeBalas' n√£o foi encontrado na cena!");
             return;
         }
 
         preparadoParaAtirar = false;
 
-        // O Ray sai do centro da tela (mira/crosshair) da c‚mera em terceira pessoa
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-
         Vector3 pontoAcerto;
+
         if (Physics.Raycast(ray, out RaycastHit acerto, alcanceDoTiro, mascaraDeTiro, QueryTriggerInteraction.Ignore))
             pontoAcerto = acerto.point;
         else
             pontoAcerto = ray.GetPoint(alcanceDoTiro);
 
-        if (lineRenderer != null)
-            StartCoroutine(DesenharRaio(pontoAtaque.position, pontoAcerto));
-
-        // DireÁ„o do cano da arma atÈ o ponto que a mira da c‚mera est· apontando
-        Vector3 direÁ„oBase = (pontoAcerto - pontoAtaque.position).normalized;
+        Vector3 dire√ß√£oBase = (pontoAcerto - pontoAtaque.position).normalized;
 
         for (int i = 0; i < tiroPorClick; i++)
         {
-            if (balasSobrando <= 0)
-            {
-                break;
-            }
-            if (tamanhoCarregador <= 0)
-            {
-                balaZerada = true;
-            }
-            else
-            {
-                balaZerada = false;
-            }
+            if (balasSobrando <= 0) break;
+
+            balaZerada = (tamanhoCarregador <= 0);
 
             float x = Random.Range(-espalhamentoHorizontal, espalhamentoHorizontal) * 0.05f;
             float y = Random.Range(-espalhamentoVertical, espalhamentoVertical) * 0.05f;
 
             Vector3 vetorEspalhamento = (playerCamera.transform.right * x) + (playerCamera.transform.up * y);
-            Vector3 direÁ„oFinal = (direÁ„oBase + vetorEspalhamento).normalized;
+            Vector3 dire√ß√£oFinal = (dire√ß√£oBase + vetorEspalhamento).normalized;
 
-            GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
-            if (balaAtual != null)
-            {
-                balaAtual.transform.position = pontoAtaque.position;
-                balaAtual.transform.forward = direÁ„oFinal;
-                balaAtual.SetActive(true);
-
-                if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
-                    scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
-
-                if (balaAtual.TryGetComponent<Rigidbody>(out Rigidbody rb))
-                {
-                    rb.linearVelocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-
-                    rb.AddForce(direÁ„oFinal * forÁaTiro, ForceMode.Impulse);
-
-                    if (forÁaCima > 0f)
-                        rb.AddForce(Vector3.up * forÁaCima, ForceMode.Impulse);
-                }
-            }
+            // üåê MULTIPLAYER: Envia o comando de atirar para todos os jogadores na sala
+            photonView.RPC("RPC_AtirarSincronizado", RpcTarget.All, pontoAtaque.position, dire√ß√£oFinal, pontoAcerto);
 
             balasSobrando--;
         }
 
-        if (muzzleFlash != null)
-            Instantiate(muzzleFlash, pontoAtaque.position, Quaternion.identity, pontoAtaque);
-
         Invoke(nameof(ResetShot), tempoEntreAtirar);
+    }
+
+    // ===============================================================
+    // üåê FUN√á√ÉO DE REDE: Todos os computadores executam esta fun√ß√£o 
+    // e puxam uma bala do seu pr√≥prio Pool local ao mesmo tempo!
+    // ===============================================================
+    [PunRPC]
+    private void RPC_AtirarSincronizado(Vector3 origemTiro, Vector3 direcaoTiro, Vector3 pontoAcertoLinha)
+    {
+        // 1. Desenha o rastro do tiro na tela (opcional)
+        if (lineRenderer != null)
+            StartCoroutine(DesenharRaio(origemTiro, pontoAcertoLinha));
+
+        // 2. Faz o MuzzleFlash
+        if (muzzleFlash != null)
+            Instantiate(muzzleFlash, origemTiro, Quaternion.identity, pontoAtaque);
+
+        // 3. Pega a bala no Pool local de cada jogador
+        if (meuPoolDeBalas == null) return;
+
+        GameObject balaAtual = meuPoolDeBalas.GetitemFromPool();
+
+        if (balaAtual != null)
+        {
+            balaAtual.transform.position = origemTiro;
+            balaAtual.transform.forward = direcaoTiro;
+            balaAtual.SetActive(true);
+
+            if (balaAtual.TryGetComponent<Bala>(out Bala scriptBala))
+                scriptBala.Inicializar(danoPorTiro, tipoDeDano, donoDaArma, nomeDaArma);
+
+            if (balaAtual.TryGetComponent<Rigidbody>(out Rigidbody rb))
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.AddForce(direcaoTiro * for√ßaTiro, ForceMode.Impulse);
+
+                if (for√ßaCima > 0f)
+                    rb.AddForce(Vector3.up * for√ßaCima, ForceMode.Impulse);
+            }
+        }
     }
 
     private void ResetShot() => preparadoParaAtirar = true;

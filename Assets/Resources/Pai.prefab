@@ -788,6 +788,7 @@ GameObject:
   - component: {fileID: 5917605085507959621}
   - component: {fileID: 9072641839959777188}
   - component: {fileID: 4595182828962515535}
+  - component: {fileID: 4858984795687731363}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -1162,6 +1163,42 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
+--- !u!114 &4858984795687731363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3317283540011002145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac60f38d6245cc7488d6272b5f201cd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::tiroPistola
+  alcanceDoTiro: 100
+  espalhamentoHorizontal: 0.5
+  espalhamentoVertical: 0.5
+  mascaraDeTiro:
+    serializedVersion: 2
+    m_Bits: 0
+  lineRenderer: {fileID: 0}
+  duracaoLinha: 0.05
+  meuPoolDeBalas: {fileID: 7676178414489101983}
+  danoPorTiro: 20
+  tipoDeDano: 0
+  nomeDaArma: Pistola
+  "for\xE7aTiro": 0
+  "for\xE7aCima": 0
+  tempoEntreAtirar: 0
+  tempoRecarga: 0
+  tamanhoCarregador: 0
+  tiroPorClick: 0
+  "permitirSegurarBot\xE3o": 0
+  playerCamera: {fileID: 214370613887720223}
+  pontoAtaque: {fileID: 0}
+  muzzleFlash: {fileID: 0}
+  ammunitionDisplay: {fileID: 0}
+  balaZerada: 0
 --- !u!1 &3985524919501369782
 GameObject:
   m_ObjectHideFlags: 0
@@ -1623,6 +1660,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2851361683365819924, guid: f8eeef6e76007e948b352719dfd7db1b, type: 3}
   m_PrefabInstance: {fileID: 1556979822830644470}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7676178414489101983 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9159410693506697833, guid: f8eeef6e76007e948b352719dfd7db1b, type: 3}
+  m_PrefabInstance: {fileID: 1556979822830644470}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf223dc5acba26479a17f8658c0eeac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4628366263240833880
 PrefabInstance:
   m_ObjectHideFlags: 0
