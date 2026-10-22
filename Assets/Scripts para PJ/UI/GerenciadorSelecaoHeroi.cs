@@ -1,195 +1,164 @@
-using System; // Importa estruturas base de dados do C# como [Serializable].
-using System.Collections.Generic; // Importa a manipulação de Listas genéricas (List<T>).
-using UnityEngine; // Importa as ferramentas e componentes nativos da Unity.
-using UnityEngine.UI; // Importa suporte aos componentes gráficos de UI (Button, Image).
-using TMPro; // Importa o suporte avançado a textos do TextMeshPro.
-using UnityEngine.SceneManagement; // Importa o gerenciador de carregamento de Cenas.
-using Photon.Pun; // Importa os métodos e componentes principais do Photon PUN 2.
-using Photon.Realtime; // Importa as classes e callbacks de jogadores e salas do Photon.
-using ExitGames.Client.Photon; // Importa a estrutura Hashtable do Photon para sincronização em rede.
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using UnityEngine.SceneManagement;
+using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
-// A classe herda de MonoBehaviourPunCallbacks para escutar atualizações de rede em tempo real.
 public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
 {
-    // Estrutura auxiliar serializável para organizar os elementos visuais dos slots de cada time no Inspector
     [Serializable]
     public struct SlotJogadorUI
     {
-        public TextMeshProUGUI textoNickname; // Referência do componente de texto do Nickname do slot.
-        public Image imagemIconeHeroi;         // Referência do componente de imagem do ícone do Familiar.
+        public TextMeshProUGUI textoNickname;
+        public Image imagemIconeHeroi;
     }
 
-    // ==========================================
-    // 1. COMPONENTES E REFERÊNCIAS DA UI
-    // ==========================================
-
     [Header("Informações da Sala Atual")]
-    [SerializeField] private TextMeshProUGUI textoPublicaOuPrivada; // Componente de texto para exibir 'SALA PÚBLICA' ou 'SALA PRIVADA'.
-    [SerializeField] private TextMeshProUGUI textoNomeDaSala;        // Componente de texto para exibir o Nome da Sala.
+    [SerializeField] private TextMeshProUGUI textoPublicaOuPrivada;
+    [SerializeField] private TextMeshProUGUI textoNomeDaSala;
 
     [Header("Slots do Time 1 (Máximo 5)")]
-    [SerializeField] private List<SlotJogadorUI> slotsTime1 = new List<SlotJogadorUI>(); // Lista dos 5 slots do Time 1.
+    [SerializeField] private List<SlotJogadorUI> slotsTime1 = new List<SlotJogadorUI>();
 
     [Header("Slots do Time 2 (Máximo 5)")]
-    [SerializeField] private List<SlotJogadorUI> slotsTime2 = new List<SlotJogadorUI>(); // Lista dos 5 slots do Time 2.
+    [SerializeField] private List<SlotJogadorUI> slotsTime2 = new List<SlotJogadorUI>();
 
     [Header("Fichas de Atributos dos Personagens")]
-    [SerializeField] private List<AtributosPersonagem> listaFichasHerois = new List<AtributosPersonagem>(); // Fichas dos heróis.
+    [SerializeField] private List<AtributosPersonagem> listaFichasHerois = new List<AtributosPersonagem>();
 
     [Header("Controles e Botões da Sala")]
-    [SerializeField] private Button botaoPlayMaster; // Botão de Play exclusivo para o Dono da Sala (Master Client).
-    [SerializeField] private TextMeshProUGUI textoAvisoStatus; // Componente de texto para mensagens de alerta na interface.
+    [SerializeField] private Button botaoPlayMaster;
+    [SerializeField] private TextMeshProUGUI textoAvisoStatus;
 
-    // Chaves de propriedades customizadas para salvar dados no Photon
-    private const string CHAVE_TIME = "TimeJogador"; // Valor numérico do time: 1 ou 2.
-    private const string CHAVE_HEROI = "HeroiIndice"; // Valor numérico do índice da ficha do herói escolhido.
-
-
-    // ==========================================
-    // 2. INICIALIZAÇÃO DA CENA
-    // ==========================================
+    // Chaves de rede
+    private const string CHAVE_TIME = "TimeJogador";
+    private const string CHAVE_HEROI = "HeroiIndice";
+    private const string CHAVE_PREFAB = "NomePrefabBase"; // Guarda o nome do Prefab para o GerenciadorDeSpawn instanciar
 
     private void Start()
     {
-        // Define que todos os jogadores conectados na sala trocarão de cena simultaneamente quando o Master carregar o nível.
         PhotonNetwork.AutomaticallySyncScene = true;
-
-        // Limpa visualmente todos os nomes e ícones da tela.
         LimparTodosOsSlotsUI();
-
-        // Exibe o Nome e se a Sala é Pública ou Privada nos componentes do topo.
         ExibirInformacoesDaSala();
 
-        // Se o jogador local ainda não definiu um time nas propriedades de rede, aloca-o no Time 1 por padrão.
+        // Se o jogador local ainda não definiu um time, aloca-o no Time 1 por padrão.
         if (PhotonNetwork.InRoom && ObterTimeDoJogador(PhotonNetwork.LocalPlayer) == 0)
         {
             SetarTimeLocal(1);
         }
 
-        // Atualiza e desenha toda a interface para refletir os jogadores conectados na sala.
+        // Se o jogador entrou e ainda não escolheu herói, define o primeiro da lista como padrão (ou "Pai" da pasta Resources)
+        if (PhotonNetwork.InRoom && ObterHeroiDoJogador(PhotonNetwork.LocalPlayer) == -1)
+        {
+            if (listaFichasHerois.Count > 0)
+            {
+                ClicarSelecionarHeroi(0);
+            }
+            else
+            {
+                // Fallback seguro caso a lista esteja vazia: define diretamente o "Pai" da pasta Resources
+                DefinirPrefabPadraoNaRede("Pai");
+            }
+        }
+
         AtualizarTodaAInterfaceRede();
     }
 
-
-    // ==========================================
-    // 3. EXIBIÇÃO DE DADOS DA SALA E DO MASTER
-    // ==========================================
-
-    /// <summary>
-    /// Lê as informações da sala do Photon e atualiza os textos da interface.
-    /// </summary>
     private void ExibirInformacoesDaSala()
     {
         if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom != null)
         {
-            if (textoNomeDaSala != null)
-            {
-                textoNomeDaSala.text = $"SALA: {PhotonNetwork.CurrentRoom.Name}"; // Preenche o nome da sala.
-            }
+            if (textoNomeDaSala != null) textoNomeDaSala.text = $"SALA: {PhotonNetwork.CurrentRoom.Name}";
 
             if (textoPublicaOuPrivada != null)
             {
-                // CORREÇÃO: Verifica se a sala possui a propriedade "Senha" gravada nela.
                 bool ehPrivada = PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("Senha");
-
-                // Se tiver senha, é Privada. Se não tiver, é Pública.
                 string tipo = ehPrivada ? "SALA PRIVADA" : "SALA PÚBLICA";
-                textoPublicaOuPrivada.text = tipo; // Exibe o tipo de sala corrigido na tela.
+                textoPublicaOuPrivada.text = tipo;
             }
         }
     }
 
+    public void ClicarEntrarTime1() => TentarMudarDeTime(1);
+    public void ClicarEntrarTime2() => TentarMudarDeTime(2);
 
-    // ==========================================
-    // 4. MÉTODOS PÚBLICOS DOS BOTÕES DA UI
-    // ==========================================
-
-    /// <summary>
-    /// Ação invocado ao clicar no botão 'Time 1'.
-    /// </summary>
-    public void ClicarEntrarTime1()
-    {
-        TentarMudarDeTime(1);
-    }
-
-    /// <summary>
-    /// Ação invocado ao clicar no botão 'Time 2'.
-    /// </summary>
-    public void ClicarEntrarTime2()
-    {
-        TentarMudarDeTime(2);
-    }
-
-    /// <summary>
-    /// Ação invocado ao clicar na foto de um herói no centro da tela.
-    /// </summary>
     public void ClicarSelecionarHeroi(int indiceHeroi)
     {
         if (indiceHeroi < 0 || indiceHeroi >= listaFichasHerois.Count) return;
 
-        // Grava o índice do herói escolhido no perfil do jogador local e transmite para a sala Photon.
+        // BUSCA O NOME DO PREFAB DIRETO DA FICHA (Ou define "Pai" como base padrão da pasta Resources)
+        string nomeDoPrefab = "Pai";
+        if (listaFichasHerois[indiceHeroi] != null && listaFichasHerois[indiceHeroi].prefabPersonagem != null)
+        {
+            nomeDoPrefab = listaFichasHerois[indiceHeroi].prefabPersonagem.name;
+        }
+
         Hashtable propriedadeHeroi = new Hashtable
         {
-            { CHAVE_HEROI, indiceHeroi }
+            { CHAVE_HEROI, indiceHeroi },
+            { CHAVE_PREFAB, nomeDoPrefab } // Envia o nome do prefab da pasta Resources para a nuvem do Photon
         };
 
-        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeHeroi); // Sincroniza via rede.
-        ExibirAviso($"Familiar '{listaFichasHerois[indiceHeroi].nomePersonagem}' selecionado!");
+        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeHeroi);
+        ExibirAviso($"Personagem '{nomeDoPrefab}' selecionado!");
     }
 
-    /// <summary>
-    /// Ação do botão 'Play'. Exclusivo para o Dono da Sala (Master Client).
-    /// </summary>
+    private void DefinirPrefabPadraoNaRede(string nomePrefab)
+    {
+        Hashtable propriedadeHeroi = new Hashtable
+        {
+            { CHAVE_HEROI, 0 },
+            { CHAVE_PREFAB, nomePrefab }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeHeroi);
+    }
+
     public void ClicarIniciarPartidaMaster()
     {
-        if (!PhotonNetwork.IsMasterClient) return; // Segurança contra chamadas não autorizadas.
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // Garante que se algum jogador porventura entrou sem selecionar propriedades, ele herda o padrão "Pai" da pasta Resources antes de carregar a cena
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            if (!p.CustomProperties.ContainsKey(CHAVE_PREFAB))
+            {
+                Hashtable propPadrao = new Hashtable { { CHAVE_PREFAB, "Pai" } };
+                p.SetCustomProperties(propPadrao);
+            }
+        }
 
         Debug.Log("[SELEÇÃO] Dono da sala iniciou a partida. Carregando cena 'Main Park'...");
-
-        // Carrega a cena 3D 'Main Park' para todos os jogadores na sala simultaneamente.
         PhotonNetwork.LoadLevel("Main Park");
     }
 
-
-    // ==========================================
-    // 5. LÓGICA DE ALOCATION E DADOS DE REDE
-    // ==========================================
-
-    /// <summary>
-    /// Solicita a mudança de time validando se o time desejado possui vagas (máximo 5).
-    /// </summary>
     private void TentarMudarDeTime(int numeroTimeDesejado)
     {
-        // Se o jogador já estiver no time selecionado, cancela a operação.
         if (ObterTimeDoJogador(PhotonNetwork.LocalPlayer) == numeroTimeDesejado)
         {
             ExibirAviso($"Você já está no Time {numeroTimeDesejado}!");
             return;
         }
 
-        // Conta quantos participantes já estão no time desejado.
         int jogadoresNoTime = ContarJogadoresNoTime(numeroTimeDesejado);
 
-        // BLOQUEIO DE VAGAS: Impede a troca se o time já tiver 5 participantes.
         if (jogadoresNoTime >= 5)
         {
             ExibirAviso($"O Time {numeroTimeDesejado} está cheio! (Máximo 5 jogadores)");
-            Debug.LogWarning($"[SELEÇÃO] Troca para o Time {numeroTimeDesejado} bloqueada: Limite de 5 atingido!");
-            return; // Bloqueia a ação.
+            return;
         }
 
-        // Aplica e transmite o novo time do jogador local.
         SetarTimeLocal(numeroTimeDesejado);
         ExibirAviso($"Você mudou para o Time {numeroTimeDesejado}!");
     }
 
     private void SetarTimeLocal(int numeroTime)
     {
-        Hashtable propriedadeTime = new Hashtable
-        {
-            { CHAVE_TIME, numeroTime }
-        };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeTime); // Grava no Photon.
+        Hashtable propriedadeTime = new Hashtable { { CHAVE_TIME, numeroTime } };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(propriedadeTime);
     }
 
     private int ContarJogadoresNoTime(int numeroTime)
@@ -197,40 +166,23 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
         int contador = 0;
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            if (ObterTimeDoJogador(p) == numeroTime)
-            {
-                contador++;
-            }
+            if (ObterTimeDoJogador(p) == numeroTime) contador++;
         }
         return contador;
     }
 
     private int ObterTimeDoJogador(Player p)
     {
-        if (p.CustomProperties.TryGetValue(CHAVE_TIME, out object timeObj))
-        {
-            return (int)timeObj;
-        }
-        return 0; // 0 indica sem time configurado
+        if (p.CustomProperties.TryGetValue(CHAVE_TIME, out object timeObj)) return (int)timeObj;
+        return 0;
     }
 
     private int ObterHeroiDoJogador(Player p)
     {
-        if (p.CustomProperties.TryGetValue(CHAVE_HEROI, out object heroiObj))
-        {
-            return (int)heroiObj;
-        }
-        return -1; // -1 indica nenhum herói escolhido
+        if (p.CustomProperties.TryGetValue(CHAVE_HEROI, out object heroiObj)) return (int)heroiObj;
+        return -1;
     }
 
-
-    // ==========================================
-    // 6. ATUALIZAÇÃO E RENDERIZAÇÃO DA UI
-    // ==========================================
-
-    /// <summary>
-    /// Limpa e oculta visualmente todos os slots dos dois times.
-    /// </summary>
     private void LimparTodosOsSlotsUI()
     {
         LimparListaSlot(slotsTime1);
@@ -246,7 +198,6 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
                 slot.textoNickname.text = "";
                 slot.textoNickname.gameObject.SetActive(false);
             }
-
             if (slot.imagemIconeHeroi != null)
             {
                 slot.imagemIconeHeroi.sprite = null;
@@ -255,58 +206,41 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
         }
     }
 
-    /// <summary>
-    /// Percorre todos os jogadores da sala, formata seus nicknames (destacando o Dono da Sala com cor) e os posiciona.
-    /// </summary>
     private void AtualizarTodaAInterfaceRede()
     {
-        LimparTodosOsSlotsUI(); // Reseta a tela antes de redesenhar.
+        LimparTodosOsSlotsUI();
 
-        int indexSlotTime1 = 0; // Índice visual do próximo slot livre no Time 1.
-        int indexSlotTime2 = 0; // Índice visual do próximo slot livre no Time 2.
+        int indexSlotTime1 = 0;
+        int indexSlotTime2 = 0;
 
         foreach (Player p in PhotonNetwork.PlayerList)
         {
             int timeDoJogador = ObterTimeDoJogador(p);
             int indiceHeroi = ObterHeroiDoJogador(p);
 
-            // FORMATANDO O NICKNAME E COR DO DONO DA SALA (MASTER CLIENT)
             string nickBase = string.IsNullOrEmpty(p.NickName) ? "Jogador" : p.NickName;
-            string nickFormatado = nickBase;
+            string nickFormatado = p.IsMasterClient ? $"<color=#FFD700>{nickBase} (LÍDER)</color>" : nickBase;
 
-            // Se o jogador for o Dono da Sala (Master Client), aplica a cor Dourada/Amarela via RichText e tag de Líder
-            if (p.IsMasterClient)
-            {
-                nickFormatado = $"<color=#FFD700>{nickBase} (LÍDER)</color>";
-            }
-
-            // Posiciona o jogador na coluna do Time 1
             if (timeDoJogador == 1 && indexSlotTime1 < slotsTime1.Count)
             {
                 PreencherSlotUI(slotsTime1[indexSlotTime1], nickFormatado, indiceHeroi);
                 indexSlotTime1++;
             }
-            // Posiciona o jogador na coluna do Time 2
             else if (timeDoJogador == 2 && indexSlotTime2 < slotsTime2.Count)
             {
                 PreencherSlotUI(slotsTime2[indexSlotTime2], nickFormatado, indiceHeroi);
                 indexSlotTime2++;
             }
         }
-
-        // Atualiza a visibilidade do botão Play
         AtualizarBotaoPlayMaster();
     }
 
-    /// <summary>
-    /// Preenche e ativa um slot individual da interface com o Nickname e a foto do Herói.
-    /// </summary>
     private void PreencherSlotUI(SlotJogadorUI slot, string nicknameFormatado, int indiceHeroi)
     {
         if (slot.textoNickname != null)
         {
-            slot.textoNickname.text = nicknameFormatado; // Exibe o nickname (formatado com cor para o líder).
-            slot.textoNickname.gameObject.SetActive(true); // Exibe o texto na UI.
+            slot.textoNickname.text = nicknameFormatado;
+            slot.textoNickname.gameObject.SetActive(true);
         }
 
         if (slot.imagemIconeHeroi != null)
@@ -314,25 +248,22 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
             if (indiceHeroi >= 0 && indiceHeroi < listaFichasHerois.Count && listaFichasHerois[indiceHeroi] != null)
             {
                 slot.imagemIconeHeroi.sprite = listaFichasHerois[indiceHeroi].iconePersonagem;
-                slot.imagemIconeHeroi.gameObject.SetActive(true); // Exibe a foto do personagem escolhido.
+                slot.imagemIconeHeroi.gameObject.SetActive(true);
             }
             else
             {
-                slot.imagemIconeHeroi.gameObject.SetActive(false); // Oculta se não escolheu herói.
+                slot.imagemIconeHeroi.gameObject.SetActive(false);
             }
         }
     }
 
-    /// <summary>
-    /// Exibe o botão de Play e permite interatividade EXCLUSIVAMENTE para o Dono da Sala.
-    /// </summary>
     private void AtualizarBotaoPlayMaster()
     {
         if (botaoPlayMaster != null)
         {
             bool ehDono = PhotonNetwork.IsMasterClient;
-            botaoPlayMaster.gameObject.SetActive(ehDono); // Esconde botão se não for o Dono da Sala.
-            botaoPlayMaster.interactable = ehDono; // Habilita o clique se for o Dono da Sala.
+            botaoPlayMaster.gameObject.SetActive(ehDono);
+            botaoPlayMaster.interactable = ehDono;
         }
     }
 
@@ -345,31 +276,8 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
         }
     }
 
-
-    // ==========================================
-    // 7. CALLBACKS AUTOMÁTICOS DO PHOTON (REDE)
-    // ==========================================
-
-    /// <summary>
-    /// Disparado automaticamente quando qualquer jogador atualiza suas propriedades de time/herói na rede.
-    /// </summary>
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-    {
-        AtualizarTodaAInterfaceRede(); // Redesenha a tela instantaneamente para todos os jogadores na sala.
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        AtualizarTodaAInterfaceRede(); // Atualiza a tela quando um novo jogador entra.
-    }
-
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        AtualizarTodaAInterfaceRede(); // Atualiza a tela quando um jogador sai.
-    }
-
-    public override void OnMasterClientSwitched(Player newMasterClient)
-    {
-        AtualizarTodaAInterfaceRede(); // Transfere a cor de líder e o botão Play para o novo Dono da Sala.
-    }
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) => AtualizarTodaAInterfaceRede();
+    public override void OnPlayerEnteredRoom(Player newPlayer) => AtualizarTodaAInterfaceRede();
+    public override void OnPlayerLeftRoom(Player otherPlayer) => AtualizarTodaAInterfaceRede();
+    public override void OnMasterClientSwitched(Player newMasterClient) => AtualizarTodaAInterfaceRede();
 }
