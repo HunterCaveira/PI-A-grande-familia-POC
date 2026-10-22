@@ -132,7 +132,8 @@ public class GerenciadorSelecaoHeroi : MonoBehaviourPunCallbacks
         }
 
         Debug.Log("[SELEÇÃO] Dono da sala iniciou a partida. Carregando cena 'Main Park'...");
-        PhotonNetwork.LoadLevel("Main Park");
+        //PhotonNetwork.LoadLevel("Main Park");
+        SceneManager.LoadScene("Main Park");
     }
 
     private void TentarMudarDeTime(int numeroTimeDesejado)
