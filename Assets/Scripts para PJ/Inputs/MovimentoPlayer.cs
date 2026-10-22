@@ -166,10 +166,10 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
 
     public void AplicarLentidao(float porcentagemReducao, float duracao)
     {
-        StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
+        //StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
     }
 
-    private System.Collections.IEnumerator RotinaAplicarLentidao(float porcentagemReducao, float duracao)
+   /* private IEnumerator RotinaAplicarLentidao(float porcentagemReducao, float duracao)
     {
         AtributosPersonagem fichaOriginal = atributos;
         if (fichaOriginal == null) yield break;
@@ -194,4 +194,5 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
 
         Debug.Log("[MOVIMENTO PLAYER] Efeito de lentid�o acabou. Velocidade restaurada.");
     }
+   */
 }

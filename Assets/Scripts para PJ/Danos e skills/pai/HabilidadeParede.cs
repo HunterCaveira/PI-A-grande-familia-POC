@@ -1,9 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
-using Photon.Pun; // Importa a API do Photon
 
-public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
+public class HabilidadeParede : MonoBehaviour, IHabilidade, IasUI
 {
     [Header("Configurações da Câmera e Raio")]
     [SerializeField] private Camera cameraPrincipal;
@@ -17,30 +16,28 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
     [SerializeField] private float alturaMaxima = 4f;
     [SerializeField] private float alturaMinima = 0.5f;
 
-    [Header("Teclas e Estado")]
     private bool modoPosicionamentoAtivo = false;
 
     [Header("Prefabs da Parede")]
     [SerializeField] private GameObject prefabParedeFantasma;
-    [Tooltip("Nome EXATO do prefab da Parede Real que está salvo dentro da pasta Resources!")]
+    [Tooltip("Arraste diretamente o Prefab da Parede Real aqui")]
+    [SerializeField] private GameObject prefabParedeRealObjeto;
     [SerializeField] private string nomePrefabParedeReal = "ParedeReal";
 
-    [Header("Regras de Uso (Cooldown e Limites)")]
+    [Header("Regras de Uso")]
     [SerializeField] private float tempoDeVida = 10f;
     [SerializeField] private int limiteParedes = 2;
     [SerializeField] private float tempoCooldown = 5f;
 
-    [Header("Configuração do Slot")]
-    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
+    [Header("Configuração do Slot UI")]
+    [SerializeField] private int slotIndex = 1;
     public int SlotIndex => slotIndex;
 
-    [Header("Imagens da UI")]
     [SerializeField] private Sprite fotoPronta;
     [SerializeField] private Sprite fotoRecarregando;
     public Sprite FotoPronta => fotoPronta;
     public Sprite FotoRecarregando => fotoRecarregando;
 
-    [Header("Tempo de Recarga para UI")]
     [SerializeField] private float tempoDeRecarga = 4f;
     private float tempoProximouso = 0f;
     public float TempoProximouso => tempoProximoUso;
@@ -51,42 +48,33 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 
     private void Awake()
     {
-        gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+        gerenciadorDeEquipamentos = GetComponentInParent<GerenciadorDeEquipamentos>();
         if (cameraPrincipal == null) cameraPrincipal = Camera.main;
+
+        // Desativa colisão da parede fantasma para não bloquear o Raycast do mouse
+        if (prefabParedeFantasma != null)
+        {
+            Collider col = prefabParedeFantasma.GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+        }
     }
 
-    void Update()
+    private void Update()
     {
-        // Garante que apenas o jogador local gerencie a mira e colocação da parece fantasma
-        if (!photonView.IsMine) return;
-
         if (modoPosicionamentoAtivo)
         {
             PosicionarECriarParede();
         }
     }
 
-    // --- MÉTODOS DA INTERFACE IHABILIDADE ---
-    public bool PodeUsar()
-    {
-        return Time.time >= tempoProximouso;
-    }
-
-    public bool EstaPronta()
-    {
-        return Time.time >= tempoProximoUso;
-    }
+    public bool PodeUsar() => Time.time >= tempoProximouso;
+    public bool EstaPronta() => Time.time >= tempoProximoUso;
 
     public void AtivarHabilidade()
     {
-        if (!photonView.IsMine) return;
-
         if (!EstaPronta())
         {
-            if (gerenciadorDeEquipamentos != null)
-            {
-                gerenciadorDeEquipamentos.TrocarEquipamento(0);
-            }
+            if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0);
             return;
         }
 
@@ -105,8 +93,6 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 
     public void CancelarHabilidade()
     {
-        if (!photonView.IsMine) return;
-
         modoPosicionamentoAtivo = false;
 
         if (prefabParedeFantasma != null)
@@ -115,16 +101,15 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
         }
     }
 
-    // --- LÓGICA DE POSICIONAMENTO E CRIAÇÃO ---
-
     private void PosicionarECriarParede()
     {
+        if (cameraPrincipal == null) cameraPrincipal = Camera.main;
         if (cameraPrincipal == null || prefabParedeFantasma == null) return;
 
         Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, distanciaMaxima, camadaChao))
+        // Realiza o Raycast ignorando Triggers
+        if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima, camadaChao, QueryTriggerInteraction.Ignore))
         {
             if (!prefabParedeFantasma.activeSelf)
             {
@@ -138,49 +123,12 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 
             prefabParedeFantasma.transform.position = posicaoAjustadaNoChao;
 
-            // Confirmação de criação ao clicar com o Botão Direito do Mouse
-            if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+            // Aceita o clique com Botão Esquerdo ou Botão Direito do Mouse para confirmar
+            bool clicou = (Mouse.current != null && (Mouse.current.rightButton.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame));
+
+            if (clicou)
             {
-                paredesAtivas.RemoveAll(parede => parede == null);
-
-                if (paredesAtivas.Count >= limiteParedes)
-                {
-                    if (paredesAtivas[0] != null)
-                    {
-                        PhotonNetwork.Destroy(paredesAtivas[0]);
-                    }
-                    paredesAtivas.RemoveAt(0);
-                }
-
-                // INSTANCIAÇÃO REDE: Cria o prefab carregado da pasta Resources/
-                GameObject paredeCriada = PhotonNetwork.Instantiate(
-                    nomePrefabParedeReal,
-                    posicaoAjustadaNoChao,
-                    prefabParedeFantasma.transform.rotation
-                );
-
-                // Aplica a escala redimensionada e envia RPC para os outros jogadores atualizarem o tamanho
-                Vector3 escalaCalculada = prefabParedeFantasma.transform.localScale;
-                PhotonView viewParede = paredeCriada.GetComponent<PhotonView>();
-
-                if (viewParede != null)
-                {
-                    viewParede.RPC("SincronizarEscalaParedeRPC", RpcTarget.AllBuffered, escalaCalculada);
-                }
-
-                paredesAtivas.Add(paredeCriada);
-
-                // Aplica Cooldown
-                tempoProximoUso = Time.time + tempoCooldown;
-
-                // Cancela o modo fantasma
-                CancelarHabilidade();
-
-                // Retorna para a arma principal (Slot 0)
-                if (gerenciadorDeEquipamentos != null)
-                {
-                    gerenciadorDeEquipamentos.TrocarEquipamento(0);
-                }
+                CriarParedeReal(posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation, prefabParedeFantasma.transform.localScale);
             }
         }
         else
@@ -190,6 +138,46 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
                 prefabParedeFantasma.SetActive(false);
             }
         }
+    }
+
+    private void CriarParedeReal(Vector3 posicao, Quaternion rotacao, Vector3 escala)
+    {
+        GameObject modeloParaInstanciar = prefabParedeRealObjeto;
+
+        if (modeloParaInstanciar == null)
+        {
+            modeloParaInstanciar = Resources.Load<GameObject>(nomePrefabParedeReal);
+        }
+
+        if (modeloParaInstanciar == null)
+        {
+            Debug.LogError($"[HabilidadeParede] ERRO: Não foi possível encontrar o prefab da parede real! Arraste o Prefab para o campo 'Prefab Parede Real Objeto' no Inspector ou salve-o em 'Assets/Resources/{nomePrefabParedeReal}'.");
+            return;
+        }
+
+        paredesAtivas.RemoveAll(parede => parede == null);
+
+        if (paredesAtivas.Count >= limiteParedes)
+        {
+            if (paredesAtivas[0] != null) Destroy(paredesAtivas[0]);
+            paredesAtivas.RemoveAt(0);
+        }
+
+        GameObject paredeCriada = Instantiate(modeloParaInstanciar, posicao, rotacao);
+        paredeCriada.transform.localScale = escala;
+        paredesAtivas.Add(paredeCriada);
+
+        Destroy(paredeCriada, tempoDeVida);
+
+        tempoProximoUso = Time.time + tempoCooldown;
+        CancelarHabilidade();
+
+        if (gerenciadorDeEquipamentos != null)
+        {
+            gerenciadorDeEquipamentos.TrocarEquipamento(0);
+        }
+
+        Debug.Log("[HabilidadeParede] Parede real posicionada na cena com sucesso!");
     }
 
     private void AjustarLarguraDaParede(Transform parede)

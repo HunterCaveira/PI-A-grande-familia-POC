@@ -18,17 +18,15 @@ public class SkillDois : MonoBehaviour, IasUI
     public Sprite FotoRecarregando => fotoRecarregando;
 
     [Header("Referências da Skill")]
-    [SerializeField] private ZonaDeComando zonaDeComandoRef; // Arraste a zona aqui
-    [SerializeField] private float duracaoEfeito = 3.5f;     // Quanto tempo dura o efeito no inimigo
+    [SerializeField] private ZonaDeComando zonaDeComandoRef;
+    [SerializeField] private float duracaoEfeito = 3.5f;
 
     private Sistemadevida meuSistemaDeVida;
 
-    void Awake()
+    private void Awake()
     {
-        meuSistemaDeVida = GetComponent<Sistemadevida>();
+        meuSistemaDeVida = GetComponentInParent<Sistemadevida>();
     }
-
-    // --- Implementação da Interface IasUI ---
 
     public bool EstaPronta()
     {
@@ -44,7 +42,6 @@ public class SkillDois : MonoBehaviour, IasUI
     {
         if (!PodeUsar()) return;
 
-        // Atualiza o cooldown
         proximoUsoPermitido = Time.time + tempoRecarga;
 
         if (zonaDeComandoRef == null)
@@ -53,13 +50,15 @@ public class SkillDois : MonoBehaviour, IasUI
             return;
         }
 
-        // Descobre o TimeID do jogador que disparou a skill
+        if (meuSistemaDeVida == null)
+        {
+            meuSistemaDeVida = GetComponentInParent<Sistemadevida>();
+        }
+
         int meuTimeID = meuSistemaDeVida != null ? meuSistemaDeVida.TimeID : 1;
 
-        // Pega os inimigos detectados na zona pela ZonaDeComando
         var inimigosAfetados = zonaDeComandoRef.ObterInimigosNaZona(meuTimeID);
 
-        // Envia o sinal para cada inimigo perder o movimento, iluminar e gerenciar por enum
         foreach (var inimigo in inimigosAfetados)
         {
             if (inimigo.TryGetComponent<EnemyController>(out var controladorEstado))
@@ -73,6 +72,6 @@ public class SkillDois : MonoBehaviour, IasUI
 
     public void CancelarHabilidade()
     {
-        // Caso precise cancelar algo ao trocar de item/arma
+        // Limpeza/cancelamento caso necessário
     }
 }

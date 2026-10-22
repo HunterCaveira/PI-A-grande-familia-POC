@@ -1,8 +1,8 @@
-using System.Collections; // Importa suporte a Corrotinas (IEnumerator e WaitForSeconds).
-using UnityEngine; // Importa as ferramentas principais do motor da Unity.
-using UnityEngine.InputSystem; // Importa o novo Input System.
+using System.Collections;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI para o HUD/UI
+public class SkillMae3 : MonoBehaviour, IasUI
 {
     // ==========================================
     // 1. CONFIGURAÇÃO DO SLOT E UI
@@ -22,13 +22,13 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
 
 
     // ==========================================
-    // 2. CONFIGURAÇÕES DE MIRA E DISPARO
+    // 2. CONFIGURAÇÕES DE MIRA E ALCANCE
     // ==========================================
 
     [Header("Configurações de Mira e Alcance")]
     [SerializeField] private float alcanceDoTiro = 100f;
     [SerializeField] private LayerMask mascaraDeTiro;
-    [Tooltip("Arraste a câmera que orbita o personagem aqui (ou deixe vazio para pegar a Camera.main)")]
+    [Tooltip("Arraste a câmera do jogador aqui (se vazio, pegará Camera.main automaticamente)")]
     [SerializeField] private Camera playerCamera;
 
 
@@ -37,10 +37,10 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
     // ==========================================
 
     [Header("Tempo de Espera e Cooldown")]
-    [SerializeField] private float tempoDeEsperaDisparo = 0.5f; // Tempo preparando o disparo antes de lançar o projétil.
-    [SerializeField] private float tempoCooldown = 5.0f; // Tempo de recarga após o uso.
+    [SerializeField] private float tempoDeEsperaDisparo = 0.5f;
+    [SerializeField] private float tempoCooldown = 5.0f;
 
-    private bool emUsoOuAnimacao = false; // Trava booleana de execução interna.
+    private bool emUsoOuAnimacao = false;
 
 
     // ==========================================
@@ -49,8 +49,8 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
 
     [Header("Referências")]
     [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
-    [SerializeField] private Transform pontoDisparoNaMao; // Ponto na mão ativado pela tecla F.
-    [SerializeField] private GameObject projetilPreCriado; // O projétil de lentidão na cena.
+    [SerializeField] private Transform pontoDisparoNaMao;
+    [SerializeField] private GameObject projetilPreCriado;
 
 
     // ==========================================
@@ -63,7 +63,7 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
             playerCamera = Camera.main;
 
         if (gerenciadorDeEquipamentos == null)
-            gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+            gerenciadorDeEquipamentos = GetComponentInParent<GerenciadorDeEquipamentos>();
     }
 
     private void Start()
@@ -81,7 +81,6 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
 
     private void Update()
     {
-        // O clique do mouse só dispara se o ponto de disparo estiver ativo na mão e a habilidade não estiver em wind-up
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (pontoDisparoNaMao != null && pontoDisparoNaMao.gameObject.activeSelf && !emUsoOuAnimacao)
@@ -114,7 +113,7 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
         return EstaPronta();
     }
 
-    public void AtivarHabilidade() // Chamado pelo GerenciadorDeEquipamentos ao apertar F.
+    public void AtivarHabilidade()
     {
         if (!EstaPronta())
         {
@@ -154,35 +153,37 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
     private IEnumerator RotinaFaseDeEsperaDisparo()
     {
         emUsoOuAnimacao = true;
-        Debug.Log("[SKILL 3] Iniciando fase de preparação do disparo...");
+        Debug.Log("[SKILL 3] Preparando disparo...");
 
-        // Aguarda o tempo de wind-up configurado
         yield return new WaitForSeconds(tempoDeEsperaDisparo);
 
-        // Verifica se o ponto de disparo ainda continua ativo após a espera
         if (pontoDisparoNaMao != null && pontoDisparoNaMao.gameObject.activeSelf)
         {
             DispararComPrecisao();
         }
-        else
-        {
-            Debug.LogWarning("[SKILL 3] Disparo cancelado: O ponto de disparo foi desativado durante a espera!");
-        }
 
-        TempoProximouso = Time.time + tempoCooldown; // Define o cooldown
+        TempoProximouso = Time.time + tempoCooldown;
         emUsoOuAnimacao = false;
     }
 
 
     // ==========================================
-    // 8. LÓGICA DE MIRA E LANÇAMENTO DO PROJÉTIL
+    // 8. LÓGICA DE MIRA E LANÇAMENTO
     // ==========================================
 
     private void DispararComPrecisao()
     {
         if (projetilPreCriado == null || pontoDisparoNaMao == null) return;
 
-        // 1. O Ray sai do centro da tela (mira/crosshair) da câmera
+        if (playerCamera == null)
+            playerCamera = Camera.main;
+
+        if (playerCamera == null)
+        {
+            Debug.LogError("[SKILL 3] Câmera não encontrada para direcionar o tiro!");
+            return;
+        }
+
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         Vector3 pontoAcerto;
@@ -195,7 +196,6 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
             pontoAcerto = ray.GetPoint(alcanceDoTiro);
         }
 
-        // 2. Calcula a direção exata do cano da mão até o ponto mirado pela câmera
         Vector3 direcaoDoTiro = (pontoAcerto - pontoDisparoNaMao.position).normalized;
 
         if (Vector3.Distance(pontoDisparoNaMao.position, pontoAcerto) < 1f)
@@ -203,7 +203,6 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
             direcaoDoTiro = playerCamera.transform.forward;
         }
 
-        // 3. Configura e ativa o projétil de lentidão
         if (projetilPreCriado.activeInHierarchy)
         {
             projetilPreCriado.SetActive(false);
@@ -212,22 +211,23 @@ public class SkillMae3 : MonoBehaviour, IasUI // Implementa a interface IasUI pa
         projetilPreCriado.transform.position = pontoDisparoNaMao.position;
         projetilPreCriado.transform.rotation = Quaternion.LookRotation(direcaoDoTiro);
 
-        // Passa o TimeID para o projétil evitar fogo amigo (se houver o script ProjetilLentidao)
+        // Busca o Sistemadevida no próprio objeto ou no objeto pai (clone principal)
         if (projetilPreCriado.TryGetComponent<ProjetilLentidao>(out ProjetilLentidao scriptProjetil))
         {
             int meuTimeID = -1;
-            if (TryGetComponent<Sistemadevida>(out Sistemadevida minhaVida))
+            Sistemadevida minhaVida = GetComponentInParent<Sistemadevida>();
+
+            if (minhaVida != null)
             {
                 meuTimeID = minhaVida.TimeID;
             }
-            scriptProjetil.Inicializar(meuTimeID, this.gameObject);
+
+            scriptProjetil.Inicializar(meuTimeID, gameObject);
         }
 
         projetilPreCriado.SetActive(true);
-
-        // 4. Desativa o ponto de disparo na mão imediatamente após o tiro
         pontoDisparoNaMao.gameObject.SetActive(false);
 
-        Debug.Log("[SKILL 3] Projétil de lentidão disparado com sucesso!");
+        Debug.Log("[SKILL 3] Projétil disparado com sucesso!");
     }
 }

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 
-public class Dominacao : MonoBehaviourPun, IPunObservable
+public class Dominacao : MonoBehaviour
 {
     [Header("Configurações do Território")]
     public int timeDonoDoTerritorio = 0;
@@ -14,7 +12,7 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
     public GameObject uiTime2;
     public GameObject uiConflito;
 
-    [Header("Progresso Salvo (Sincronizado na Rede)")]
+    [Header("Progresso Salvo")]
     public float progressoTime1 = 0f;
     public float progressoTime2 = 0f;
     public int timeTentandoDominar = 0;
@@ -24,23 +22,19 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
 
     private void Update()
     {
-        // APENAS O MASTER CLIENT processa a lógica de domínio
-        if (PhotonNetwork.IsMasterClient)
-        {
-            jogadoresNaArea.RemoveAll(jogador => jogador == null || jogador.vidaAtual <= 0);
+        // Limpa referências nulas ou jogadores mortos na área
+        jogadoresNaArea.RemoveAll(jogador => jogador == null || jogador.vidaAtual <= 0);
 
-            if (jogadoresNaArea.Count > 0)
-            {
-                ProcessarCaptura();
-            }
-            else
-            {
-                timeTentandoDominar = 0;
-                emDisputa = false;
-            }
+        if (jogadoresNaArea.Count > 0)
+        {
+            ProcessarCaptura();
+        }
+        else
+        {
+            timeTentandoDominar = 0;
+            emDisputa = false;
         }
 
-        // Atualização gráfica da interface
         AtualizarInterface();
     }
 
@@ -129,9 +123,12 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
 
     private void OnTriggerEnter(Collider quemEntrou)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        Sistemadevida scriptDoJogador = quemEntrou.GetComponentInParent<Sistemadevida>();
 
-        Sistemadevida scriptDoJogador = quemEntrou.GetComponent<Sistemadevida>();
+        if (scriptDoJogador == null)
+        {
+            scriptDoJogador = quemEntrou.GetComponent<Sistemadevida>();
+        }
 
         if (scriptDoJogador != null && scriptDoJogador.vidaAtual > 0 && !jogadoresNaArea.Contains(scriptDoJogador))
         {
@@ -141,32 +138,16 @@ public class Dominacao : MonoBehaviourPun, IPunObservable
 
     private void OnTriggerExit(Collider quemSaiu)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        Sistemadevida scriptDoJogador = quemSaiu.GetComponentInParent<Sistemadevida>();
 
-        Sistemadevida scriptDoJogador = quemSaiu.GetComponent<Sistemadevida>();
+        if (scriptDoJogador == null)
+        {
+            scriptDoJogador = quemSaiu.GetComponent<Sistemadevida>();
+        }
+
         if (scriptDoJogador != null && jogadoresNaArea.Contains(scriptDoJogador))
         {
             jogadoresNaArea.Remove(scriptDoJogador);
-        }
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(timeDonoDoTerritorio);
-            stream.SendNext(progressoTime1);
-            stream.SendNext(progressoTime2);
-            stream.SendNext(timeTentandoDominar);
-            stream.SendNext(emDisputa);
-        }
-        else
-        {
-            timeDonoDoTerritorio = (int)stream.ReceiveNext();
-            progressoTime1 = (float)stream.ReceiveNext();
-            progressoTime2 = (float)stream.ReceiveNext();
-            timeTentandoDominar = (int)stream.ReceiveNext();
-            emDisputa = (bool)stream.ReceiveNext();
         }
     }
 }

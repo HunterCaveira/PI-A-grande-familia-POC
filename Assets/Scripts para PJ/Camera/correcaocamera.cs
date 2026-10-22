@@ -1,8 +1,7 @@
 using UnityEngine;
 using Unity.Cinemachine;
-using Photon.Pun; // Adicionado
 
-public class CorrecaoCameraPersonagem : MonoBehaviourPun // Herda de MonoBehaviourPun
+public class CorrecaoCameraPersonagem : MonoBehaviour
 {
     [Header("Configuração de Foco da Câmera")]
     [Tooltip("Arraste o objeto filho 'CameraTarget' posicionado no ombro do personagem.")]
@@ -15,34 +14,32 @@ public class CorrecaoCameraPersonagem : MonoBehaviourPun // Herda de MonoBehavio
 
     private Transform cameraTransform;
 
-    void Start()
+    private void Start()
     {
-        // MULTIPLAYER: Só alinha a câmera e permite buscar as referências se for seu boneco
-        if (!photonView.IsMine) return;
-
         if (Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
         }
 
+        // Tenta encontrar o ponto de foco no próprio clone caso não esteja configurado
         if (cameraTarget == null)
         {
             Transform encontrado = transform.Find("CameraTarget");
-            cameraTarget = encontrado != null ? encontrado : transform;
+            cameraTarget = (encontrado != null) ? encontrado : transform;
         }
 
+        // Conecta o ponto de foco do clone à câmera principal do Cinemachine 3
         CinemachineCamera freeLookCam = FindFirstObjectByType<CinemachineCamera>();
         if (freeLookCam != null)
         {
             freeLookCam.Target.TrackingTarget = cameraTarget;
+            freeLookCam.Follow = cameraTarget;
+            freeLookCam.LookAt = cameraTarget;
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // MULTIPLAYER: Inimigos não rodam essa lógica de rotação local
-        if (!photonView.IsMine) return;
-
         AlinharPersonagemComCamera();
     }
 

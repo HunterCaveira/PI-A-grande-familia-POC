@@ -1,8 +1,7 @@
 using UnityEngine;
 using Unity.Cinemachine;
-using Photon.Pun; // Adicionado
 
-public class CameraEvitaParede : MonoBehaviourPun // Herda de MonoBehaviourPun
+public class CameraEvitaParede : MonoBehaviour
 {
     [Header("Configurações do Cinemachine 3")]
     [SerializeField] private CinemachineCamera virtualCamera;
@@ -11,11 +10,17 @@ public class CameraEvitaParede : MonoBehaviourPun // Herda de MonoBehaviourPun
     private CinemachineOrbitalFollow orbitalFollow;
     private Transform mainCameraTransform;
 
-    void Awake()
+    private void Awake()
     {
         if (Camera.main != null)
         {
             mainCameraTransform = Camera.main.transform;
+        }
+
+        // Caso a câmera não tenha sido arrastada pelo Inspector, busca na cena
+        if (virtualCamera == null)
+        {
+            virtualCamera = FindFirstObjectByType<CinemachineCamera>();
         }
 
         if (virtualCamera != null)
@@ -24,39 +29,29 @@ public class CameraEvitaParede : MonoBehaviourPun // Herda de MonoBehaviourPun
 
             if (orbitalFollow == null)
             {
-                Debug.LogWarning("A 'virtualCamera' precisa do componente 'Cinemachine Orbital Follow'!");
+                Debug.LogWarning("[CameraEvitaParede] A 'virtualCamera' precisa do componente 'Cinemachine Orbital Follow'!");
             }
         }
     }
 
-    void Start()
-    {
-        // MULTIPLAYER: Impede que o boneco do inimigo altere o alvo da SUA câmera
-        if (!photonView.IsMine) return;
-
-        if (virtualCamera != null && cameraFollowTarget != null)
-        {
-            virtualCamera.Target.TrackingTarget = cameraFollowTarget;
-        }
-    }
-
-    void LateUpdate()
-    {
-        if (!photonView.IsMine) return;
-
-        if (virtualCamera == null || cameraFollowTarget == null || orbitalFollow == null)
-            return;
-    }
-
+    /// <summary>
+    /// Reassocia a câmera do Cinemachine ao novo clone instanciado.
+    /// </summary>
+    /// <param name="novoTarget">Transform do clone do personagem</param>
     public void ConfigurarNovoHeroi(Transform novoTarget)
     {
-        if (!photonView.IsMine) return;
+        if (novoTarget == null) return;
 
         cameraFollowTarget = novoTarget;
 
         if (virtualCamera != null)
         {
-            virtualCamera.Target.TrackingTarget = cameraFollowTarget;
+            // Atualiza os alvos do Cinemachine 3 para focar e seguir o novo clone
+            virtualCamera.Target.TrackingTarget = novoTarget;
+            virtualCamera.Follow = novoTarget;
+            virtualCamera.LookAt = novoTarget;
+
+            Debug.Log($"[CameraEvitaParede] Câmera reconfigurada para seguir o clone: {novoTarget.name}");
         }
     }
 }

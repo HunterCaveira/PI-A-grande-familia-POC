@@ -1,11 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
-public class Respawn : MonoBehaviourPunCallbacks
+public class Respawn : MonoBehaviour
 {
-    // Singleton para ser acessado de qualquer script (ex: no momento da morte no Sistemadevida)
     public static Respawn Instancia { get; private set; }
 
     [Header("Pontos de Spawn no Mapa")]
@@ -18,15 +16,15 @@ public class Respawn : MonoBehaviourPunCallbacks
     private void Awake()
     {
         if (Instancia == null)
+        {
             Instancia = this;
+        }
         else
-            Destroy(gameObject);
+        {
+            gameObject.SetActive(false);
+        }
     }
 
-    /// <summary>
-    /// Método público chamado quando o jogador local morre.
-    /// </summary>
-    /// <param name="bonecoAntigo">O GameObject do herói que foi destruído/eliminado.</param>
     public void SolicitarRespawn(GameObject bonecoAntigo)
     {
         StartCoroutine(RotinaRespawn(bonecoAntigo));
@@ -34,43 +32,39 @@ public class Respawn : MonoBehaviourPunCallbacks
 
     private IEnumerator RotinaRespawn(GameObject bonecoAntigo)
     {
-        // 1. Destrói o boneco antigo na rede se ele pertencer a este cliente local
+        // 1. Desativa o herói na cena durante o tempo de respawn
         if (bonecoAntigo != null)
         {
-            PhotonView pv = bonecoAntigo.GetComponent<PhotonView>();
-            if (pv != null && pv.IsMine)
+            bonecoAntigo.SetActive(false);
+        }
+
+        // 2. Aguarda a contagem regressiva
+        yield return new WaitForSeconds(tempoParaRespawn);
+
+        // 3. Lê a escolha do time/personagem salva no PlayerPrefs
+        int timeID = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
+
+        // 4. Seleciona um ponto de spawn aleatório
+        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
+
+        // 5. Reposiciona o clone e o reativa
+        if (bonecoAntigo != null)
+        {
+            if (pontoEscolhido != null)
             {
-                PhotonNetwork.Destroy(bonecoAntigo);
+                bonecoAntigo.transform.position = pontoEscolhido.position;
+                bonecoAntigo.transform.rotation = pontoEscolhido.rotation;
+            }
+
+            bonecoAntigo.SetActive(true);
+
+            if (bonecoAntigo.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
+            {
+                vida.Renascer();
             }
         }
 
-        // 2. Aguarda a contagem regressiva de respawn
-        yield return new WaitForSeconds(tempoParaRespawn);
-
-        // 3. Lê as configurações do jogador local salvas na transição (HeroiIndice e TimeJogador)
-        int heroiIndice = 0;
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("HeroiIndice"))
-        {
-            heroiIndice = (int)PhotonNetwork.LocalPlayer.CustomProperties["HeroiIndice"];
-        }
-
-        int timeID = 1;
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("TimeJogador"))
-        {
-            timeID = (int)PhotonNetwork.LocalPlayer.CustomProperties["TimeJogador"];
-        }
-
-        string nomePrefabHeroi = (heroiIndice == 0) ? "Pai" : "Mae";
-
-        // 4. Seleciona o ponto de spawn correto baseado no time
-        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
-        Vector3 posicaoSpawn = pontoEscolhido != null ? pontoEscolhido.position : Vector3.zero;
-        Quaternion rotacaoSpawn = pontoEscolhido != null ? pontoEscolhido.rotation : Quaternion.identity;
-
-        // 5. Instancia um novo personagem limpo na rede através da pasta Resources
-        GameObject novoBoneco = PhotonNetwork.Instantiate(nomePrefabHeroi, posicaoSpawn, rotacaoSpawn);
-
-        Debug.Log($"[RESPAWN] Jogador renasceu com sucesso! Prefab: {nomePrefabHeroi} | Time {timeID}");
+        Debug.Log($"[RESPAWN] Jogador reposicionado com sucesso! Time {timeID}");
     }
 
     private Transform ObterPontoDeSpawn(int timeID)

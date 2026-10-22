@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Photon.Pun; // Adicionado para Multiplayer
 
 public class GerenciadorUI : MonoBehaviour
 {
@@ -12,7 +11,6 @@ public class GerenciadorUI : MonoBehaviour
     [SerializeField] private Image imagemSlotF; // Slot 3
     [SerializeField] public TextMeshProUGUI meuTexto;
 
-    // Removido o SerializeField de arma e jogador para evitar arrastar inimigos por engano
     private GameObject jogadorLocal;
     private tiroPistola pistolaRef;
 
@@ -26,20 +24,20 @@ public class GerenciadorUI : MonoBehaviour
     private Dictionary<int, SlotUIInfo> slotsMap = new Dictionary<int, SlotUIInfo>();
     private bool uiConfigurada = false;
 
-    void Start()
+    private void Start()
     {
         slotsMap[1] = new SlotUIInfo { ImagemUI = imagemSlotQ }; // 1 = Q
         slotsMap[2] = new SlotUIInfo { ImagemUI = imagemSlotE }; // 2 = E
         slotsMap[3] = new SlotUIInfo { ImagemUI = imagemSlotF }; // 3 = F
     }
 
-    void Update()
+    private void Update()
     {
-        // MULTIPLAYER: Fica buscando o jogador local caso ele ainda não tenha sido spawnado/configurado
-        if (!uiConfigurada)
+        // Se o jogador ainda não foi configurado ou se o clone atual foi desativado (ex: durante respawn), rebinda a UI
+        if (!uiConfigurada || jogadorLocal == null || !jogadorLocal.activeInHierarchy)
         {
             BuscarEConfigurarJogadorLocal();
-            return; // Interrompe o Update até achar o jogador
+            return;
         }
 
         AcabouMunição();
@@ -62,39 +60,55 @@ public class GerenciadorUI : MonoBehaviour
 
     private void BuscarEConfigurarJogadorLocal()
     {
-        // Encontra todos os componentes de movimento (ou seja, todos os players no mapa)
-        var todosOsJogadores = FindObjectsByType<MovimentodoPlayer>(FindObjectsSortMode.None);
-
-        foreach (var jog in todosOsJogadores)
+        // 1. Tenta obter o clone ativo diretamente pelo GerenciadorRespawn
+        Gerenciadorderespawn respawn = FindFirstObjectByType<Gerenciadorderespawn>();
+        if (respawn != null && respawn.CloneAtivo != null && respawn.CloneAtivo.activeInHierarchy)
         {
-            PhotonView pv = jog.GetComponent<PhotonView>();
-            if (pv != null && pv.IsMine) // Acha EXATAMENTE o jogador que pertence a esta máquina
+            VincularJogador(respawn.CloneAtivo);
+            return;
+        }
+
+        // 2. Fallback: Procura qualquer jogador ativo na cena com o script MovimentodoPlayer
+        MovimentodoPlayer jogadorEncontrado = FindFirstObjectByType<MovimentodoPlayer>();
+        if (jogadorEncontrado != null && jogadorEncontrado.gameObject.activeInHierarchy)
+        {
+            VincularJogador(jogadorEncontrado.gameObject);
+        }
+    }
+
+    private void VincularJogador(GameObject playerObj)
+    {
+        jogadorLocal = playerObj;
+        pistolaRef = jogadorLocal.GetComponentInChildren<tiroPistola>(true);
+
+        // Limpa os slots para reatribuição limpa
+        foreach (var slot in slotsMap.Values)
+        {
+            slot.Habilidade = null;
+        }
+
+        // Procura todos os scripts IasUI no próprio clone e em seus sub-objetos
+        IasUI[] habilidadesDoJogador = jogadorLocal.GetComponentsInChildren<IasUI>(true);
+
+        foreach (var hab in habilidadesDoJogador)
+        {
+            if (slotsMap.ContainsKey(hab.SlotIndex))
             {
-                jogadorLocal = jog.gameObject;
-                pistolaRef = jogadorLocal.GetComponentInChildren<tiroPistola>(); // Pega a arma somente deste jogador
-
-                IasUI[] habilidadesDoJogador = jogadorLocal.GetComponents<IasUI>();
-
-                foreach (var hab in habilidadesDoJogador)
-                {
-                    if (slotsMap.ContainsKey(hab.SlotIndex))
-                    {
-                        slotsMap[hab.SlotIndex].Habilidade = hab;
-                    }
-                }
-
-                uiConfigurada = true; // Trava a busca, configuração finalizada
-                Debug.Log("UI vinculada ao Jogador Local da Rede com sucesso!");
-                break;
+                slotsMap[hab.SlotIndex].Habilidade = hab;
+                // Força atualização visual imediata no próximo quadro
+                slotsMap[hab.SlotIndex].UltimoEstadoPronto = !hab.EstaPronta();
             }
         }
+
+        uiConfigurada = true;
+        Debug.Log($"[GerenciadorUI] UI vinculada com sucesso ao clone ativo: {jogadorLocal.name}");
     }
 
     public void AcabouMunição()
     {
-        if (pistolaRef == null) return;
+        if (pistolaRef == null || meuTexto == null) return;
 
-        if (pistolaRef.balaZerada == true)
+        if (pistolaRef.balaZerada)
         {
             meuTexto.color = Color.blue;
         }

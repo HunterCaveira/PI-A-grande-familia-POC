@@ -1,8 +1,7 @@
 using UnityEngine;
 using TMPro;
-using Photon.Pun;
 
-public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
+public class GerenciadorDePartida : MonoBehaviour
 {
     [Header("Interface (UI)")]
     public TextMeshProUGUI textoCronometro;
@@ -39,27 +38,25 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     {
         if (partidaAcabou) return;
 
-        // Apenas o Master Client calcula a pontuação oficial
-        if (PhotonNetwork.IsMasterClient)
+        tempoRestante -= Time.deltaTime;
+
+        // Calcula a pontuação acumulada se a área não estiver em disputa
+        if (areaDeDominacao != null && !areaDeDominacao.emDisputa)
         {
-            tempoRestante -= Time.deltaTime;
-
-            if (areaDeDominacao != null && !areaDeDominacao.emDisputa)
+            if (areaDeDominacao.timeDonoDoTerritorio == 1)
             {
-                if (areaDeDominacao.timeDonoDoTerritorio == 1)
-                {
-                    tempoTotalTime1 += Time.deltaTime;
-                }
-                else if (areaDeDominacao.timeDonoDoTerritorio == 2)
-                {
-                    tempoTotalTime2 += Time.deltaTime;
-                }
+                tempoTotalTime1 += Time.deltaTime;
             }
-
-            if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+            else if (areaDeDominacao.timeDonoDoTerritorio == 2)
             {
-                photonView.RPC("FinalizarPartidaRPC", RpcTarget.All, tempoTotalTime1, tempoTotalTime2);
+                tempoTotalTime2 += Time.deltaTime;
             }
+        }
+
+        // Checa condição de término da partida
+        if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+        {
+            FinalizarPartida(tempoTotalTime1, tempoTotalTime2);
         }
 
         AtualizarRelogiosNaTela();
@@ -90,8 +87,7 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
         return string.Format("{0:00}:{1:00}", minutos, segundos);
     }
 
-    [PunRPC]
-    private void FinalizarPartidaRPC(float pontosFinalTime1, float pontosFinalTime2)
+    private void FinalizarPartida(float pontosFinalTime1, float pontosFinalTime2)
     {
         partidaAcabou = true;
         tempoRestante = 0f;
@@ -100,12 +96,8 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 
         AtualizarRelogiosNaTela();
 
-        // Determina o time do jogador local através do CustomProperties
-        int meuTime = 1;
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("TimeJogador"))
-        {
-            meuTime = (int)PhotonNetwork.LocalPlayer.CustomProperties["TimeJogador"];
-        }
+        // Lê o time do jogador salvo via PlayerPrefs (padrão 1)
+        int meuTime = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
 
         int timeVencedor = 0;
         if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f) timeVencedor = 1;
@@ -122,22 +114,6 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
         else
         {
             if (imagemDerrota != null) imagemDerrota.SetActive(true);
-        }
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(tempoRestante);
-            stream.SendNext(tempoTotalTime1);
-            stream.SendNext(tempoTotalTime2);
-        }
-        else
-        {
-            tempoRestante = (float)stream.ReceiveNext();
-            tempoTotalTime1 = (float)stream.ReceiveNext();
-            tempoTotalTime2 = (float)stream.ReceiveNext();
         }
     }
 }

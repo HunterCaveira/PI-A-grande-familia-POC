@@ -260,7 +260,6 @@ GameObject:
   - component: {fileID: 2588890255097247149}
   - component: {fileID: 8794448110551824356}
   - component: {fileID: 1280254733132079239}
-  - component: {fileID: 9109185544430400059}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -346,7 +345,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
   m_Name: 
@@ -356,7 +355,6 @@ MonoBehaviour:
   forcaPulo: 2
   velocidadeVertical: 2
   atributos: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
-  playerAnimation: {fileID: 9109185544430400059}
 --- !u!114 &849392077082758349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,7 +362,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65b1e106bf3214e4898ca37ff13cb7f9, type: 3}
   m_Name: 
@@ -379,7 +377,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d800c5dcd143b44086ce93eadae95b5, type: 3}
   m_Name: 
@@ -391,7 +389,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97f8b8c9bebc53d43a95df6a9199ed07, type: 3}
   m_Name: 
@@ -406,7 +404,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f4832feae4d7304e88eea6d0ac9fe7c, type: 3}
   m_Name: 
@@ -423,7 +421,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
@@ -441,7 +439,8 @@ MonoBehaviour:
   alturaMaxima: 3
   alturaMinima: 0.5
   prefabParedeFantasma: {fileID: 3792216503709269380}
-  prefabParedeReal: {fileID: 8832845509866653796}
+  prefabParedeRealObjeto: {fileID: 1973905232264155721}
+  nomePrefabParedeReal: ParedeReal
   tempoDeVida: 10
   limiteParedes: 2
   tempoCooldown: 1
@@ -456,7 +455,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
@@ -481,7 +480,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
@@ -505,7 +504,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12e45f230206a684696bae1e50ef2aca, type: 3}
   m_Name: 
@@ -519,7 +518,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43b27cb39a4227244ae24a72fba942f1, type: 3}
   m_Name: 
@@ -533,34 +532,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
   cameraTarget: {fileID: 7566779434684666353}
---- !u!95 &9109185544430400059
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3375185681077528402}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 4ea0bd7b94598674f8408c1adc90ad0f, type: 3}
-  m_Controller: {fileID: 9100000, guid: f6283eca98ac16f4a8ee10b470e9fa7c, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3853642255824957655
 GameObject:
   m_ObjectHideFlags: 0
@@ -1610,6 +1587,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+--- !u!1 &1973905232264155721 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
+  m_PrefabInstance: {fileID: 594938616542535257}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9172823074755321772 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
@@ -1824,10 +1806,5 @@ PrefabInstance:
 --- !u!4 &2214719421718349185 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8578737687830331893, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
-  m_PrefabInstance: {fileID: 7616026696701723764}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8832845509866653796 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1379541694731373584, guid: d1abdd6f957fb6b409b4747d03f05e09, type: 3}
   m_PrefabInstance: {fileID: 7616026696701723764}
   m_PrefabAsset: {fileID: 0}

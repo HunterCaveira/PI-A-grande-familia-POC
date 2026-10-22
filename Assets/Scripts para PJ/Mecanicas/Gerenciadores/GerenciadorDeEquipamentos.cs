@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Photon.Pun;
 
-public class GerenciadorDeEquipamentos : MonoBehaviourPun
+public class GerenciadorDeEquipamentos : MonoBehaviour
 {
     [Header("Configurações Visuais das Mãos")]
     [SerializeField] private Transform pontoMaos;
 
     [Header("Configurações de Tempo")]
     [SerializeField] private float tempoAnimacaoTroca = 0.5f;
+    [Tooltip("Tempo em segundos sem uso para voltar automaticamente à arma principal (Slot 0).")]
+    [SerializeField] private float tempoInatividadeVoltarArma = 5.0f;
+
     private float tempoLiberadoParaTrocar = 0f;
+    private float cronometroInatividade = 0f;
 
     [Header("Controle Interno")]
     private int indiceEquipamentoAtual = 0;
@@ -17,16 +20,18 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
 
     private IasUI[] habilidadesDoPersonagem;
 
-    void Awake()
+    private void Awake()
     {
         habilidadesDoPersonagem = GetComponents<IasUI>();
+        if (habilidadesDoPersonagem == null || habilidadesDoPersonagem.Length == 0)
+        {
+            habilidadesDoPersonagem = GetComponentsInChildren<IasUI>(true);
+        }
     }
 
-    void Update()
+    private void Update()
     {
-        // Apenas o jogador dono processa comandos de teclado localmente
-        if (!photonView.IsMine) return;
-
+        // 1. Leitura do Teclado (Atalhos Q, E, F)
         if (Keyboard.current != null)
         {
             if (Keyboard.current.qKey.wasPressedThisFrame)
@@ -43,17 +48,38 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
             }
         }
 
+        // 2. Processa troca pendente de equipamento
         if (Time.time >= tempoLiberadoParaTrocar && proximoIndicePendente != -1)
         {
             TrocarEquipamento(proximoIndicePendente);
             proximoIndicePendente = -1;
         }
+
+        // 3. Cronômetro de Inatividade (Auto-retorno para Slot 0 após 5s)
+        ControalrInatividadeEquipamento();
+    }
+
+    private void ControalrInatividadeEquipamento()
+    {
+        // Se estiver usando qualquer item/habilidade diferente da arma principal (Slot 0)
+        if (indiceEquipamentoAtual != 0)
+        {
+            cronometroInatividade += Time.deltaTime;
+
+            if (cronometroInatividade >= tempoInatividadeVoltarArma)
+            {
+                Debug.Log($"[GerenciadorDeEquipamentos] Inatividade de {tempoInatividadeVoltarArma}s atingida. Voltando para a arma principal.");
+                TrocarEquipamento(0);
+            }
+        }
+        else
+        {
+            cronometroInatividade = 0f;
+        }
     }
 
     public void TrocarEquipamento(int novoIndice)
     {
-        if (!photonView.IsMine) return;
-
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
@@ -66,17 +92,27 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
 
         CancelarTodasAsHabilidades();
 
-        // Atualiza a malha 3D visual da mão em todos os computadores da sala
-        photonView.RPC("SincronizarTrocaEquipamentoRPC", RpcTarget.All, novoIndice);
+        // Atualiza a malha visual 3D das mãos no clone
+        SincronizarTrocaEquipamento(novoIndice);
 
         AtivarHabilidadePorSlot(novoIndice);
 
         indiceEquipamentoAtual = novoIndice;
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
+
+        // Reseta o cronômetro sempre que trocar de equipamento
+        cronometroInatividade = 0f;
     }
 
-    [PunRPC]
-    private void SincronizarTrocaEquipamentoRPC(int novoIndice)
+    /// <summary>
+    /// Permite que habilidades estendam/resetem a contagem ao interagir (ex: ao mirar/movimentar a habilidade)
+    /// </summary>
+    public void ResetarCronometroInatividade()
+    {
+        cronometroInatividade = 0f;
+    }
+
+    private void SincronizarTrocaEquipamento(int novoIndice)
     {
         if (pontoMaos != null)
         {

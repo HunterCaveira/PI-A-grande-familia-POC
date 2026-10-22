@@ -1,20 +1,11 @@
 using UnityEngine;
-using Photon.Pun; // Adicionado
 
-// O NOME FOI ALTERADO: Lembre-se de renomear o arquivo .cs no Windows para "ControleCursor.cs"
-public class ControleCursor : MonoBehaviourPun
+public class ControleCursor : MonoBehaviour
 {
-    void Start()
+    private void Start()
     {
-        // MULTIPLAYER: Somente o jogador local trava o próprio mouse
-        if (!photonView.IsMine) return;
-
+        // Trava e esconde o cursor para o jogador
         UnityEngine.Cursor.visible = false;
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-    }
-
-    void Update()
-    {
-
     }
 }

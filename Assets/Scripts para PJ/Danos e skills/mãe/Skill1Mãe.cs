@@ -18,18 +18,15 @@ public class Skill1Mãe : MonoBehaviour, IasUI
     public Sprite FotoRecarregando => fotoRecarregando;
 
     [Header("Referência da Hitbox (Intermediário)")]
-    [SerializeField] private GameObject objetoIntermediario; // O objeto com o Collider/Trigger de ataque
+    [SerializeField] private GameObject objetoIntermediario;
 
     private void Awake()
     {
-        // Garante que a hitbox começa desativada ao iniciar o jogo
         if (objetoIntermediario != null)
         {
             objetoIntermediario.SetActive(false);
         }
     }
-
-    // --- Implementação dos Contratos de Interface ---
 
     public bool EstaPronta()
     {
@@ -45,15 +42,12 @@ public class Skill1Mãe : MonoBehaviour, IasUI
     {
         if (!PodeUsar()) return;
 
-        // Atualiza o tempo de recarga
         proximoUsoPermitido = Time.time + tempoRecarga;
 
-        // Ativa o Intermediário (Hitbox)
         if (objetoIntermediario != null)
         {
             objetoIntermediario.SetActive(true);
 
-            // Exemplo: Desativa a hitbox automaticamente após 0.3 segundos (golpe rápido)
             CancelInvoke(nameof(DesativarHitbox));
             Invoke(nameof(DesativarHitbox), 0.3f);
         }
@@ -63,12 +57,12 @@ public class Skill1Mãe : MonoBehaviour, IasUI
 
     public void CancelarHabilidade()
     {
-        // Chamado pelo Gerenciador de Equipamentos se o jogador cancelar/trocar de ação
         DesativarHitbox();
     }
 
     private void DesativarHitbox()
     {
+        CancelInvoke(nameof(DesativarHitbox));
         if (objetoIntermediario != null)
         {
             objetoIntermediario.SetActive(false);

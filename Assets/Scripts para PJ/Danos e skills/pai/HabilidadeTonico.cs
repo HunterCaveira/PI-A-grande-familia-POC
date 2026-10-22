@@ -1,9 +1,12 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Pun; // Importa a API do Photon
 
-public class HabilidadeTonico : MonoBehaviourPun, IasUI
+public class HabilidadeTonico : MonoBehaviour, IasUI
 {
+    // ==========================================
+    // 1. CONFIGURAÇÃO DE SLOT E UI
+    // ==========================================
+
     [Header("Configuração do Slot e UI")]
     [SerializeField] private int slotIndex = 3;
     public int SlotIndex => slotIndex;
@@ -61,8 +64,11 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
 
     private void Awake()
     {
-        if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
-        if (sistemaDeVida == null) sistemaDeVida = GetComponent<Sistemadevida>();
+        if (gerenciadorDeEquipamentos == null)
+            gerenciadorDeEquipamentos = GetComponentInParent<GerenciadorDeEquipamentos>();
+
+        if (sistemaDeVida == null)
+            sistemaDeVida = GetComponentInParent<Sistemadevida>();
     }
 
     private void OnDisable()
@@ -87,8 +93,6 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
 
     public void AtivarHabilidade()
     {
-        if (!photonView.IsMine) return;
-
         if (!EstaPronta())
         {
             if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0);
@@ -102,7 +106,7 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
     {
         if (emUsoOuAnimacao)
         {
-            photonView.RPC("SincronizarVisualTonicoRPC", RpcTarget.All, false);
+            SincronizarVisualTonico(false);
             return;
         }
 
@@ -114,11 +118,7 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
         StopAllCoroutines();
         RemoverBuffs();
         emUsoOuAnimacao = false;
-
-        if (photonView != null && photonView.IsMine)
-        {
-            photonView.RPC("SincronizarVisualTonicoRPC", RpcTarget.All, false);
-        }
+        SincronizarVisualTonico(false);
     }
 
 
@@ -130,24 +130,18 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
     {
         emUsoOuAnimacao = true;
 
-        // MULTIPLAYER: Liga o tônico para todos na rede
-        photonView.RPC("SincronizarVisualTonicoRPC", RpcTarget.All, true);
+        SincronizarVisualTonico(true);
 
-        // FASE 1: TEMPO DE CONSUMO (ANIMAÇÃO DE BEBER)
         yield return new WaitForSeconds(tempoAnimacaoConsumo);
 
-        // FASE 2: APLICAÇÃO DOS BUFFS (FICHA TEMPORÁRIA LOCAL)
         AplicarBuffs();
 
-        // MULTIPLAYER: Desliga o tônico na mão para todos na rede
-        photonView.RPC("SincronizarVisualTonicoRPC", RpcTarget.All, false);
+        SincronizarVisualTonico(false);
 
         if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0);
 
-        // FASE 3: DURAÇÃO DO EFEITO
         yield return new WaitForSeconds(duracaoDoEfeito);
 
-        // FASE 4: REMOÇÃO DOS BUFFS
         RemoverBuffs();
 
         TempoProximouso = Time.time + tempoCooldown;
@@ -168,12 +162,13 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
             atributosBuffados = Instantiate(atributosOriginal);
             atributosBuffados.velocidadeMovimento = velocidadeComBuff;
 
-            MovimentodoPlayer movimento = GetComponent<MovimentodoPlayer>();
+            MovimentodoPlayer movimento = GetComponentInParent<MovimentodoPlayer>();
             if (movimento != null)
             {
                 movimento.AtualizarFichaAtributos(atributosBuffados);
             }
 
+            if (sistemaDeVida == null) sistemaDeVida = GetComponentInParent<Sistemadevida>();
             if (sistemaDeVida != null)
             {
                 sistemaDeVida.AtualizarFichaAtributos(atributosBuffados);
@@ -184,12 +179,13 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
 
     private void RemoverBuffs()
     {
-        MovimentodoPlayer movimento = GetComponent<MovimentodoPlayer>();
+        MovimentodoPlayer movimento = GetComponentInParent<MovimentodoPlayer>();
         if (movimento != null && atributosOriginal != null)
         {
             movimento.AtualizarFichaAtributos(atributosOriginal);
         }
 
+        if (sistemaDeVida == null) sistemaDeVida = GetComponentInParent<Sistemadevida>();
         if (sistemaDeVida != null && atributosOriginal != null)
         {
             sistemaDeVida.AtualizarFichaAtributos(atributosOriginal);
@@ -203,13 +199,7 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
         }
     }
 
-
-    // ==========================================
-    // 9. EVENTOS RPC DO PHOTON
-    // ==========================================
-
-    [PunRPC]
-    public void SincronizarVisualTonicoRPC(bool visivel)
+    private void SincronizarVisualTonico(bool visivel)
     {
         if (prefabTonicoMao != null)
         {

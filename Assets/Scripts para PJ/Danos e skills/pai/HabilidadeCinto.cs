@@ -1,8 +1,6 @@
 using UnityEngine;
-using Photon.Pun; // Importa a biblioteca do Photon PUN para multiplayer.
 
-// Agora herda de MonoBehaviourPun para usar funções de rede
-public class HabilidadeCinto : MonoBehaviourPun, IasUI
+public class HabilidadeCinto : MonoBehaviour, IasUI
 {
     // ==========================================
     // 1. CONFIGURAÇÕES DA CÂMERA E ALCANCE
@@ -27,11 +25,11 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
 
     // ==========================================
-    // 3. CONFIGURAÇÃO DE SLOT E UI (OBRIGATÓRIO)
+    // 3. CONFIGURAÇÃO DE SLOT E UI
     // ==========================================
 
     [Header("Configuração de Slot e UI")]
-    [SerializeField] private int slotIndex = 1; // 1 = Q, 2 = E, 3 = F
+    [SerializeField] private int slotIndex = 1;
     public int SlotIndex => slotIndex;
 
     [SerializeField] private Sprite fotoPronta;
@@ -48,7 +46,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [Header("Controle De Referência e Visuais")]
     [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
     [SerializeField] private GameObject prefabCinto;
-    public Transform pontoFivelaPontos; // Tornado public para o alvo conseguir ler a posição
+    public Transform pontoFivelaPontos;
     [SerializeField] private Transform pontoDestinoPuxao;
 
 
@@ -64,13 +62,11 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     private EstadoCinto estadoAtual = EstadoCinto.Inativo;
 
     private Transform inimigoCapturado;
+    private CharacterController controllerInimigo;
+    private Rigidbody rbInimigo;
     private Vector3 posicaoInicialLocal;
     private Vector3 pontoFinalMundo;
 
-    // Variáveis para a "vítima" gerenciar o próprio puxão
-    private Transform fivelaQueMePuxa;
-    private CharacterController controllerLocal;
-    private Rigidbody rbLocal;
 
     // ==========================================
     // 6. CICLO DE VIDA DA UNITY
@@ -78,33 +74,22 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
     private void Awake()
     {
-        if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
-        if (cameraPrincipal == null) cameraPrincipal = Camera.main;
+        if (gerenciadorDeEquipamentos == null)
+            gerenciadorDeEquipamentos = GetComponentInParent<GerenciadorDeEquipamentos>();
+
+        if (cameraPrincipal == null)
+            cameraPrincipal = Camera.main;
 
         if (prefabCinto != null)
         {
             posicaoInicialLocal = prefabCinto.transform.localPosition;
         }
-
-        // Cache das físicas locais caso esse jogador seja puxado
-        controllerLocal = GetComponent<CharacterController>();
-        rbLocal = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        // SE EU FOR A VÍTIMA: Eu sigo a fivela do jogador que me puxou
-        if (fivelaQueMePuxa != null && photonView.IsMine)
-        {
-            transform.position = fivelaQueMePuxa.position;
-        }
-
-        // SE NÃO FOR MEU PERSONAGEM: Ignora o resto da lógica (apenas o dono controla o cinto)
-        if (!photonView.IsMine) return;
-
         if (estadoAtual == EstadoCinto.Inativo) return;
 
-        // MÁQUINA DE ESTADOS DO CINTO
         switch (estadoAtual)
         {
             case EstadoCinto.Avancando:
@@ -162,8 +147,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         {
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
-            Sistemadevida vidaAlvo = col.GetComponent<Sistemadevida>();
-            HabilidadeCinto scriptAlvo = col.GetComponent<HabilidadeCinto>();
+            Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
+            HabilidadeCinto scriptAlvo = col.GetComponentInParent<HabilidadeCinto>();
 
             int timeAlvo = -1;
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
@@ -171,14 +156,14 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
             if (timeAlvo != -1 && timeAlvo != this.idDoTime)
             {
-                inimigoCapturado = col.transform;
+                inimigoCapturado = col.transform.root;
 
-                // MULTIPLAYER: Avisa o PC do inimigo que ele foi pego, passando a minha ID (ViewID)
-                PhotonView inimigoView = col.GetComponent<PhotonView>();
-                if (inimigoView != null)
-                {
-                    inimigoView.RPC("ReceberPuxaoRPC", RpcTarget.All, photonView.ViewID, true);
-                }
+                // Desativa a física e movimentação do inimigo puxado localmente
+                controllerInimigo = inimigoCapturado.GetComponent<CharacterController>();
+                rbInimigo = inimigoCapturado.GetComponent<Rigidbody>();
+
+                if (controllerInimigo != null) controllerInimigo.enabled = false;
+                if (rbInimigo != null) rbInimigo.isKinematic = true;
 
                 estadoAtual = EstadoCinto.PuxandoInimigo;
                 return true;
@@ -194,7 +179,6 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         Vector3 destinoMao = pontoDestinoPuxao != null ? pontoDestinoPuxao.position : transform.position;
         prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeRetorno * Time.deltaTime);
 
-        // Visualmente, forçamos o inimigo a ficar na fivela na nossa tela
         if (inimigoCapturado != null)
         {
             Vector3 posicaoFivela = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
@@ -211,16 +195,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     {
         estadoAtual = EstadoCinto.Inativo;
 
-        // MULTIPLAYER: Avisa o inimigo para se soltar e reativar as físicas
-        if (inimigoCapturado != null)
-        {
-            PhotonView inimigoView = inimigoCapturado.GetComponent<PhotonView>();
-            if (inimigoView != null)
-            {
-                inimigoView.RPC("ReceberPuxaoRPC", RpcTarget.All, photonView.ViewID, false);
-            }
-            inimigoCapturado = null;
-        }
+        // Reativa as físicas do inimigo solto
+        SoltarInimigo();
 
         CancelarHabilidade();
 
@@ -230,9 +206,22 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         }
     }
 
+    private void SoltarInimigo()
+    {
+        if (inimigoCapturado != null)
+        {
+            if (controllerInimigo != null) controllerInimigo.enabled = true;
+            if (rbInimigo != null) rbInimigo.isKinematic = false;
+
+            inimigoCapturado = null;
+            controllerInimigo = null;
+            rbInimigo = null;
+        }
+    }
+
 
     // ==========================================
-    // 8. MÉTODOS DA INTERFACE IasUI / ISkills
+    // 8. MÉTODOS DA INTERFACE IasUI
     // ==========================================
 
     public bool EstaPronta()
@@ -253,8 +242,9 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
             return;
         }
 
-        // MULTIPLAYER: Sincroniza visual do cinto aparecendo
-        photonView.RPC("SincronizarCintoVisualRPC", RpcTarget.All, true);
+        SincronizarCintoVisual(true);
+
+        if (cameraPrincipal == null) cameraPrincipal = Camera.main;
 
         if (cameraPrincipal != null)
         {
@@ -279,59 +269,11 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     public void CancelarHabilidade()
     {
         estadoAtual = EstadoCinto.Inativo;
-
-        // Libera o inimigo caso a habilidade seja cancelada bruscamente
-        if (inimigoCapturado != null)
-        {
-            PhotonView inimigoView = inimigoCapturado.GetComponent<PhotonView>();
-            if (inimigoView != null) inimigoView.RPC("ReceberPuxaoRPC", RpcTarget.All, photonView.ViewID, false);
-            inimigoCapturado = null;
-        }
-
-        // MULTIPLAYER: Sincroniza visual do cinto sumindo
-        photonView.RPC("SincronizarCintoVisualRPC", RpcTarget.All, false);
+        SoltarInimigo();
+        SincronizarCintoVisual(false);
     }
 
-
-    // ==========================================
-    // 9. EVENTOS RPC DO PHOTON (REDE)
-    // ==========================================
-
-    [PunRPC]
-    public void ReceberPuxaoRPC(int puxadorViewID, bool prender)
-    {
-        if (prender)
-        {
-            // Procura o jogador que atirou o cinto para podermos seguir a fivela dele
-            PhotonView puxadorView = PhotonView.Find(puxadorViewID);
-            if (puxadorView != null)
-            {
-                HabilidadeCinto scriptPuxador = puxadorView.GetComponent<HabilidadeCinto>();
-                if (scriptPuxador != null) fivelaQueMePuxa = scriptPuxador.pontoFivelaPontos;
-            }
-
-            // Apenas o PC da vítima desativa as suas próprias físicas
-            if (photonView.IsMine)
-            {
-                if (controllerLocal != null) controllerLocal.enabled = false;
-                if (rbLocal != null) rbLocal.isKinematic = true;
-            }
-        }
-        else
-        {
-            fivelaQueMePuxa = null; // Solta a referência da fivela
-
-            // O PC da vítima reativa as próprias físicas
-            if (photonView.IsMine)
-            {
-                if (controllerLocal != null) controllerLocal.enabled = true;
-                if (rbLocal != null) rbLocal.isKinematic = false;
-            }
-        }
-    }
-
-    [PunRPC]
-    public void SincronizarCintoVisualRPC(bool ativar)
+    private void SincronizarCintoVisual(bool ativar)
     {
         if (prefabCinto != null)
         {
