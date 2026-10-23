@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Cinemachine; // Cinemachine v3
+using Photon.Pun;   
 
 public class CorrecaoCameraPersonagem : MonoBehaviour
 {
@@ -14,8 +15,12 @@ public class CorrecaoCameraPersonagem : MonoBehaviour
 
     private Transform cameraTransform;
 
+    private PhotonView view;
+
+
     void Start()
     {
+        view = GetComponent<PhotonView>();
         // Encontra a câmera principal
         if (Camera.main != null)
         {
@@ -33,6 +38,7 @@ public class CorrecaoCameraPersonagem : MonoBehaviour
         CinemachineCamera freeLookCam = FindFirstObjectByType<CinemachineCamera>();
         if (freeLookCam != null)
         {
+            if(view.IsMine)
             freeLookCam.Target.TrackingTarget = cameraTarget;
         }
     }

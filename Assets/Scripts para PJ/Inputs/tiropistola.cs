@@ -70,7 +70,7 @@ public class tiroPistola : MonoBehaviourPun // Herda de MonoBehaviourPun para us
 
     private void OnEnable()
     {
-        // 🔒 MULTIPLAYER: Apenas o dono da arma liga os comandos do teclado
+        // 🔒 Bloqueia a ativação do teclado se o boneco não for seu
         if (photonView != null && !photonView.IsMine) return;
 
         acoesPlayer.MovimentoPlayer.Atirar.Enable();
@@ -89,13 +89,16 @@ public class tiroPistola : MonoBehaviourPun // Herda de MonoBehaviourPun para us
 
     private void Update()
     {
-        // 🔒 MULTIPLAYER: Impede que o jogador controle as armas dos outros personagens
+        // 🔒 Trava absoluta: Impede que a tela de um jogador processe o Update das armas dos outros
         if (photonView != null && !photonView.IsMine) return;
 
         MyInput();
 
-        if (ammunitionDisplay != null)
+        // Atualiza a UI apenas se o tiroPorClick for maior que 0 para evitar erros matemáticos
+        if (ammunitionDisplay != null && tiroPorClick > 0)
+        {
             ammunitionDisplay.SetText(balasSobrando / tiroPorClick + " / " + tamanhoCarregador / tiroPorClick);
+        }
     }
 
     private void MyInput()

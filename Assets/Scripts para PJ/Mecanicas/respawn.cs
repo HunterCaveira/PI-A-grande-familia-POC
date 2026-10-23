@@ -14,12 +14,25 @@ public class Respawn : MonoBehaviourPunCallbacks
     [Header("Regras de Partida")]
     [SerializeField] private float tempoParaRespawn = 5f;
 
+    private const string PrefabJogador = "Pai"; // Prefab dentro de Assets/Resources
+
     private void Awake()
     {
         if (Instancia == null)
+        {
             Instancia = this;
+        }
         else
-            Destroy(gameObject);
+        {
+            // Destroy(this) remove só o componente duplicado, sem apagar o GameObject inteiro
+            Destroy(this);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instancia == this)
+            Instancia = null;
     }
 
     private void Start()
@@ -37,51 +50,50 @@ public class Respawn : MonoBehaviourPunCallbacks
         foreach (GameObject obj in todosObjetos)
         {
             if (obj.name.Contains("Ponto de Respawn2"))
-            {
                 pontosSpawnTime2.Add(obj.transform);
-            }
             else if (obj.name.Contains("Ponto de Respawn"))
-            {
                 pontosSpawnTime1.Add(obj.transform);
-            }
         }
     }
 
-    public void SolicitarRespawn(int timeID, string nomePrefabHeroi)
+    // Deve ser chamado apenas no cliente DONO do personagem que morreu.
+    // O parâmetro nomePrefabHeroi é mantido por compatibilidade; sempre usa "Pai".
+    public void SolicitarRespawn(int timeID, string nomePrefabHeroi = PrefabJogador)
     {
-        StartCoroutine(RotinaRespawn(timeID, nomePrefabHeroi));
+        StartCoroutine(RotinaRespawn(timeID));
     }
 
-    private IEnumerator RotinaRespawn(int timeID, string nomePrefabHeroi)
+    private IEnumerator RotinaRespawn(int timeID)
     {
         yield return new WaitForSeconds(tempoParaRespawn);
 
-        // MODIFICAÇÃO: Ignora o nome recebido e utiliza obrigatoriamente "Pai" da pasta Resources
-        string prefabFinal = "Pai";
-
-        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
-        if (pontoEscolhido == null)
+        // Se o jogador saiu da sala durante a espera, não recria
+        if (!PhotonNetwork.InRoom)
         {
-            pontoEscolhido = this.transform;
+            Debug.LogWarning("[RESPAWN] Cancelado: jogador não está mais na sala.");
+            yield break;
         }
 
-        GameObject novoBoneco = PhotonNetwork.Instantiate(prefabFinal, pontoEscolhido.position, pontoEscolhido.rotation);
+        Transform ponto = ObterPontoDeSpawn(timeID);
+        if (ponto == null) ponto = this.transform;
 
-        if (novoBoneco != null && novoBoneco.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
-        {
-            vida.TimeID = timeID;
-        }
+        // O TimeID viaja em InstantiationData e é lido pelo OnPhotonInstantiate
+        // do Sistemadevida em TODOS os clientes (não precisa setar depois).
+        PhotonNetwork.Instantiate(
+            PrefabJogador,
+            ponto.position,
+            ponto.rotation,
+            0,
+            new object[] { timeID }
+        );
 
-        Debug.Log($"<color=cyan>[RESPAWN] Jogador renasceu com sucesso como '{prefabFinal}' no Time {timeID}!</color>");
+        Debug.Log($"<color=cyan>[RESPAWN] Jogador renasceu como '{PrefabJogador}' no Time {timeID}!</color>");
     }
 
     private Transform ObterPontoDeSpawn(int timeID)
     {
-        List<Transform> listaPontos = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
-
-        if (listaPontos == null || listaPontos.Count == 0) return null;
-
-        int indiceAleatorio = Random.Range(0, listaPontos.Count);
-        return listaPontos[indiceAleatorio];
+        List<Transform> lista = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
+        if (lista == null || lista.Count == 0) return null;
+        return lista[Random.Range(0, lista.Count)];
     }
 }

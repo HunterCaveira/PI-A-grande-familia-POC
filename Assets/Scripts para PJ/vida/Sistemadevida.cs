@@ -1,9 +1,8 @@
-using System; // Importa suporte para eventos (Action).
-using UnityEngine; // Importa a biblioteca base da Unity.
-using Photon.Pun; // IMPORTANTE: Importa as ferramentas de rede do Photon.
+using System;
+using UnityEngine;
+using Photon.Pun;
 
-// 1. A classe agora herda de MonoBehaviourPun para usar o photonView
-public class Sistemadevida : MonoBehaviourPun, IPunObservable
+public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
     // ==========================================
     // 1. ATRIBUTOS E VARIÁVEIS
@@ -14,10 +13,12 @@ public class Sistemadevida : MonoBehaviourPun, IPunObservable
 
     [Header("PvP e Partida")]
     [SerializeField] private int timeID = 1;
-
     [SerializeField] public float vidaAtual;
 
-    // CORREÇÃO: Permitido get e set público para que o script de respawn possa alterar o time livremente
+    [Header("Debug")]
+    [SerializeField] private bool logsDeRede = true;
+
+    // Setter público mantém compatível com GerenciadorDeSpawn e Respawn (vida.TimeID = x)
     public int TimeID
     {
         get => timeID;
@@ -28,29 +29,14 @@ public class Sistemadevida : MonoBehaviourPun, IPunObservable
 
     public event Action<float, float> OnVidaMudou;
 
-
     // ==========================================
-    // 2. INICIALIZAÇÃO
+    // 2. CICLO DE VIDA
     // ==========================================
 
     private void Awake()
     {
-        // 1. Inicializa a vida máxima baseada na ficha
         if (dadosDoHeroi != null)
-        {
             vidaAtual = dadosDoHeroi.vidaMaxima;
-        }
-
-        // 2. CORREÇÃO MULTIPLAYER: Descobre o time verdadeiro do dono deste personagem
-        // Lê as propriedades customizadas do jogador que é dono deste PhotonView
-        if (photonView != null && photonView.Owner != null)
-        {
-            if (photonView.Owner.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
-            {
-                timeID = (int)timeObj; // Sobrescreve o timeID do Inspector com o time real (1 ou 2)
-                Debug.Log($"[SISTEMA DE VIDA] O jogador {photonView.Owner.NickName} nasceu no Time {timeID}");
-            }
-        }
     }
 
     private void Start()
@@ -58,9 +44,25 @@ public class Sistemadevida : MonoBehaviourPun, IPunObservable
         NotificarMudancaDeVida();
     }
 
+    // Chamado em TODOS os clientes quando o personagem chega pela rede
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        object[] dados = info.photonView.InstantiationData;
+        if (dados != null && dados.Length > 0)
+            timeID = (int)dados[0];
+
+        if (logsDeRede)
+            Debug.Log($"[SPAWN REDE] viewID={info.photonView.ViewID} dono={info.photonView.Owner?.NickName} souEu={info.photonView.IsMine} time={timeID}");
+    }
+
+    private void OnDestroy()
+    {
+        if (!logsDeRede || photonView == null) return;
+        Debug.Log($"[DESTROY] viewID={photonView.ViewID} souEu={photonView.IsMine}\n{Environment.StackTrace}");
+    }
 
     // ==========================================
-    // 3. MÉTODOS DE DANO E REDE (MULTIPLAYER)
+    // 3. FICHA DE ATRIBUTOS
     // ==========================================
 
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
@@ -69,110 +71,98 @@ public class Sistemadevida : MonoBehaviourPun, IPunObservable
         {
             dadosDoHeroi = novaFicha;
             NotificarMudancaDeVida();
+            Debug.Log($"[SISTEMA DE VIDA] Ficha de atributos atualizada! Vida máxima da ficha: {dadosDoHeroi.vidaMaxima}");
         }
     }
 
-    /// <summary>
-    /// Calcula o dano localmente e avisa TODOS OS COMPUTADORES para aplicarem a perda de vida.
-    /// </summary>
+    // ==========================================
+    // 4. DANO E MORTE (rede)
+    // ==========================================
+
+    // Chamado por quem detectou o acerto (tiro, etc.).
+    // Faz o filtro de fogo amigo e entrega o dano ao DONO do personagem atingido.
     public void ReceberDano(InformacaoDano dano)
     {
         if (vidaAtual <= 0) return;
 
-        // Lógica de Fogo Amigo
         if (dano.atacante != null && dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
         {
-            if (atacanteVida.TimeID == this.timeID && dano.atacante != this.gameObject)
-            {
-                return; // Ignora o dano (Fogo amigo)
-            }
+            if (atacanteVida.TimeID == timeID && dano.atacante != gameObject)
+                return;
         }
 
-        // Calcula o dano final descontando a armadura/mitigação
-        float danoFinal = dano.quantidade * (1f - PorcentagemReducaoDano);
-
-        // MULTIPLAYER: Em vez de descontar a vida só aqui, manda a ordem de dano para TODOS na sala!
-        photonView.RPC("AplicarDanoPelaRede", RpcTarget.All, danoFinal);
+        if (photonView.IsMine)
+            AplicarDano(dano.quantidade);
+        else
+            photonView.RPC(nameof(RPC_AplicarDano), photonView.Owner, dano.quantidade);
     }
 
-    /// <summary>
-    /// [PunRPC] é uma função que roda simultaneamente no computador de todos os jogadores da sala.
-    /// </summary>
     [PunRPC]
-    private void AplicarDanoPelaRede(float danoFinal)
+    private void RPC_AplicarDano(float quantidade)
     {
-        if (vidaAtual <= 0) return; // Evita morte dupla
-
-        // Subtrai a vida e garante que não fica menor que zero
-        vidaAtual -= danoFinal;
-        vidaAtual = Mathf.Max(vidaAtual, 0f);
-
-        NotificarMudancaDeVida(); // Atualiza a barra de vida flutuante do personagem na tela
-
-        // APENAS o computador que é "dono" deste personagem chama a lógica de morrer e respawnar,
-        // para evitar que 5 computadores tentem renascer o mesmo jogador ao mesmo tempo.
-        if (vidaAtual <= 0 && photonView.IsMine)
-        {
-            Morrer();
-        }
+        AplicarDano(quantidade);
     }
 
-    /// <summary>
-    /// Avisa todos os computadores que este jogador renasceu com a vida cheia.
-    /// </summary>
+    // Só roda no dono do personagem (autoridade da vida)
+    private void AplicarDano(float quantidade)
+    {
+        if (vidaAtual <= 0) return;
+
+        float danoFinal = quantidade * (1f - PorcentagemReducaoDano);
+        vidaAtual = Mathf.Max(vidaAtual - danoFinal, 0f);
+
+        NotificarMudancaDeVida();
+        photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
+
+        if (vidaAtual <= 0)
+            Morrer();
+    }
+
+    [PunRPC]
+    private void RPC_SincronizarVida(float novaVida)
+    {
+        vidaAtual = novaVida;
+        NotificarMudancaDeVida();
+    }
+
     public void Renascer()
     {
-        photonView.RPC("RenascerPelaRede", RpcTarget.All);
-    }
+        if (dadosDoHeroi == null) return;
 
-    [PunRPC]
-    private void RenascerPelaRede()
-    {
-        if (dadosDoHeroi != null)
-        {
-            vidaAtual = dadosDoHeroi.vidaMaxima;
-            PorcentagemReducaoDano = 0f;
-            NotificarMudancaDeVida();
-        }
+        vidaAtual = dadosDoHeroi.vidaMaxima;
+        PorcentagemReducaoDano = 0f;
+        NotificarMudancaDeVida();
+
+        if (photonView.IsMine)
+            photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
     }
 
     private void NotificarMudancaDeVida()
     {
         if (dadosDoHeroi != null)
-        {
             OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
-        }
     }
 
     private void Morrer()
     {
-        Debug.Log($"{gameObject.name} foi eliminado!");
+        if (!photonView.IsMine) return;
 
-        GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
+        Debug.Log($"[MORTE] {gameObject.name} viewID={photonView.ViewID} time={timeID}");
 
-        if (gerenciador != null)
+        if (Respawn.Instancia != null)
         {
-            gerenciador.ProcessarMorte(this.gameObject);
-        }
-    }
-
-    // ==========================================
-    // 4. SINCRONIZAÇÃO CONTÍNUA (GARANTIA)
-    // ==========================================
-
-    /// <summary>
-    /// Garante que se alguém entrar atrasado na sala, veja a vida atualizada deste jogador.
-    /// </summary>
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(vidaAtual); // O Dono envia a sua vida
+            // Fluxo multiplayer: recria o personagem com PhotonNetwork.Instantiate
+            Respawn.Instancia.SolicitarRespawn(timeID, "Pai");
+            PhotonNetwork.Destroy(gameObject);
         }
         else
         {
-            vidaAtual = (float)stream.ReceiveNext(); // Os outros leem a vida
-            NotificarMudancaDeVida(); // Atualizam as barrinhas
+            // Fluxo antigo (fallback)
+            GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
+            if (gerenciador != null)
+                gerenciador.ProcessarMorte(gameObject);
+            else
+                Debug.LogWarning("Nenhum Respawn nem GerenciadorRespawn encontrado na cena!");
         }
     }
 }

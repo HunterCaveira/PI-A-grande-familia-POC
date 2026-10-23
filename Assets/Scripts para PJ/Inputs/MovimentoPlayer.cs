@@ -6,6 +6,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
 {
     private CharacterController characterController;
     private AcoesPlayer acoesPlay;
+    private bool inputAtivo = false; // true só no dono do personagem
 
     [Header("Configurações de Movimento")]
     [SerializeField] private float velocidade;
@@ -19,26 +20,29 @@ public class MovimentodoPlayer : MonoBehaviourPun
 
     public AtributosPersonagem AtributosAtuais => atributos;
 
+    private bool SouDono => photonView == null || photonView.IsMine;
+
     private void Awake()
     {
+        characterController = GetComponent<CharacterController>();
         acoesPlay = new AcoesPlayer();
     }
 
-    void Start()
+    private void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        // No Start o Photon já definiu ViewID e dono, então IsMine é confiável.
+        if (!SouDono) return;
 
-        if (photonView != null && !photonView.IsMine) return;
-
-        acoesPlay.MovimentoPlayer.Pular.started += ctx => SolicitarPulo();
+        acoesPlay.MovimentoPlayer.Pular.started += OnPular;
+        acoesPlay.MovimentoPlayer.Enable();
+        inputAtivo = true;
     }
 
     private void OnEnable()
     {
-        if (photonView == null || photonView.IsMine)
-        {
+        // Só reativa o input se já foi confirmado que sou o dono
+        if (inputAtivo)
             acoesPlay?.MovimentoPlayer.Enable();
-        }
     }
 
     private void OnDisable()
@@ -46,9 +50,24 @@ public class MovimentodoPlayer : MonoBehaviourPun
         acoesPlay?.MovimentoPlayer.Disable();
     }
 
-    void Update()
+    private void OnDestroy()
     {
-        if (photonView != null && !photonView.IsMine) return;
+        if (acoesPlay == null) return;
+
+        if (inputAtivo)
+            acoesPlay.MovimentoPlayer.Pular.started -= OnPular;
+
+        acoesPlay.Dispose();
+    }
+
+    private void OnPular(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
+    {
+        SolicitarPulo();
+    }
+
+    private void Update()
+    {
+        if (!SouDono || !inputAtivo) return;
 
         AplicarGravidade();
         Correr();
@@ -64,21 +83,17 @@ public class MovimentodoPlayer : MonoBehaviourPun
         }
     }
 
-    void AplicarGravidade()
+    private void AplicarGravidade()
     {
         if (characterController.isGrounded && velocidadeVertical < 0)
-        {
             velocidadeVertical = -2f;
-        }
         else
-        {
             velocidadeVertical += gravidade * Time.deltaTime;
-        }
     }
 
-    void SolicitarPulo()
+    private void SolicitarPulo()
     {
-        if (photonView != null && !photonView.IsMine) return;
+        if (!SouDono) return;
 
         if (characterController.isGrounded)
         {
@@ -87,28 +102,18 @@ public class MovimentodoPlayer : MonoBehaviourPun
         }
     }
 
-    void Correr()
+    private void Correr()
     {
         float velocidadeBase = 5f;
 
         if (atributos != null)
-        {
             velocidadeBase = atributos.velocidadeMovimento + (atributos.velocidadeMovimento * (atributos.porcentagemSpeed / 100f));
-        }
 
         bool botaoCorrerPressionado = acoesPlay.MovimentoPlayer.Correr.IsPressed();
-
-        if (botaoCorrerPressionado)
-        {
-            velocidadeAtual = velocidadeBase * 2f;
-        }
-        else
-        {
-            velocidadeAtual = velocidadeBase;
-        }
+        velocidadeAtual = botaoCorrerPressionado ? velocidadeBase * 2f : velocidadeBase;
     }
 
-    void Andar()
+    private void Andar()
     {
         Vector2 leituraInput = acoesPlay.MovimentoPlayer.Andar.ReadValue<Vector2>();
 
@@ -119,7 +124,20 @@ public class MovimentodoPlayer : MonoBehaviourPun
         characterController.Move(movimentoFinal * Time.deltaTime);
     }
 
+    // ==========================================
+    // LENTIDÃO (efeito precisa rodar no DONO do personagem)
+    // ==========================================
+
     public void AplicarLentidao(float porcentagemReducao, float duracao)
+    {
+        if (SouDono)
+            StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
+        else
+            photonView.RPC(nameof(RPC_AplicarLentidao), photonView.Owner, porcentagemReducao, duracao);
+    }
+
+    [PunRPC]
+    private void RPC_AplicarLentidao(float porcentagemReducao, float duracao)
     {
         StartCoroutine(RotinaAplicarLentidao(porcentagemReducao, duracao));
     }
@@ -139,9 +157,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
 
         atributos = fichaOriginal;
         if (fichaDebuffada != null)
-        {
             Destroy(fichaDebuffada);
-        }
 
         Debug.Log("[MOVIMENTO PLAYER] Efeito de lentidão acabou. Velocidade restaurada.");
     }

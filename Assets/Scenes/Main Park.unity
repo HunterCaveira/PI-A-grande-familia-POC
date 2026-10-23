@@ -1296,6 +1296,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4365384142314376460, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
   m_PrefabInstance: {fileID: 1013040126}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1013040129 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6470122333196230697, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+  m_PrefabInstance: {fileID: 1013040126}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1013040130 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5504852132491897413, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+  m_PrefabInstance: {fileID: 1013040126}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1032933491
 Mesh:
   m_ObjectHideFlags: 0
@@ -2457,7 +2467,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6220591073685751629, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 40.778755
+      value: 37.7
       objectReference: {fileID: 0}
     - target: {fileID: 6220591073685751629, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2535,6 +2545,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2546835917218624315}
+    - targetCorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2546835917218624316}
   m_SourcePrefab: {fileID: 100100000, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
 --- !u!1 &2546835917218624308 stripped
 GameObject:
@@ -2625,6 +2638,23 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
+--- !u!114 &2546835917218624316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2546835917218624308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f4832feae4d7304e88eea6d0ac9fe7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Respawn
+  pontosSpawnTime1:
+  - {fileID: 1013040130}
+  pontosSpawnTime2:
+  - {fileID: 1013040129}
+  tempoParaRespawn: 5
 --- !u!1001 &2747227476813841911
 PrefabInstance:
   m_ObjectHideFlags: 0

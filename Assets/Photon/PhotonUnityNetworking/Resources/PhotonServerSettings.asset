@@ -47,6 +47,9 @@ MonoBehaviour:
   - RPC_AlternarFrasco
   - RPC_SincronizarMaos
   - RPC_AtirarSincronizado
+  - RPC_AplicarDano
+  - RPC_SincronizarVida
+  - RPC_AplicarLentidao
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
