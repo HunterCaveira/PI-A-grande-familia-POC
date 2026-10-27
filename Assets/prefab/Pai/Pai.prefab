@@ -412,6 +412,7 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
   timeID: 1
   vidaAtual: 500
+  logsDeRede: 1
 --- !u!114 &1383563808686832634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -608,7 +609,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 1
   ObservedComponents:
-  - {fileID: 830441756110303205}
   - {fileID: 851539600583030991}
   sceneViewId: 0
   InstantiationId: 0
@@ -1212,6 +1212,7 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
   timeID: 1
   vidaAtual: 500
+  logsDeRede: 1
 --- !u!114 &2125328242363607523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1408,7 +1409,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 1
   ObservedComponents:
-  - {fileID: 8305240971407860968}
   - {fileID: 1849147595969471756}
   sceneViewId: 0
   InstantiationId: 0
@@ -3300,6 +3300,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4ea0bd7b94598674f8408c1adc90ad0f, type: 3}
       propertyPath: m_Name
       value: Pai
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4ea0bd7b94598674f8408c1adc90ad0f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 4ea0bd7b94598674f8408c1adc90ad0f, type: 3}
       propertyPath: m_ApplyRootMotion
