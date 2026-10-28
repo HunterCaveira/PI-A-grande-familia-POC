@@ -16,15 +16,13 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
     [SerializeField] private float forcaPulo = 2f; // For�a base de impulso para o pulo do her�i.
     [SerializeField] private float velocidadeVertical; // Guarda a velocidade acumulada de queda/pulo no eixo Y.
     private float velocidadeAtual; // Guarda o valor final de velocidade calculada no frame atual (andando ou correndo).
-
+    private Animator animator; // Refer�ncia para o componente Animator do personagem, usado para controlar anima��es.
     [Header("Ficha de Atributos")]
     [SerializeField] private AtributosPersonagem atributos; // Refer�ncia para o ScriptableObject da ficha de atributos do her�i.
 
     // PROPRIEDADE P�BLICA EXPOSTA (Permite que o ProjetilLentidao acesse a ficha atual)
     public AtributosPersonagem AtributosAtuais => atributos;
 
-    [Header("Animação")]
-    [SerializeField] private Animator playerAnimation;
 
     // ==========================================
     // 2. CICLO DE VIDA DA UNITY
@@ -38,7 +36,7 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
     void Start() // M�todo chamado no primeiro frame de execu��o do jogo.
     {
         characterController = GetComponent<CharacterController>(); // Busca e atribui o componente CharacterController do GameObject.
-
+        animator = GetComponent<Animator>(); // Busca e atribui o componente Animator do GameObject.
         // Registra o evento de acionamento do bot�o de pulo para disparar a fun��o SolicitarPulo
         acoesPlay.MovimentoPlayer.Pular.started += ctx => SolicitarPulo();
     }
@@ -160,7 +158,12 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
         // Atualiza a animação.
         if (acoesPlay.MovimentoPlayer.Andar.triggered)
         {
-            playerAnimation.SetBool("isWalking", andando);
+            animator.SetBool("isWalking", andando);
+            
+        }
+        else
+        {
+            animator.SetBool("isWalking", andando);
         }
     }
 
