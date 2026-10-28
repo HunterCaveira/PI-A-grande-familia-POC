@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3913838312804590522
 Transform:
   m_ObjectHideFlags: 0
@@ -90,7 +90,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6565916445348019624
 Transform:
   m_ObjectHideFlags: 0
@@ -125,7 +125,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &343642781802892552
 Transform:
   m_ObjectHideFlags: 0
@@ -260,15 +260,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -200.14348
+      value: -260.27255
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -111.8
+      value: 15.63
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 589.65247
+      value: 563.3134
       objectReference: {fileID: 0}
     - target: {fileID: 5689908482841728664, guid: 73b8b56f0f084474984adf3edb41ff6b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -366,6 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeEquipamentos
   pontoMaos: {fileID: 3974819310955665945}
   tempoAnimacaoTroca: 0.5
+  tempoInatividadeVoltarArma: 5
 --- !u!114 &4356903093000266095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -444,8 +445,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillMae3
   slotIndex: 1
-  fotoPronta: {fileID: 21300000, guid: 25835765e3b5233499e837aa426e5060, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+  fotoPronta: {fileID: 21300000, guid: c224b572731bbe340ba8c9bc3a3fc814, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 98c526ffe13fef141b2bd5413a9ebd31, type: 3}
   alcanceDoTiro: 100
   mascaraDeTiro:
     serializedVersion: 2

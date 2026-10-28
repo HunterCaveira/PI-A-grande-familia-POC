@@ -158,9 +158,9 @@ public class MovimentodoPlayer : MonoBehaviour // Declara a classe p�blica Mov
         bool andando = leituraInput.sqrMagnitude > 0.01f;
 
         // Atualiza a animação.
-        if (playerAnimation != null)
+        if (acoesPlay.MovimentoPlayer.Andar.triggered)
         {
-            playerAnimation.SetInteger("Andando", andando ? 1 : 0);
+            playerAnimation.SetBool("isWalking", andando);
         }
     }
 
