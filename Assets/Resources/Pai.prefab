@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7594863263936207513}
   - component: {fileID: 9013693261440874950}
   - component: {fileID: 1819761146540021436}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,9 +26,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 785988413014970344}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.115, y: 3.352, z: 10.564}
-  m_LocalScale: {x: 0.11314236, y: 0.08301072, z: 0.13553946}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7566779434684666353}
@@ -290,7 +290,7 @@ CapsuleCollider:
   m_Radius: 0.62
   m_Height: 2.8614414
   m_Direction: 1
-  m_Center: {x: -0.61, y: 3.03, z: 0}
+  m_Center: {x: -0.52, y: 2.93, z: 0.21}
 --- !u!143 &8944851139297610719
 CharacterController:
   m_ObjectHideFlags: 0
@@ -309,13 +309,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 3.31
-  m_Radius: 0.62
+  m_Height: 2.75
+  m_Radius: 0.58
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: -0.61, y: 3.03, z: 0.15}
+  m_Center: {x: -0.52, y: 2.93, z: 0.32}
 --- !u!114 &5462147207407341697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,7 +554,7 @@ MonoBehaviour:
   observableSearch: 1
   ObservedComponents:
   - {fileID: 1849147595969471756}
-  sceneViewId: 2
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &1849147595969471756
@@ -784,7 +784,7 @@ Transform:
   m_GameObject: {fileID: 5503696140454005005}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.128, y: 0.528, z: -10.681}
+  m_LocalPosition: {x: -0.19, y: 3.943, z: 0.144}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1641,7 +1641,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2698394403376183562, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: sceneViewId
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8264904805395110718, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: m_LocalPosition.x
