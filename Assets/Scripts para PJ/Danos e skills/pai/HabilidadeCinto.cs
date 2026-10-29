@@ -1,390 +1,262 @@
-﻿// Importa as funções básicas da Unity
+﻿// Importa bibliotecas essenciais da Unity e do Photon
 using UnityEngine;
-// Importa a biblioteca do Photon para permitir comunicação multiplayer pela internet
 using Photon.Pun;
 
-// A classe herda de MonoBehaviourPun (para ter photonView) e implementa a interface de UI
+// A classe herda do Photon e implementa a interface da UI para os tempos de recarga
 public class HabilidadeCinto : MonoBehaviourPun, IasUI
 {
     [Header("Configurações da Câmera e Alcance")]
-    // Removido o [SerializeField]. A câmera agora é achada automaticamente pelo script.
+    // Removido o [SerializeField], agora procura a câmera sozinho!
     private Camera cameraPrincipal;
-    // Distância máxima que o cinto consegue esticar para pegar um inimigo
+    // Distância máxima que o cinto estica no ar
     [SerializeField] private float distanciaMaxima = 15f;
 
     [Header("Controle de Tempo e Velocidades")]
-    // Tempo de espera para usar o cinto novamente (Cooldown)
+    // Tempo que o jogador tem de esperar para usar o cinto outra vez
     [SerializeField] private float tempoCooldown = 3.0f;
-    // Guarda o momento exato em que o cinto poderá ser usado de novo
+    // Variável interna que guarda o exato segundo em que o cinto estará pronto
     private float tempoProximoUso = 0f;
-    // Propriedade para a Interface (UI) ler o tempo do cooldown
     public float TempoProximouso => tempoProximoUso;
 
-    // Velocidade em que o cinto voa na direção do inimigo
+    // Velocidade de voo do cinto ao ir para a frente
     [SerializeField] private float velocidadeAvanco = 30f;
-    // Velocidade em que o cinto puxa o inimigo de volta para si
+    // Velocidade ao puxar o inimigo de volta (deixei mais lento para dar chance de reação)
     [SerializeField] private float velocidadeRetorno = 20f;
 
     [Header("Configuração de Slot e UI")]
-    // Posição desta habilidade na barra de ícones da tela
+    // Indica que o cinto é a habilidade secundária (Slot 1 ou 2)
     [SerializeField] private int slotIndex = 1;
-    // Permite que outros scripts saibam qual é o slot
     public int SlotIndex => slotIndex;
 
-    // Foto iluminada quando o cinto está pronto
+    // Imagens que aparecem na tela do jogador (UI)
     [SerializeField] private Sprite fotoPronta;
     public Sprite FotoPronta => fotoPronta;
-
-    // Foto escura para quando o cinto está recarregando
     [SerializeField] private Sprite fotoRecarregando;
     public Sprite FotoRecarregando => fotoRecarregando;
 
     [Header("Controle De Referência e Visuais")]
-    // Script que troca os itens na mão do jogador
+    // Referência ao script que troca as armas/itens
     [SerializeField] private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
-    // O objeto 3D do cinto que será ativado e esticado
+    // O modelo 3D do cinto que voa da mão
     [SerializeField] private GameObject prefabCinto;
-    // A ponta do cinto (fivela) que detecta colisões
+    // O ponto exato (fivela) que deteta o embate no inimigo
     [SerializeField] private Transform pontoFivelaPontos;
-    // O ponto final para onde o inimigo será puxado (geralmente perto de você)
+    // Onde a vítima vai parar quando o cinto terminar de recolher
     [SerializeField] private Transform pontoDestinoPuxao;
 
     [Header("Filtragem de Time")]
-    // Define o número do time deste jogador para não puxar aliados
+    // Para não puxar aliados, configuramos o ID do nosso time
     [SerializeField] private int idDoTime = 1;
     public int IdDoTime => idDoTime;
 
-    // Máquina de estados simples para saber o que o cinto está a fazer no momento
+    // Máquina de estados simples: define o que o cinto está a fazer neste momento
     private enum EstadoCinto { Inativo, Avancando, PuxandoInimigo, RecolhendoVazio }
-    // Começa desligado
     private EstadoCinto estadoAtual = EstadoCinto.Inativo;
 
-    // Guarda quem foi capturado para arrastá-lo
+    // Variáveis que guardam o inimigo que foi laçado para aplicar a física nele
     private Transform inimigoCapturado;
-    // Guarda o CharacterController do inimigo para desativá-lo no puxão
     private CharacterController controllerInimigo;
-    // Guarda o CapsuleCollider do inimigo para evitar que bata em paredes enquanto voa
-    private CapsuleCollider colliderInimigo;
-    // Guarda o Rigidbody do inimigo (se existir)
-    private Rigidbody rbInimigo;
-    // Guarda o componente de rede do inimigo para lhe roubar a posse
     private PhotonView pvInimigo;
 
-    // Posição original do cinto na mão para quando voltar
+    // Variáveis de voo corrigidas para o Bug do Tônico
     private Vector3 posicaoInicialLocal;
-    // O ponto no mapa para onde a mira estava a apontar
-    private Vector3 pontoFinalMundo;
+    private float distanciaAtualVoo = 0f;
 
-    // Awake roda uma vez quando o objeto nasce na cena
+    // Awake chamado ao nascer
     private void Awake()
     {
-        // Se o gerenciador estiver vazio, procura-o no próprio corpo
+        // Pega as referências do gerenciador e da câmera AUTOMATICAMENTE
         if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+        cameraPrincipal = Camera.main;
 
-        // MUDANÇA: Procura automaticamente a câmera principal da cena (A que tem a Tag "MainCamera")
-        if (cameraPrincipal == null) cameraPrincipal = Camera.main;
-
-        // Se o modelo do cinto existir, guarda onde ele fica encostado na mão do jogador
+        // Guarda a posição original do cinto encolhido na mão
         if (prefabCinto != null)
         {
             posicaoInicialLocal = prefabCinto.transform.localPosition;
         }
     }
 
-    // Update roda a todos os frames
+    // Update chamado todos os frames
     private void Update()
     {
-        // Trava multiplayer: Se este boneco não for seu, ignora os cálculos (evita bug de atirar junto)
+        // Bloqueio de Rede: se não for o meu boneco, não calculo as físicas do cinto
         if (photonView != null && !photonView.IsMine) return;
 
-        // Se o cinto não foi jogado, não faz nada
+        // Se a habilidade estiver guardada, ignora o Update inteiro para poupar CPU
         if (estadoAtual == EstadoCinto.Inativo) return;
 
-        // Dependendo do que o cinto está a fazer, executa uma função diferente
+        // Máquina de Estados decide qual animação/física rodar
         switch (estadoAtual)
         {
-            case EstadoCinto.Avancando: // Cinto a voar para a frente
+            case EstadoCinto.Avancando:
                 ProcessarAvanco();
                 break;
-            case EstadoCinto.PuxandoInimigo: // Pegou alguém, está a trazer de volta
+            case EstadoCinto.PuxandoInimigo:
                 ProcessarPuxao();
                 break;
-            case EstadoCinto.RecolhendoVazio: // Errou o alvo, voltando para a mão
+            case EstadoCinto.RecolhendoVazio:
                 ProcessarRecolhimento();
                 break;
         }
     }
 
-    // Move o cinto para a frente em direção à mira
+    // MUDANÇA PARA O BUG DO TÓNICO: O cinto avança de forma relativa à mira e à mão, não num ponto fixo do ar
     private void ProcessarAvanco()
     {
-        if (prefabCinto == null) return;
+        if (prefabCinto == null || cameraPrincipal == null) return;
 
-        // Move o objeto 3D do cinto do ponto atual para o ponto da mira usando velocidade
-        prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, pontoFinalMundo, velocidadeAvanco * Time.deltaTime);
+        // Aumenta a distância de voo baseada na velocidade e tempo
+        distanciaAtualVoo += velocidadeAvanco * Time.deltaTime;
 
-        // A cada passo, verifica se bateu em alguém. Se bateu, sai da função.
+        // Move o cinto para a frente usando a direção para onde a câmera aponta
+        // Isso resolve o bug do tónico, porque se o boneco correr, a mira (câmera) acompanha.
+        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
+
+        // Enquanto voa, checa a cada milímetro se bateu num inimigo (CharacterController/Capsule)
         if (ChecarEPrenderInimigo()) return;
 
-        // Se o cinto chegou ao limite da mira e não pegou ninguém
-        if (Vector3.Distance(prefabCinto.transform.position, pontoFinalMundo) <= 0.2f)
+        // Se o cinto voou até ao limite máximo e não achou ninguém
+        if (distanciaAtualVoo >= distanciaMaxima)
         {
-            // Muda o estado para voltar para o dono vazio
-            estadoAtual = EstadoCinto.RecolhendoVazio;
+            estadoAtual = EstadoCinto.RecolhendoVazio; // Muda o estado para puxar de volta
         }
     }
 
-    // Move o cinto de volta se tiver errado o tiro
+    // Puxa o cinto de volta caso não tenha acertado em ninguém
     private void ProcessarRecolhimento()
     {
         if (prefabCinto == null) return;
 
-        // Define que o destino de volta é o ponto de puxão (mão) ou o próprio corpo
-        Vector3 destinoMao = pontoDestinoPuxao != null ? pontoDestinoPuxao.position : transform.position;
+        // Encolhe a distância de voo até chegar a zero (volta para a mão)
+        distanciaAtualVoo -= velocidadeAvanco * Time.deltaTime;
+        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
 
-        // Move o cinto de volta para a mão
-        prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeAvanco * Time.deltaTime);
-
-        // Mesmo a voltar, se raspar num inimigo, prende-o (opcional, pode ser removido se quiser)
+        // Se durante a volta ele acidentalmente acertar em alguém que se meteu no caminho, prende a pessoa
         if (ChecarEPrenderInimigo()) return;
 
-        // Se já voltou totalmente para a mão
-        if (Vector3.Distance(prefabCinto.transform.position, destinoMao) <= 0.2f)
+        // Quando o cinto voltar totalmente à mão (distância zero ou menor)
+        if (distanciaAtualVoo <= 0f)
         {
-            // Limpa tudo e desativa a habilidade
-            FinalizarHabilidade();
+            FinalizarHabilidade(); // Guarda o cinto
         }
     }
 
-    // A lógica principal que detecta e "laça" o inimigo
+    // Corrigido para Capsule Collider e Character Controller (Raiz do Prefab do Inimigo)
     private bool ChecarEPrenderInimigo()
     {
-        // Define de onde sai o radar de colisão (Fivela ou do meio do cinto)
+        // Ponto de checagem do choque é a ponta da fivela
         Vector3 posicaoCheck = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
-        // Cria uma esfera invisível de 0.6 metros para ver quem está dentro
+        // Cria uma esfera invisível na fivela para detetar colisões
         Collider[] hits = Physics.OverlapSphere(posicaoCheck, 0.6f);
 
-        // Vasculha todos os objetos que tocaram na esfera
+        // Varre tudo o que a esfera tocou
         foreach (var col in hits)
         {
-            // Ignora a si mesmo e aos próprios equipamentos
+            // Ignora o meu próprio corpo ou partes do meu modelo
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
-            // Tenta achar o sistema de vida ou o cinto do alvo para ver se é um jogador
+            // Busca o sistema de vida para ver em que equipa a pessoa tocada está
             Sistemadevida vidaAlvo = col.GetComponent<Sistemadevida>();
-            HabilidadeCinto scriptAlvo = col.GetComponent<HabilidadeCinto>();
-
-            // Inicializa a variável do time como -1 (desconhecido)
             int timeAlvo = -1;
-            // Se tiver vida, pega o ID do time dele
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
-            // Senão, tenta pegar pelo script do cinto dele
-            else if (scriptAlvo != null) timeAlvo = scriptAlvo.IdDoTime;
 
-            // Se achou um time e NÃO for do seu time (é inimigo!)
+            // Se achou alguém, e não é do meu time (aliado), a caça começou!
             if (timeAlvo != -1 && timeAlvo != this.idDoTime)
             {
-                // Guarda o inimigo para arrastá-lo
-                inimigoCapturado = col.transform;
+                inimigoCapturado = col.transform; // Guarda a raiz do inimigo capturado
                 pvInimigo = col.GetComponent<PhotonView>();
 
                 if (pvInimigo != null)
                 {
-                    // Rouba a permissão da rede para poder mexer no corpo dele
+                    // ROUBA a posse de rede do inimigo e manda o aviso visual para a tela dele
                     pvInimigo.RequestOwnership();
-                    // MUDANÇA: Chama um RPC pela rede para travar o teclado da vítima na tela DELA
                     pvInimigo.RPC("RPC_EstadoPuxao", RpcTarget.All, true);
                 }
 
-                // MUDANÇA: Desliga o Character Controller do inimigo para a Unity não bloquear o puxão
+                // Acha o CharacterController do inimigo na raiz (Pai) e desliga para podermos arrastar o corpo dele sem o sistema trancar
                 controllerInimigo = col.GetComponent<CharacterController>();
                 if (controllerInimigo != null) controllerInimigo.enabled = false;
 
-                // MUDANÇA: Desliga o Capsule Collider para ele não agarrar em escadas ou paredes enquanto voa
-                colliderInimigo = col.GetComponent<CapsuleCollider>();
-                if (colliderInimigo != null) colliderInimigo.enabled = false;
-
-                // Transforma o rigidbody em cinemático para não ter gravidade a atrapalhar
-                rbInimigo = col.GetComponent<Rigidbody>();
-                if (rbInimigo != null) rbInimigo.isKinematic = true;
-
-                // Muda o estado para começar a puxá-lo na próxima frame
+                // Muda o estado para começar o recolhimento com carga
                 estadoAtual = EstadoCinto.PuxandoInimigo;
-                return true;
+                return true; // Para o Loop, só pega 1 pessoa!
             }
         }
-        // Se ninguém foi pego, retorna falso
         return false;
     }
 
-    // Traz o cinto (e o inimigo colado nele) de volta para o jogador
+    // Puxa o cinto E arrasta o Character Controller do inimigo pelo chão
     private void ProcessarPuxao()
     {
         if (prefabCinto == null) return;
 
-        // Calcula a rota de volta para a mão
-        Vector3 destinoMao = pontoDestinoPuxao != null ? pontoDestinoPuxao.position : transform.position;
+        // Recolhe o cabo do cinto da mesma forma que o recolhimento vazio, mas mais devagar
+        distanciaAtualVoo -= velocidadeRetorno * Time.deltaTime;
+        // Evita que a distância fique negativa
+        distanciaAtualVoo = Mathf.Max(0, distanciaAtualVoo);
+        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
 
-        // Move o cinto de volta, agora usando a velocidade específica de retorno
-        prefabCinto.transform.position = Vector3.MoveTowards(prefabCinto.transform.position, destinoMao, velocidadeRetorno * Time.deltaTime);
-
-        // Se tem um inimigo preso
+        // Teleporta (arrasta) o corpo do inimigo para ficar colado à fivela a voltar
         if (inimigoCapturado != null)
         {
-            // O corpo do inimigo é forçado a ficar exatamente na fivela do cinto enquanto ele volta
             Vector3 posicaoFivela = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
             inimigoCapturado.position = posicaoFivela;
         }
 
-        // Se o inimigo já chegou muito perto do jogador (0.8 metros)
-        if (Vector3.Distance(prefabCinto.transform.position, destinoMao) <= 0.8f)
+        // Quando a fivela (e o inimigo) chegarem à mão do caçador
+        if (distanciaAtualVoo <= 0.2f)
         {
-            // Finaliza o puxão e liberta o inimigo
             FinalizarHabilidade();
         }
     }
 
-    // Método que arruma a casa depois que o tiro acaba
+    // Guarda a habilidade e solta o refém
     private void FinalizarHabilidade()
     {
-        // Coloca o cinto em repouso
         estadoAtual = EstadoCinto.Inativo;
+        distanciaAtualVoo = 0f;
 
-        // Se tínhamos desligado o Character Controller do inimigo, ligamos de volta para ele andar
-        if (controllerInimigo != null)
+        // Se tinha apanhado alguém, liberta!
+        if (inimigoCapturado != null)
         {
-            controllerInimigo.enabled = true;
+            // Devolve o comando do boneco e avisa a UI do refém
+            if (pvInimigo != null) pvInimigo.RPC("RPC_EstadoPuxao", RpcTarget.All, false);
+
+            // Religa o Character Controller para o inimigo voltar a andar
+            if (controllerInimigo != null) controllerInimigo.enabled = true;
+
+            inimigoCapturado = null;
             controllerInimigo = null;
+            pvInimigo = null;
         }
 
-        // Religamos o Capsule Collider do inimigo
-        if (colliderInimigo != null)
-        {
-            colliderInimigo.enabled = true;
-            colliderInimigo = null;
-        }
-
-        // Devolvemos a física de gravidade ao inimigo
-        if (rbInimigo != null)
-        {
-            rbInimigo.isKinematic = false;
-            rbInimigo = null;
-        }
-
-        // MUDANÇA: Avisamos a rede e a vítima que ela já pode voltar a andar
-        if (pvInimigo != null)
-        {
-            pvInimigo.RPC("RPC_EstadoPuxao", RpcTarget.All, false);
-        }
-
-        // Limpamos a memória do alvo capturado
-        inimigoCapturado = null;
-        pvInimigo = null;
-
-        // Garantimos que o cinto volta exatamente para a pose inicial dentro da mão
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.localPosition = posicaoInicialLocal;
-            prefabCinto.transform.localRotation = Quaternion.identity;
-        }
-
-        // Desativamos o visual
+        // Devolve o cinto para o inventário
         CancelarHabilidade();
 
-        // Puxamos a arma principal de volta (slot 0)
+        // Volta a equipar a arma primária
         if (gerenciadorDeEquipamentos != null)
         {
             gerenciadorDeEquipamentos.TrocarEquipamento(0);
         }
     }
 
-    // Checa se o cooldown já passou e se o cinto está guardado
-    public bool EstaPronta()
-    {
-        return Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
-    }
-
-    // Mesma função, usada pela interface IHabilidade
-    public bool PodeUsar()
-    {
-        return EstaPronta();
-    }
-
-    // Inicia o ataque quando o jogador aperta o botão
-    public void AtivarHabilidade()
-    {
-        // Trava para só o dono usar
-        if (photonView != null && !photonView.IsMine) return;
-
-        // Se ainda está a recarregar
-        if (!PodeUsar())
-        {
-            // Volta para a arma sem atirar
-            if (gerenciadorDeEquipamentos != null)
-            {
-                gerenciadorDeEquipamentos.TrocarEquipamento(0);
-            }
-            return;
-        }
-
-        // Liga o cinto visualmente
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.localPosition = posicaoInicialLocal;
-            prefabCinto.SetActive(true);
-        }
-
-        // Faz o raio da mira a partir da câmera
-        if (cameraPrincipal != null)
-        {
-            Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            pontoFinalMundo = ray.origin + ray.direction * distanciaMaxima;
-
-            // Se o raio bater nalguma parede, o cinto só vai até à parede (não a atravessa)
-            if (Physics.Raycast(ray, out RaycastHit hit, distanciaMaxima))
-            {
-                pontoFinalMundo = hit.point;
-            }
-        }
-
-        // Vira o cinto para olhar para o alvo
-        if (prefabCinto != null)
-        {
-            prefabCinto.transform.LookAt(pontoFinalMundo);
-        }
-
-        // Adiciona o tempo de cooldown
-        tempoProximoUso = Time.time + tempoCooldown;
-        // Coloca no modo "Avançando" para o Update começar a movê-lo
-        estadoAtual = EstadoCinto.Avancando;
-    }
-
-    // Desliga a habilidade abruptamente (ex: se o jogador morrer)
+    // Cancela abruptamente (usado ao morrer ou trocar de arma enquanto o cinto voava)
     public void CancelarHabilidade()
     {
         estadoAtual = EstadoCinto.Inativo;
+        distanciaAtualVoo = 0f;
 
+        // Força a devolução do Character Controller da vítima
         if (controllerInimigo != null)
         {
             controllerInimigo.enabled = true;
             controllerInimigo = null;
         }
 
-        if (colliderInimigo != null)
-        {
-            colliderInimigo.enabled = true;
-            colliderInimigo = null;
-        }
-
-        if (rbInimigo != null)
-        {
-            rbInimigo.isKinematic = false;
-            rbInimigo = null;
-        }
-
         inimigoCapturado = null;
         pvInimigo = null;
 
+        // Recolhe visualmente o cinto para a mão do jogador e esconde
         if (prefabCinto != null)
         {
             prefabCinto.transform.localPosition = posicaoInicialLocal;
@@ -393,26 +265,56 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         }
     }
 
-    // MUDANÇA: A Função RPC que é chamada via internet para notificar a vítima
+    // Função de verificação para UI
+    public bool EstaPronta()
+    {
+        return Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
+    }
+    public bool PodeUsar() { return EstaPronta(); }
+
+    // O Player apertou o botão
+    public void AtivarHabilidade()
+    {
+        // Trava de rede básica
+        if (photonView != null && !photonView.IsMine) return;
+
+        // Se está em cooldown, força o saque da arma e aborta
+        if (!PodeUsar())
+        {
+            if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0);
+            return;
+        }
+
+        // Prepara o cinto visualmente
+        if (prefabCinto != null)
+        {
+            prefabCinto.transform.localPosition = posicaoInicialLocal;
+            prefabCinto.SetActive(true);
+        }
+
+        // Inicia a marcação do tempo de voo e o cooldown
+        distanciaAtualVoo = 0f;
+        tempoProximoUso = Time.time + tempoCooldown;
+        estadoAtual = EstadoCinto.Avancando;
+    }
+
+    // 🌐 RPC PARA FEEDBACK DO INIMIGO (Como prometido no problema anterior!)
     [PunRPC]
     public void RPC_EstadoPuxao(bool estaSendoPuxado)
     {
-        // Trava ou destrava o movimento da vítima
-        MovimentodoPlayer mov = GetComponent<MovimentodoPlayer>();
-        if (mov != null) mov.enabled = !estaSendoPuxado;
-
-        // Se o boneco for meu (eu sou a vítima), recebe um aviso visual na tela!
+        // Se eu sou a vítima, travo/destravo a leitura do meu teclado e mostro um aviso
         if (photonView.IsMine)
         {
+            MovimentodoPlayer mov = GetComponent<MovimentodoPlayer>();
+            if (mov != null) mov.enabled = !estaSendoPuxado;
+
             if (estaSendoPuxado)
             {
-                // Mostra um aviso vermelho gigante na consola
-                Debug.Log("<color=red>⚠️ VOCÊ FOI LAÇADO PELO CINTO E ESTÁ SENDO PUXADO!</color>");
-                // Aqui você pode ativar uma UI futuramente, como um flash na tela
+                Debug.Log("<color=red>⚠️ VOCÊ FOI LAÇADO!</color>");
             }
             else
             {
-                Debug.Log("<color=green>O puxão acabou, você está livre.</color>");
+                Debug.Log("<color=green>Você foi solto.</color>");
             }
         }
     }

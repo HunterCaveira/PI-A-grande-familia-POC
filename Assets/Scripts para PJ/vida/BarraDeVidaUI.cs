@@ -1,63 +1,102 @@
+﻿// Importa as bibliotecas base da Unity
 using UnityEngine;
-using UnityEngine.UI;
-using Photon.Pun; // Necess�rio para acessar a rede
+// Importa a biblioteca System para usar Actions (Eventos)
+using System;
+// Importa a biblioteca do Photon
+using Photon.Pun;
 
-public class BarraDeVidaUI : MonoBehaviour
+public class Sistemadevida : MonoBehaviourPun
 {
-    [Header("Componentes de UI")]
-    [SerializeField] private Slider _sliderVida;
+    [Header("Configurações Base")]
+    // Referência aos atributos base do personagem
+    [SerializeField] private AtributosPersonagem fichaAtributos;
 
-    private Sistemadevida sistemaDeVida;
-    private bool jogadorConectado = false;
+    // ID do time para impedir fogo amigo (Usado também pela Habilidade Cinto)
+    public int TimeID = 1;
 
-    private void Update()
+    // 🔊 O ALTO-FALANTE: Este é o evento que o seu script BarraDeVidaUI está a escutar!
+    public event Action<float, float> OnVidaMudou;
+
+    // Variáveis internas de vida
+    private float vidaAtual;
+    private float vidaMaxima = 100f; // Valor padrão caso não tenha ficha
+
+    // Variável modificada pela Habilidade Tonico para "tancar" dano
+    public float PorcentagemReducaoDano { get; set; } = 0f;
+
+    private void Start()
     {
-        // Se o boneco for destru�do (morrer) ou ainda n�o tiver nascido, tenta buscar novamente
-        if (sistemaDeVida == null)
+        // Puxa a vida máxima da ficha de atributos (se existir)
+        if (fichaAtributos != null)
         {
-            jogadorConectado = false;
-            BuscarSistemaDeVidaLocal();
+            vidaMaxima = fichaAtributos.vidaMaxima;
+        }
+
+        // Enche a vida ao nascer
+        vidaAtual = vidaMaxima;
+
+        // 🔗 CONEXÃO COM A UI: 
+        // Se este for o MEU boneco, grito no alto-falante para a BarraDeVidaUI atualizar no primeiro frame!
+        if (photonView.IsMine)
+        {
+            OnVidaMudou?.Invoke(vidaAtual, vidaMaxima);
         }
     }
 
-    private void BuscarSistemaDeVidaLocal()
+    // Método usado pela Habilidade Tonico para atualizar a velocidade e vida dinamicamente
+    public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
     {
-        // Encontra todos os sistemas de vida ativos na cena (Unity 6)
-        Sistemadevida[] sistemasNaCena = Object.FindObjectsByType<Sistemadevida>(FindObjectsSortMode.None);
+        fichaAtributos = novaFicha;
 
-        foreach (Sistemadevida sistema in sistemasNaCena)
+        // Se o Tonico também aumentar a vida máxima, recalcula aqui
+        if (novaFicha != null && novaFicha.vidaMaxima > vidaMaxima)
         {
-            PhotonView pv = sistema.GetComponent<PhotonView>();
-
-            // Verifica se o boneco encontrado pertence a este computador
-            if (pv != null && pv.IsMine)
-            {
-                sistemaDeVida = sistema;
-                sistemaDeVida.OnVidaMudou += AtualizarBarra;
-                jogadorConectado = true;
-
-                Debug.Log("<color=green>[UI] Barra de vida conectada ao jogador local!</color>");
-                break;
-            }
+            vidaMaxima = novaFicha.vidaMaxima;
+            // Atualiza a UI se a barra esticar
+            if (photonView.IsMine) OnVidaMudou?.Invoke(vidaAtual, vidaMaxima);
         }
     }
 
-    private void OnDisable()
+    // ===============================================================
+    // 🌐 RECEPÇÃO DE DANO MULTIPLAYER: Chamado pela Bala.cs
+    // ===============================================================
+    [PunRPC]
+    public void ReceberDanoRPC(float dano, int viewIdAtirador)
     {
-        // Cancela a inscri��o quando a UI for desativada para evitar vazamento de mem�ria
-        if (sistemaDeVida != null)
+        // 1. Aplica a redução de dano (Ex: Tonico dá 30% de redução, então 1 - 0.3 = 0.7)
+        float danoFinal = dano * (1f - PorcentagemReducaoDano);
+
+        // 2. Subtrai a vida
+        vidaAtual -= danoFinal;
+
+        // 3. Trava a vida para não ficar negativa nem passar do máximo
+        vidaAtual = Mathf.Clamp(vidaAtual, 0, vidaMaxima);
+
+        // 4. Se este for o meu boneco, aviso a minha UI para esvaziar a barrinha vermelha
+        if (photonView.IsMine)
         {
-            sistemaDeVida.OnVidaMudou -= AtualizarBarra;
-            jogadorConectado = false;
+            OnVidaMudou?.Invoke(vidaAtual, vidaMaxima);
+        }
+
+        // 5. Verifica se morreu
+        if (vidaAtual <= 0)
+        {
+            Morrer(viewIdAtirador);
         }
     }
 
-    private void AtualizarBarra(float vidaAtual, float vidaMaxima)
+    private void Morrer(int viewIdAssassino)
     {
-        if (_sliderVida != null && vidaMaxima > 0)
+        // Só o dono do boneco decide como e quando ele morre para evitar bugs de rede
+        if (photonView.IsMine)
         {
-            _sliderVida.maxValue = vidaMaxima;
-            _sliderVida.value = vidaAtual;
+            Debug.Log("<color=red>Morri! Fui morto pelo jogador de ID: " + viewIdAssassino + "</color>");
+
+            // Aqui você pode chamar o seu script de Respawn (que já moveu para o GameManager!)
+            // Exemplo: FindFirstObjectByType<RespawnManager>().Reviver(photonView.ViewID);
+
+            // Opcional: Destrói o boneco atual
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 }
