@@ -51,6 +51,7 @@ MonoBehaviour:
   - RPC_SincronizarVida
   - RPC_AplicarLentidao
   - RPC_EstadoPuxao
+  - ReceberDanoRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
