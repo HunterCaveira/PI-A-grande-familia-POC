@@ -9,11 +9,17 @@ EditorBuildSettings:
     path: Assets/Scenes/HUD do jogo.unity
     guid: a3d6c804dfdf1b04fb851adf23227fde
   - enabled: 1
-    path: Assets/Scenes/Main Park.unity
-    guid: 57f2cec3a9cafbe498677c5c0cdc45c9
+    path: Assets/Scenes/Criar Server.unity
+    guid: de3ce62de6708d94ba77b9a77236a498
+  - enabled: 1
+    path: Assets/Scenes/HUD Server.unity
+    guid: 45db5169a6fbc0541afeca1030ca1027
   - enabled: 1
     path: Assets/Scenes/TelaSelecaoPersonagem.unity
     guid: 82997d0be10f4ef48b1493aac7a2f486
+  - enabled: 1
+    path: Assets/Scenes/Main Park.unity
+    guid: 57f2cec3a9cafbe498677c5c0cdc45c9
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
   m_UseUCBPForAssetBundles: 0
