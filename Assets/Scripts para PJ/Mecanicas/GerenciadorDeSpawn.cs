@@ -1,84 +1,81 @@
-using System.Collections;
+ï»¿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class GerenciadorRespawn : MonoBehaviour
+public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 {
-    [SerializeField] protected tiroPistola Tiropistola;
+    [Header("Pontos de Nascimento (AutomÃ¡ticos)")]
+    [SerializeField] private List<Transform> pontosSpawnTime1 = new List<Transform>();
+    [SerializeField] private List<Transform> pontosSpawnTime2 = new List<Transform>();
 
-    [Header("Prefabs dos Personagens (Offline / Singleplayer)")]
-    [SerializeField] private GameObject prefabPersonagem1;
-    [SerializeField] private GameObject prefabPersonagem2;
+    private const string PrefabJogador = "Pai"; // Prefab dentro de Assets/Resources
 
-    [Header("Configurações de Respawn")]
-    [SerializeField] private Transform[] pontosDeSpawn;
-    [SerializeField] private float tempoParaRenascer = 3f;
-
-    // Referência do jogador ativo instanciado na cena
-    private GameObject jogadorAtivo;
+    // Campo de instÃ¢ncia: cada vez que a cena carrega nasce um novo gerenciador com valor false.
+    private bool jaInstanciou = false;
 
     private void Start()
     {
-        if (pontosDeSpawn == null || pontosDeSpawn.Length == 0)
+        PhotonNetwork.IsMessageQueueRunning = true;
+        BuscarPontosDeSpawnAutomaticos();
+
+        if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
         {
-            Debug.LogError("[GerenciadorRespawn] Nenhum ponto de spawn atribuído no Inspector!");
-            return;
-        }
-
-        // 1. Lê a escolha do personagem salva pelo Menu via PlayerPrefs
-        int idPersonagem = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
-
-        // 2. Instancia o jogador local na cena
-        SpawnarPersonagemInicial(idPersonagem);
-
-        if (Tiropistola != null)
-        {
-            Tiropistola.gameObject.SendMessage("Reload", SendMessageOptions.DontRequireReceiver);
+            InstanciarMeuPersonagem();
         }
     }
 
-    private void SpawnarPersonagemInicial(int id)
+    public override void OnJoinedRoom()
     {
-        Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
-        GameObject prefabParaCriar = (id == 1) ? prefabPersonagem1 : prefabPersonagem2;
+        InstanciarMeuPersonagem();
+    }
 
-        if (prefabParaCriar != null)
+    private void BuscarPontosDeSpawnAutomaticos()
+    {
+        pontosSpawnTime1.Clear();
+        pontosSpawnTime2.Clear();
+
+        GameObject[] todosObjetos = UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        foreach (GameObject obj in todosObjetos)
         {
-            // Instancia o objeto localmente sem usar PhotonNetwork.Instantiate
-            jogadorAtivo = Instantiate(prefabParaCriar, spawnEscolhido.position, spawnEscolhido.rotation);
-        }
-        else
-        {
-            Debug.LogError($"[GerenciadorRespawn] O Prefab do Personagem {id} não foi atribuído no Inspector!");
+            if (obj.name.Contains("Ponto de Respawn2"))
+                pontosSpawnTime2.Add(obj.transform);
+            else if (obj.name.Contains("Ponto de Respawn"))
+                pontosSpawnTime1.Add(obj.transform);
         }
     }
 
-    public void ProcessarMorte(GameObject jogador)
+    private void InstanciarMeuPersonagem()
     {
-        StartCoroutine(RotinaRespawn(jogador));
-    }
+        // Evita criar dois personagens (Start + OnJoinedRoom)
+        if (jaInstanciou) return;
+        jaInstanciou = true;
 
-    private IEnumerator RotinaRespawn(GameObject jogador)
-    {
-        // 1. Desativa o GameObject do jogador durante o tempo de respawn
-        jogador.SetActive(false);
+        // PadrÃ£o para testes: MasterClient = Time 1, convidado = Time 2
+        int meuTime = PhotonNetwork.IsMasterClient ? 1 : 2;
 
-        // 2. Aguarda a contagem de tempo
-        yield return new WaitForSeconds(tempoParaRenascer);
-
-        // 3. Sorteia um novo ponto de spawn e reposiciona o jogador
-        if (pontosDeSpawn.Length > 0)
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
         {
-            Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
-            jogador.transform.position = spawnEscolhido.position;
-            jogador.transform.rotation = spawnEscolhido.rotation;
+            meuTime = Convert.ToInt32(timeObj);
         }
 
-        // 4. Reativa o jogador e restaura os atributos de vida
-        jogador.SetActive(true);
+        Transform pontoDeSpawn = this.transform;
+        List<Transform> lista = (meuTime == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
+        if (lista.Count > 0)
+            pontoDeSpawn = lista[UnityEngine.Random.Range(0, lista.Count)];
 
-        if (jogador.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
-        {
-            vida.Renascer();
-        }
+        // O TimeID viaja em InstantiationData e Ã© lido pelo OnPhotonInstantiate
+        // do Sistemadevida em TODOS os clientes.
+        PhotonNetwork.Instantiate(
+            PrefabJogador,
+            pontoDeSpawn.position,
+            pontoDeSpawn.rotation,
+            0,
+            new object[] { meuTime }
+        );
+
+        Debug.Log($"<color=green>[SPAWN] Personagem '{PrefabJogador}' instanciado para o Time {meuTime} em {pontoDeSpawn.name}</color>");
     }
 }

@@ -1,95 +1,68 @@
-using NUnit.Framework;
+﻿// Importa apenas as bibliotecas essenciais da Unity
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.PlayerLoop;
+
 public class BalaPool : MonoBehaviour
 {
-    [Header("Pool Settings")]
-    //Prefab dos Objetos
+    [Header("Configurações do Pool")]
+    [Tooltip("O prefab da bala. NÃO precisa ter PhotonView, pois o RPC da pistola já sincroniza o tiro.")]
     [SerializeField] private GameObject balaPrefab;
 
-    //Definindo tamanho da piscina (quantidade de objetos criados)
-    [SerializeField] private int PooledAmount;
+    [Tooltip("Quantidade de balas criadas no início para evitar travamentos (ex: tamanho do carregador)")]
+    [SerializeField] private int quantidadeInicial = 30;
 
-    //Lista de objetos criados
-    [SerializeField] private List<GameObject> PoolBalaList;
+    [Header("Lista de Balas")]
+    // Lista que guarda todas as balas criadas para reaproveitamento
+    [SerializeField] private List<GameObject> listaDeBalas;
 
-    //Metodo que inicializa a "pscina" de objetos (slime)
+    // Awake é chamado assim que o objeto nasce na cena
     private void Awake()
     {
-        InitializePool();
-
+        InicializarPool();
     }
-    private void InitializePool()
+
+    // Prepara a piscina de balas antes de o jogador dar o primeiro tiro
+    private void InicializarPool()
     {
+        listaDeBalas = new List<GameObject>();
 
-        PoolBalaList = new List<GameObject>();
-
-        for (int i = 0; i < PooledAmount; i++)
+        for (int i = 0; i < quantidadeInicial; i++)
         {
-
-            //Criando um novo item.
-            GameObject newitem = Instantiate(balaPrefab);
-
-            //Desativando o objeto
-            newitem.SetActive(false);
-
-            //Definindo o zumbi criado como filho do object pooling (game object)
-            newitem.transform.SetParent(this.gameObject.transform);
-
-            //Adicionando o item na lista
-            PoolBalaList.Add(newitem);
-
-
+            CriarNovaBala();
         }
     }
 
-    //Metodo resposavel por retorna algum objeto inativo da "psicina"
+    // Método isolado para criar uma bala (usado no início e caso a piscina esvazie)
+    private GameObject CriarNovaBala()
+    {
+        // 🌐 ARQUITETURA MULTIPLAYER: Usa Instantiate normal (local).
+        // Como o RPC do tiroPistola roda em todos os clientes, cada computador puxa uma bala local ao mesmo tempo.
+        // O "this.transform" já define o parentesco diretamente na criação, economizando processamento.
+        GameObject novaBala = Instantiate(balaPrefab, this.transform);
+
+        // Desativa a bala na cena até que ela seja disparada
+        novaBala.SetActive(false);
+
+        // Adiciona a bala pronta na lista
+        listaDeBalas.Add(novaBala);
+
+        return novaBala;
+    }
+
+    // Método chamado pelo tiroPistola para pegar uma bala pronta
     public GameObject GetitemFromPool()
     {
-        //Acessando os objetos da lista por meio do for
-        for (int i = 0; i < PoolBalaList.Count; i++)
+        // Procura a primeira bala que estiver invisível (desativada) na cena
+        for (int i = 0; i < listaDeBalas.Count; i++)
         {
-
-            //Verificando se o objeto acessado esta desativado na cena
-            if (PoolBalaList[i].activeInHierarchy == false)
-           {
-
-                //Retornando o objeto desativado da cena
-                return PoolBalaList[i];
-
+            if (listaDeBalas[i].activeInHierarchy == false)
+            {
+                return listaDeBalas[i];
             }
-
         }
 
-        //Criando e adincionando novos zumbis na lita, caso nao haja mais objetos disponiveis na "piscina"
-
-        //Criando um novo Zumbi
-        GameObject newBala = Instantiate(balaPrefab);
-
-        // Definindo o zumbi criado com filho do object pooling (game object)
-        newBala.transform.SetParent(this.gameObject.transform);
-
-        //Adicionanod o item na lista
-        PoolBalaList.Add(newBala);
-
-        //Retonando o novo item criado
-        return newBala;
-
-
-    }
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        // Se o jogador atirar muito rápido e todas as 30 balas estiverem no ar ao mesmo tempo,
+        // o sistema cria uma bala extra de emergência e devolve para o cano da arma.
+        return CriarNovaBala();
     }
 }

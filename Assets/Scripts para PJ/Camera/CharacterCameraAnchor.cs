@@ -1,26 +1,27 @@
 using UnityEngine;
 using Unity.Cinemachine;
+using Photon.Pun;
 
-public class CharacterCameraAnchor : MonoBehaviour
+public class CharacterCameraAnchor : MonoBehaviourPun
 {
     [Header("Configuração de Foco")]
     [Tooltip("Arraste aqui o GameObject filho que representa a posição do ombro/mira")]
     [SerializeField] private Transform cameraTarget;
 
-    private void Start()
+    void Start()
     {
+        if (photonView != null && !photonView.IsMine) return;
+
         if (cameraTarget == null)
         {
             Transform encontrado = transform.Find("CameraTarget");
-            cameraTarget = (encontrado != null) ? encontrado : transform;
+            cameraTarget = encontrado != null ? encontrado : transform;
         }
 
         CinemachineCamera freeLookCam = FindFirstObjectByType<CinemachineCamera>();
         if (freeLookCam != null)
         {
             freeLookCam.Target.TrackingTarget = cameraTarget;
-            freeLookCam.Follow = cameraTarget;
-            freeLookCam.LookAt = cameraTarget;
         }
     }
 

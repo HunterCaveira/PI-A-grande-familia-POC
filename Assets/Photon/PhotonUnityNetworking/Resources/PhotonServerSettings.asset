@@ -43,15 +43,15 @@ MonoBehaviour:
   - UpgradeScore
   - AplicarDanoPelaRede
   - RenascerPelaRede
-  - ReceberPuxaoRPC
-  - SincronizarCintoVisualRPC
-  - SincronizarVisualTonicoRPC
-  - SincronizarEscalaParedeRPC
+  - RPC_FinalizarPartida
+  - RPC_AlternarFrasco
+  - RPC_SincronizarMaos
+  - RPC_AtirarSincronizado
+  - RPC_AplicarDano
+  - RPC_SincronizarVida
+  - RPC_AplicarLentidao
+  - RPC_EstadoPuxao
   - ReceberDanoRPC
-  - RenascerRPC
-  - FinalizarPartidaRPC
-  - SincronizarTrocaEquipamentoRPC
-  - SincronizarVisibilidadePlayerRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

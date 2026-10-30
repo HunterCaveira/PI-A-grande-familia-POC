@@ -1,19 +1,29 @@
+// Importa bibliotecas básicas da Unity, TextMeshPro e do Photon para multiplayer
 using UnityEngine;
 using TMPro;
+using Photon.Pun;
 
-public class GerenciadorDePartida : MonoBehaviour
+// A classe herda de MonoBehaviourPun e implementa IPunObservable para sincronizar dados em tempo real pela rede
+public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 {
     [Header("Interface (UI)")]
+    [Tooltip("Arraste o objeto de Texto (TextMeshPro) do cronômetro da partida aqui")]
     public TextMeshProUGUI textoCronometro;
+    [Tooltip("Texto da UI que exibe a porcentagem do Time Roxo")]
     public TextMeshProUGUI dominaçãoRoxo;
+    [Tooltip("Texto da UI que exibe a porcentagem do Time Amarelo")]
     public TextMeshProUGUI dominaçãoAmarelo;
 
     [Header("Telas de Fim de Jogo")]
-    public GameObject imagemVitoria;
-    public GameObject imagemDerrota;
+    [Tooltip("Tela exibida se o Time 1 vencer")]
+    public GameObject imagemVitoriaTime1;
+    [Tooltip("Tela exibida se o Time 2 vencer")]
+    public GameObject imagemVitoriaTime2;
+    [Tooltip("Tela exibida em caso de empate")]
     public GameObject imagemEmpate;
 
     [Header("Configurações da Partida")]
+    [Tooltip("Duração total da partida em segundos (ex: 300s = 5 minutos)")]
     public float tempoDePartida = 300f;
     private float tempoRestante;
     private bool partidaAcabou = false;
@@ -23,97 +33,164 @@ public class GerenciadorDePartida : MonoBehaviour
     public float tempoTotalTime2 = 0f;
 
     [Header("Conexão com a Área")]
+    [Tooltip("Referência ao script de Dominação do mapa (Pode ser deixado vazio para busca automática)")]
     public Dominacao areaDeDominacao;
 
+    // Start é chamado no primeiro frame da cena
     private void Start()
     {
-        tempoRestante = tempoDePartida;
-
-        if (imagemVitoria != null) imagemVitoria.SetActive(false);
-        if (imagemDerrota != null) imagemDerrota.SetActive(false);
+        // Garante que todas as imagens de vitória/derrota comecem desativadas (invisíveis)
+        if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(false);
+        if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(false);
         if (imagemEmpate != null) imagemEmpate.SetActive(false);
+
+        // MUDANÇA DE MELHORIA: Se esqueceu de arrastar no Inspector, procura o objeto de dominação sozinho na cena
+        if (areaDeDominacao == null)
+        {
+            areaDeDominacao = Object.FindFirstObjectByType<Dominacao>();
+            if (areaDeDominacao == null)
+            {
+                Debug.LogWarning("[GerenciadorDePartida] Nenhum script 'Dominacao' foi encontrado na cena!");
+            }
+        }
+
+        // Apenas o líder da sala (Master Client) inicializa os valores oficiais do tempo e placar
+        if (PhotonNetwork.IsMasterClient)
+        {
+            tempoRestante = tempoDePartida;
+            tempoTotalTime1 = 0f;
+            tempoTotalTime2 = 0f;
+        }
     }
 
+    // Update roda a cada frame do jogo
     private void Update()
     {
+        // Se a partida já acabou, interrompe a execução do Update
         if (partidaAcabou) return;
 
-        tempoRestante -= Time.deltaTime;
-
-        // Calcula a pontuação acumulada se a área não estiver em disputa
-        if (areaDeDominacao != null && !areaDeDominacao.emDisputa)
+        // 2. REGRA DE OURO DO MULTIPLAYER: APENAS O LÍDER DA SALA (Master Client) FAZ A MATEMÁTICA E CONTAGEM
+        // Isso evita conflitos de relógio e lag desincronizado entre os jogadores.
+        if (PhotonNetwork.IsMasterClient)
         {
-            if (areaDeDominacao.timeDonoDoTerritorio == 1)
+            // O cronômetro regride baseando-se no tempo real do Unity
+            tempoRestante -= Time.deltaTime;
+
+            // Lógica de pontuação do território de dominação
+            if (areaDeDominacao != null)
             {
-                tempoTotalTime1 += Time.deltaTime;
+                // Se a zona não estiver a ser disputada por dois inimigos ao mesmo tempo
+                if (!areaDeDominacao.emDisputa)
+                {
+                    // Se o dono for o Time 1, acumula tempo para o Time 1
+                    if (areaDeDominacao.timeDonoDoTerritorio == 1)
+                    {
+                        tempoTotalTime1 += Time.deltaTime;
+                    }
+                    // Se o dono for o Time 2, acumula tempo para o Time 2
+                    else if (areaDeDominacao.timeDonoDoTerritorio == 2)
+                    {
+                        tempoTotalTime2 += Time.deltaTime;
+                    }
+                }
             }
-            else if (areaDeDominacao.timeDonoDoTerritorio == 2)
+
+            // Condições de término: O tempo acabou OU algum dos times atingiu 100% de dominação
+            if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
             {
-                tempoTotalTime2 += Time.deltaTime;
+                // Manda uma ordem via RPC para todos os computadores da sala encerrarem a partida juntos
+                photonView.RPC("RPC_FinalizarPartida", RpcTarget.All);
             }
         }
 
-        // Checa condição de término da partida
-        if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
-        {
-            FinalizarPartida(tempoTotalTime1, tempoTotalTime2);
-        }
-
+        // 3. TODOS os computadores atualizam as suas telas locais com base nos números sincronizados pelo Líder
         AtualizarRelogiosNaTela();
     }
 
-    private void AtualizarRelogiosNaTela()
+    // ==========================================
+    // MÉTODO OBRIGATÓRIO PARA O IPunObservable
+    // Sincroniza as variáveis de tempo e pontuação de forma fluida pela rede
+    // ==========================================
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (textoCronometro != null)
+        if (stream.IsWriting)
         {
-            textoCronometro.text = FormatarTempo(tempoRestante);
-        }
-
-        if (dominaçãoRoxo != null)
-        {
-            dominaçãoRoxo.text = $"{Mathf.Round(tempoTotalTime1)} %";
-        }
-
-        if (dominaçãoAmarelo != null)
-        {
-            dominaçãoAmarelo.text = $"{Mathf.Round(tempoTotalTime2)} %";
-        }
-    }
-
-    private string FormatarTempo(float tempoEmSegundos)
-    {
-        int minutos = Mathf.FloorToInt(Mathf.Max(tempoEmSegundos, 0f) / 60);
-        int segundos = Mathf.FloorToInt(Mathf.Max(tempoEmSegundos, 0f) % 60);
-        return string.Format("{0:00}:{1:00}", minutos, segundos);
-    }
-
-    private void FinalizarPartida(float pontosFinalTime1, float pontosFinalTime2)
-    {
-        partidaAcabou = true;
-        tempoRestante = 0f;
-        tempoTotalTime1 = pontosFinalTime1;
-        tempoTotalTime2 = pontosFinalTime2;
-
-        AtualizarRelogiosNaTela();
-
-        // Lê o time do jogador salvo via PlayerPrefs (padrão 1)
-        int meuTime = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
-
-        int timeVencedor = 0;
-        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f) timeVencedor = 1;
-        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f) timeVencedor = 2;
-
-        if (timeVencedor == 0)
-        {
-            if (imagemEmpate != null) imagemEmpate.SetActive(true);
-        }
-        else if (timeVencedor == meuTime)
-        {
-            if (imagemVitoria != null) imagemVitoria.SetActive(true);
+            // O Líder transmite os seus dados atuais para os clientes conectados
+            stream.SendNext(tempoRestante);
+            stream.SendNext(tempoTotalTime1);
+            stream.SendNext(tempoTotalTime2);
         }
         else
         {
-            if (imagemDerrota != null) imagemDerrota.SetActive(true);
+            // Os demais jogadores recebem e aplicam os valores enviados pelo Líder
+            tempoRestante = (float)stream.ReceiveNext();
+            tempoTotalTime1 = (float)stream.ReceiveNext();
+            tempoTotalTime2 = (float)stream.ReceiveNext();
+        }
+    }
+
+    // Gerencia a atualização visual de todos os textos na interface
+    private void AtualizarRelogiosNaTela()
+    {
+        // Trava matemática para o relógio nunca exibir números negativos na tela
+        float tempoVisual = Mathf.Max(0, tempoRestante);
+
+        // Atualiza o texto do cronômetro principal
+        if (textoCronometro != null)
+        {
+            textoCronometro.text = FormatarTempo(tempoVisual);
+        }
+
+        // Atualiza a barragem de porcentagem do Time Roxo
+        if (dominaçãoRoxo != null)
+        {
+            // Arredonda o valor para cima e trava entre 0% e 100%
+            float pctTime1 = Mathf.Clamp(Mathf.Round(tempoTotalTime1), 0f, 100f);
+            dominaçãoRoxo.text = string.Format($"{pctTime1} %");
+        }
+
+        // Atualiza a barragem de porcentagem do Time Amarelo
+        if (dominaçãoAmarelo != null)
+        {
+            float pctTime2 = Mathf.Clamp(Mathf.Round(tempoTotalTime2), 0f, 100f);
+            dominaçãoAmarelo.text = string.Format($"{pctTime2} %");
+        }
+    }
+
+    // Função utilitária que converte segundos crus em formato de cronômetro clássico (Minutos:Segundos)
+    private string FormatarTempo(float tempoEmSegundos)
+    {
+        int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
+        int segundos = Mathf.FloorToInt(tempoEmSegundos % 60);
+        return string.Format("{0:00}:{1:00}", minutos, segundos);
+    }
+
+    // ==========================================
+    // EVENTO DE FIM DE JOGO (Executado simultaneamente em todos os PCs via RPC)
+    // ==========================================
+    [PunRPC]
+    private void RPC_FinalizarPartida()
+    {
+        if (partidaAcabou) return; // Trava para impedir que o fim de jogo dispare duas vezes por acidente
+
+        partidaAcabou = true;
+        tempoRestante = 0f;
+        AtualizarRelogiosNaTela();
+
+        Debug.Log($"Fim de Partida! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
+
+        // Compara os pontos acumulados e exibe o painel de vitória correspondente
+        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
+        {
+            if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
+        }
+        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f)
+        {
+            if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(true);
+        }
+        else
+        {
+            if (imagemEmpate != null) imagemEmpate.SetActive(true);
         }
     }
 }

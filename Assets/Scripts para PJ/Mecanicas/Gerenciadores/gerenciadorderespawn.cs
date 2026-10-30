@@ -1,172 +1,96 @@
+// Importa as coleções para uso de Coroutines (cronômetros de espera)
 using System.Collections;
+// Importa a biblioteca base da Unity
 using UnityEngine;
-using Unity.Cinemachine;
+// Importa a biblioteca do Photon para instanciar objetos na rede multiplayer
+using Photon.Pun;
 
-public class Gerenciadorderespawn : MonoBehaviour
+public class GerenciadorRespawn : MonoBehaviourPun
 {
-    [SerializeField] protected tiroPistola Tiropistola;
-
-    [Header("Cinemachine")]
-    [SerializeField] private CinemachineCamera virtualCamera;
-
-    [Header("Personagens Pré-gerados na Cena (Matrizes)")]
-    [SerializeField] private GameObject personagem1Cena;
-    [SerializeField] private GameObject personagem2Cena;
-
-    [Header("Configurações de Respawn Oficial")]
+    [Header("Configurações de Respawn")]
+    [Tooltip("Lista com os pontos espalhados pelo mapa onde os jogadores podem renascer")]
     [SerializeField] private Transform[] pontosDeSpawn;
+
+    [Tooltip("Quantos segundos o jogador fica aguardando antes de renascer")]
     [SerializeField] private float tempoParaRenascer = 3f;
 
-    [Header("Segurança / Trava de Reativação Automática")]
-    [Tooltip("Tempo (em segundos) que o clone pode ficar inativo por erro antes de ser forçado a ativar novamente.")]
-    [SerializeField] private float tempoSegurancaReativacao = 2f;
+    [Tooltip("Nome exato do prefab do herói (ex: 'Pai') que está guardado dentro da pasta 'Resources'")]
+    [SerializeField] private string nomePrefabHeroi = "Pai";
 
-    private GameObject cloneAtivo;
-    public GameObject CloneAtivo => cloneAtivo;
+    // Instância global estática (Singleton) para permitir que outros scripts encontrem o gerenciador facilmente
+    public static GerenciadorRespawn Instancia;
 
-    private bool emProcessoDeRespawn = false;
-    private float tempoInativoAcumulado = 0f;
+    private void Awake()
+    {
+        // Configura o Singleton do gerenciador de respawn
+        if (Instancia == null)
+            Instancia = this;
+        else
+            Destroy(gameObject);
+    }
 
     private void Start()
     {
+        // Validação de segurança para garantir que configurou os pontos de spawn no mapa
         if (pontosDeSpawn == null || pontosDeSpawn.Length == 0)
         {
-            Debug.LogError("[GerenciadorRespawn] ERRO: Nenhum ponto de spawn atribuído no Inspector!");
-            return;
-        }
-
-        if (virtualCamera == null)
-        {
-            virtualCamera = FindFirstObjectByType<CinemachineCamera>();
-        }
-
-        OcultarPersonagensMatriz();
-
-        int idPersonagem = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
-        if (idPersonagem <= 0) idPersonagem = 1;
-
-        ClonarPersonagemInicial(idPersonagem);
-
-        if (Tiropistola != null)
-        {
-            Tiropistola.gameObject.SendMessage("Reload", SendMessageOptions.DontRequireReceiver);
+            Debug.LogError("[GerenciadorRespawn] Nenhum ponto de spawn atribuído no Inspector da cena!");
         }
     }
 
-    private void Update()
+    // ==========================================
+    // MÉTODOS DE PROCESSAMENTO DE MORTE
+    // ==========================================
+
+    // Sobrecarga 1: Chamada diretamente pelo Sistema de Vida moderno
+    public void ProcessarMorte(int timeID)
     {
-        VerificarEstadoDoClone();
+        StartCoroutine(RotinaRespawnRede(timeID));
     }
 
-    /// <summary>
-    /// Checa constantemente se o clone está ativo. Caso tenha sido desativado por erro externo, força a reativação.
-    /// </summary>
-    private void VerificarEstadoDoClone()
+    // Sobrecarga 2: Mantida por compatibilidade caso algum script antigo passe o GameObject do jogador
+    public void ProcessarMorte(GameObject jogador)
     {
-        // Se o jogador morreu legitimamente, o respawn normal assume o controle
-        if (emProcessoDeRespawn) return;
+        int timeID = 1; // Valor padrão caso não encontre a ficha
 
-        // CASO 1: O clone existe na cena, mas foi desativado sem autorização
-        if (cloneAtivo != null && !cloneAtivo.activeInHierarchy)
+        // Tenta descobrir a qual time o jogador pertencia antes de morrer
+        if (jogador != null && jogador.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
         {
-            tempoInativoAcumulado += Time.deltaTime;
+            timeID = vida.TimeID;
+        }
 
-            if (tempoInativoAcumulado >= tempoSegurancaReativacao)
-            {
-                Debug.LogWarning($"[GerenciadorRespawn] Clone '{cloneAtivo.name}' detectado como inativo fora do respawn! Reativando em emergência...");
-                cloneAtivo.SetActive(true);
-                AtualizarCameraCinemachine(cloneAtivo.transform);
-                tempoInativoAcumulado = 0f;
-            }
-        }
-        // CASO 2: O clone foi deletado por algum script antigo
-        else if (cloneAtivo == null)
-        {
-            tempoInativoAcumulado += Time.deltaTime;
-
-            if (tempoInativoAcumulado >= tempoSegurancaReativacao)
-            {
-                Debug.LogWarning("[GerenciadorRespawn] Clone nulo/destruído! Re-clonando personagem de emergência...");
-                int idPersonagem = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
-                ClonarPersonagemInicial(idPersonagem);
-                tempoInativoAcumulado = 0f;
-            }
-        }
-        else
-        {
-            // Reset do cronômetro enquanto o clone estiver ativo e saudável
-            tempoInativoAcumulado = 0f;
-        }
+        StartCoroutine(RotinaRespawnRede(timeID));
     }
 
-    private void OcultarPersonagensMatriz()
+    // A Corrotina principal que gerencia o tempo de espera e o renascimento na rede
+    private IEnumerator RotinaRespawnRede(int timeID)
     {
-        if (personagem1Cena != null) personagem1Cena.SetActive(false);
-        if (personagem2Cena != null) personagem2Cena.SetActive(false);
-    }
-
-    private void ClonarPersonagemInicial(int id)
-    {
-        Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
-        GameObject objetoMatriz = (id == 1) ? personagem1Cena : personagem2Cena;
-
-        if (objetoMatriz != null)
-        {
-            cloneAtivo = Instantiate(objetoMatriz, spawnEscolhido.position, spawnEscolhido.rotation);
-            cloneAtivo.name = $"Jogador_Clone_{(id == 1 ? "Pai" : "Mae")}";
-            cloneAtivo.SetActive(true);
-
-            AtualizarCameraCinemachine(cloneAtivo.transform);
-            Debug.Log($"[GerenciadorRespawn] Clone '{cloneAtivo.name}' ativo na cena.");
-        }
-        else
-        {
-            Debug.LogError($"[GerenciadorRespawn] Objeto matriz do Personagem {id} não foi atribuído no Inspector!");
-        }
-    }
-
-    private void AtualizarCameraCinemachine(Transform alvo)
-    {
-        if (virtualCamera != null)
-        {
-            virtualCamera.Follow = alvo;
-            virtualCamera.LookAt = alvo;
-        }
-    }
-
-    public void ProcessarMorte(GameObject jogador = null)
-    {
-        GameObject alvo = (cloneAtivo != null) ? cloneAtivo : (jogador != null ? jogador.transform.root.gameObject : null);
-
-        if (alvo != null)
-        {
-            StartCoroutine(RotinaRespawn(alvo));
-        }
-    }
-
-    private IEnumerator RotinaRespawn(GameObject clone)
-    {
-        // Ativa a trava para o Watchdog não reativar o clone antes do tempo de respawn terminar
-        emProcessoDeRespawn = true;
-        clone.SetActive(false);
-
+        // 1. Aguarda os segundos configurados (tempo de tela preta / spectate)
         yield return new WaitForSeconds(tempoParaRenascer);
 
-        if (pontosDeSpawn.Length > 0)
+        // 2. Valida se existem pontos de spawn disponíveis no mapa
+        if (pontosDeSpawn == null || pontosDeSpawn.Length == 0)
         {
-            Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
-            clone.transform.position = spawnEscolhido.position;
-            clone.transform.rotation = spawnEscolhido.rotation;
+            Debug.LogError("[GerenciadorRespawn] Impossível renascer: A lista de pontos de spawn está vazia!");
+            yield break;
         }
 
-        clone.SetActive(true);
+        // 3. Sorteia aleatoriamente um dos pontos de spawn cadastrados na cena
+        Transform spawnEscolhido = pontosDeSpawn[Random.Range(0, pontosDeSpawn.Length)];
 
-        if (clone.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
+        // 4. Prepara os dados extras (InstantiationData) para enviar o TimeID pela rede ao recriar o boneco
+        object[] dadosSpawn = new object[] { timeID };
+
+        // 5. MULTIPLAYER: Recria o personagem do jogador do zero na rede usando PhotonNetwork.Instantiate.
+        // Nota: O prefab especificado em 'nomePrefabHeroi' DEVE estar dentro de uma pasta chamada "Resources".
+        if (PhotonNetwork.IsConnected)
         {
-            vida.Renascer();
+            GameObject novoHeroi = PhotonNetwork.Instantiate(nomePrefabHeroi, spawnEscolhido.position, spawnEscolhido.rotation, 0, dadosSpawn);
+            Debug.Log($"<color=green>[GerenciadorRespawn] Herói renascido com sucesso na rede na posição {spawnEscolhido.position}!</color>");
         }
-
-        // Libera a checagem de segurança novamente
-        emProcessoDeRespawn = false;
+        else
+        {
+            Debug.LogWarning("[GerenciadorRespawn] Aviso: Photon não está conectado na rede.");
+        }
     }
 }
