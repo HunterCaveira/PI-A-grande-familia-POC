@@ -18,4 +18,4 @@ MonoBehaviour:
   vidaMaxima: 500
   velocidadeMovimento: 5
   forcaPulo: 3
-  porcentagemSpeed: 5
+  porcentagemSpeed: 0
