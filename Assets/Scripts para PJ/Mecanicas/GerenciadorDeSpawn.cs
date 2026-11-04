@@ -1,19 +1,25 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
 
 public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 {
+    public static GerenciadorDeSpawn Instancia { get; private set; }
+
     [Header("Pontos de Nascimento (Automáticos)")]
     [SerializeField] private List<Transform> pontosSpawnTime1 = new List<Transform>();
     [SerializeField] private List<Transform> pontosSpawnTime2 = new List<Transform>();
 
-    private const string PrefabJogador = "Pai"; // Prefab dentro de Assets/Resources
-
-    // Campo de instância: cada vez que a cena carrega nasce um novo gerenciador com valor false.
+    private const string PrefabJogador = "Pai";
     private bool jaInstanciou = false;
+
+    private void Awake()
+    {
+        if (Instancia == null) Instancia = this;
+        else Destroy(gameObject);
+    }
 
     private void Start()
     {
@@ -47,13 +53,11 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
         }
     }
 
-    private void InstanciarMeuPersonagem()
+    public void InstanciarMeuPersonagem()
     {
-        // Evita criar dois personagens (Start + OnJoinedRoom)
         if (jaInstanciou) return;
         jaInstanciou = true;
 
-        // Padrão para testes: MasterClient = Time 1, convidado = Time 2
         int meuTime = PhotonNetwork.IsMasterClient ? 1 : 2;
 
         if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("TimeJogador", out object timeObj))
@@ -61,13 +65,8 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
             meuTime = Convert.ToInt32(timeObj);
         }
 
-        Transform pontoDeSpawn = this.transform;
-        List<Transform> lista = (meuTime == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
-        if (lista.Count > 0)
-            pontoDeSpawn = lista[UnityEngine.Random.Range(0, lista.Count)];
+        Transform pontoDeSpawn = ObterPontoDeSpawn(meuTime);
 
-        // O TimeID viaja em InstantiationData e é lido pelo OnPhotonInstantiate
-        // do Sistemadevida em TODOS os clientes.
         PhotonNetwork.Instantiate(
             PrefabJogador,
             pontoDeSpawn.position,
@@ -75,7 +74,31 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
             0,
             new object[] { meuTime }
         );
+    }
 
-        Debug.Log($"<color=green>[SPAWN] Personagem '{PrefabJogador}' instanciado para o Time {meuTime} em {pontoDeSpawn.name}</color>");
+    // 🌐 OPÇÃO 1: Aguarda o tempo e reativa a mesma instância do jogador no novo ponto de spawn
+    public void SolicitarRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempoEspera = 3f)
+    {
+        StartCoroutine(RotinaRespawnReaproveitado(sistemaVida, timeID, tempoEspera));
+    }
+
+    private IEnumerator RotinaRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempo)
+    {
+        yield return new WaitForSeconds(tempo);
+
+        if (sistemaVida != null)
+        {
+            Transform pontoDeSpawn = ObterPontoDeSpawn(timeID);
+            sistemaVida.Renascer(pontoDeSpawn.position, pontoDeSpawn.rotation);
+        }
+    }
+
+    private Transform ObterPontoDeSpawn(int timeID)
+    {
+        List<Transform> lista = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
+        if (lista.Count > 0)
+            return lista[UnityEngine.Random.Range(0, lista.Count)];
+
+        return transform;
     }
 }
