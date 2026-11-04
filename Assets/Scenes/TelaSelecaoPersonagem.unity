@@ -950,6 +950,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1359113390}
+        m_TargetAssemblyTypeName: GerenciadorSelecaoHeroi, Assembly-CSharp
+        m_MethodName: ClicarVoltarMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &173848452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3838,6 +3850,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 36597eb0c6bdd4b47aa220af60b1395c, type: 2}
   botaoPlayMaster: {fileID: 487318516}
   textoAvisoStatus: {fileID: 70269297}
+  nomeCenaMenu: HUD Server
 --- !u!1 &1394035171
 GameObject:
   m_ObjectHideFlags: 0
