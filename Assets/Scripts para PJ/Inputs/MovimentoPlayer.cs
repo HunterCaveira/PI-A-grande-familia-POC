@@ -15,6 +15,10 @@ public class MovimentodoPlayer : MonoBehaviourPun
     [SerializeField] private float velocidadeVertical;
     private float velocidadeAtual;
 
+    [Header("Animações")]
+    [Tooltip("Arraste o componente Animator do seu modelo visual aqui")]
+    [SerializeField] private Animator animator;
+
     [Header("Ficha de Atributos")]
     [SerializeField] private AtributosPersonagem atributos;
 
@@ -26,6 +30,22 @@ public class MovimentodoPlayer : MonoBehaviourPun
     {
         characterController = GetComponent<CharacterController>();
         acoesPlay = new AcoesPlayer();
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+
+        // ==========================================
+        // TRAVA DE SEGURANÇA MULTIPLAYER (Merge Fix)
+        // Impede cruzamento de câmeras e duplo controle
+        // ==========================================
+        if (photonView != null && !photonView.IsMine)
+        {
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam != null) cam.gameObject.SetActive(false);
+
+            AudioListener audio = GetComponentInChildren<AudioListener>();
+            if (audio != null) audio.enabled = false;
+        }
     }
 
     private void Start()
@@ -99,7 +119,20 @@ public class MovimentodoPlayer : MonoBehaviourPun
         {
             float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
             velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade);
+
+            // ANIMAÇÃO DE PULO
+            if (animator != null)
+            {
+                animator.SetTrigger("Pular");
+                photonView.RPC(nameof(RPC_DispararTriggerPulo), RpcTarget.Others);
+            }
         }
+    }
+
+    [PunRPC]
+    private void RPC_DispararTriggerPulo()
+    {
+        if (animator != null) animator.SetTrigger("Pular");
     }
 
     private void Correr()
@@ -122,6 +155,15 @@ public class MovimentodoPlayer : MonoBehaviourPun
         Vector3 movimentoFinal = new Vector3(movimentoHorizontal.x, velocidadeVertical, movimentoHorizontal.z);
 
         characterController.Move(movimentoFinal * Time.deltaTime);
+
+        // ATUALIZAÇÃO DA ANIMAÇÃO DE MOVIMENTO
+        if (animator != null)
+        {
+            float inputMagnitude = leituraInput.magnitude;
+            if (acoesPlay.MovimentoPlayer.Correr.IsPressed() && inputMagnitude > 0f) inputMagnitude = 2f;
+
+            animator.SetFloat("Velocidade", inputMagnitude, 0.1f, Time.deltaTime);
+        }
     }
 
     // ==========================================
