@@ -15,6 +15,11 @@ public class tiroPistola : MonoBehaviourPun
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private float duracaoLinha = 0.05f;
 
+    [Header("Sons da Arma")]
+    public AudioSource audioSource;
+    public AudioClip somTiro;
+    public AudioClip somRecarga;
+
     [Header("Pool de Balas")]
     public BalaPool meuPoolDeBalas;
 
@@ -34,7 +39,7 @@ public class tiroPistola : MonoBehaviourPun
     public bool permitirSegurarBotão = false;
 
     [Header("Referências")]
-    [Tooltip("Nome exato do GameObject da Câmera na cena para a Opção 1")]
+    [Tooltip("Nome exato do GameObject da Câmera na cena")]
     [SerializeField] private string nomeDaCamera = "Main Camera";
     public Camera playerCamera;
     public Transform pontoAtaque;
@@ -53,7 +58,7 @@ public class tiroPistola : MonoBehaviourPun
     {
         acoesPlayer = new AcoesPlayer();
         pvRaiz = transform.root.GetComponent<PhotonView>();
-        donoDaArma = transform.root.gameObject; // Garante a referência do objeto pai do jogador
+        donoDaArma = transform.root.gameObject;
     }
 
     private void OnEnable()
@@ -91,6 +96,12 @@ public class tiroPistola : MonoBehaviourPun
     {
         if (pvRaiz != null && !pvRaiz.IsMine) return;
 
+        // Tenta reconectar a câmera continuamente se ela ainda não existir
+        if (playerCamera == null)
+        {
+            VerificarEConectarReferenciasDaCena();
+        }
+
         MyInput();
 
         if (ammunitionDisplay != null)
@@ -101,15 +112,41 @@ public class tiroPistola : MonoBehaviourPun
         balaZerada = (balasSobrando <= 0);
     }
 
-    // 🎯 OPÇÃO 1 IMPLEMENTADA: Busca o GameObject da Câmera pelo nome exato na cena
     private void VerificarEConectarReferenciasDaCena()
     {
+        // 1. Busca pelo GameObject ativo na hierarquia
         if (playerCamera == null)
         {
-            GameObject camObj = GameObject.Find("Main Camera");
+            GameObject camObj = GameObject.Find(nomeDaCamera);
+
+            // 2. Caso o GameObject.Find não encontre, busca entre todas as câmeras ativas no projeto
+            if (camObj == null)
+            {
+                Camera[] camerasNaCena = FindObjectsByType<Camera>(FindObjectsSortMode.None);
+                foreach (Camera cam in camerasNaCena)
+                {
+                    if (cam.gameObject.name == nomeDaCamera)
+                    {
+                        camObj = cam.gameObject;
+                        break;
+                    }
+                }
+            }
+
             if (camObj != null)
             {
                 playerCamera = camObj.GetComponent<Camera>();
+            }
+        }
+
+        // 3. Conecta o AudioSource da Câmera assim que ela for encontrada
+        if (audioSource == null && playerCamera != null)
+        {
+            audioSource = playerCamera.GetComponent<AudioSource>();
+
+            if (audioSource == null)
+            {
+                audioSource = playerCamera.gameObject.AddComponent<AudioSource>();
             }
         }
 
@@ -151,7 +188,6 @@ public class tiroPistola : MonoBehaviourPun
             return;
         }
 
-        // 🎯 STRAIGHT TO POINT: Direção frontal direta da Câmera
         Vector3 direçãoBase = playerCamera.transform.forward;
 
         Vector3 pontoAcerto;
@@ -192,6 +228,11 @@ public class tiroPistola : MonoBehaviourPun
     private void RPC_ExecutarTiro(Vector3 origemTiro, Vector3 direcaoFinal, Vector3 pontoAcerto)
     {
         VerificarEConectarReferenciasDaCena();
+
+        if (audioSource != null && somTiro != null)
+        {
+            audioSource.PlayOneShot(somTiro);
+        }
 
         if (lineRenderer != null)
             StartCoroutine(DesenharRaio(origemTiro, pontoAcerto));
@@ -237,6 +278,12 @@ public class tiroPistola : MonoBehaviourPun
     {
         if (recarregando) return;
         recarregando = true;
+
+        if (audioSource != null && somRecarga != null)
+        {
+            audioSource.PlayOneShot(somRecarga);
+        }
+
         Invoke(nameof(TerminarRecarga), tempoRecarga);
     }
 

@@ -27,7 +27,7 @@ public class GerenciadorUI : MonoBehaviour
         public bool UltimoEstadoPronto = true;
     }
 
-    // Dicionário que mapeia o número do Slot (1, 2, 3) para a sua respetiva UI
+    // Dicionário que mapeia o número do Slot (1, 2, 3) para a sua respectiva UI
     private Dictionary<int, SlotUIInfo> slotsMap = new Dictionary<int, SlotUIInfo>();
 
     // Variáveis de controle para varredura otimizada
@@ -46,11 +46,12 @@ public class GerenciadorUI : MonoBehaviour
 
     void Update()
     {
-        // Se o boneco ainda não nasceu na rede, tenta procurá-lo periodicamente de forma leve
+        // Se o boneco ainda não nasceu na rede ou foi destruído (morte/respawn)
         if (jogador == null)
         {
             if (Time.time >= proximaBusca)
             {
+                LimparReferenciasJogador(); // Limpa resíduos de instâncias destruídas
                 TentarAcharJogadorLocal();
                 proximaBusca = Time.time + 0.5f; // Tenta a cada meio segundo
             }
@@ -60,22 +61,39 @@ public class GerenciadorUI : MonoBehaviour
         // Atualiza a cor do texto da munição em tempo real
         AcabouMunição();
 
-        // Atualiza o visual das habilidades apenas quando houver mudança de estado (Pronta <-> Recarregando)
+        // Atualiza o visual das habilidades apenas quando houver mudança de estado
         foreach (var par in slotsMap)
         {
             SlotUIInfo slotInfo = par.Value;
 
-            if (slotInfo.Habilidade == null || slotInfo.ImagemUI == null) continue;
+            // Validação de segurança contra objetos destruídos da Unity
+            if (slotInfo.ImagemUI == null || slotInfo.Habilidade == null || (slotInfo.Habilidade is Object obj && obj == null))
+                continue;
 
-            // Utiliza o método EstaPronta() para respeitar tanto o tempo quanto as travas de animação/uso
+            // Utiliza o método EstaPronta() para respeitar tanto o tempo quanto as travas
             bool estaPronta = slotInfo.Habilidade.EstaPronta();
 
             if (estaPronta != slotInfo.UltimoEstadoPronto)
             {
                 slotInfo.UltimoEstadoPronto = estaPronta;
-                // Troca a imagem da UI para a foto pronta ou escurecida (recarregando)
-                slotInfo.ImagemUI.sprite = estaPronta ? slotInfo.Habilidade.FotoPronta : slotInfo.Habilidade.FotoRecarregando;
+
+                Sprite novoSprite = estaPronta ? slotInfo.Habilidade.FotoPronta : slotInfo.Habilidade.FotoRecarregando;
+                if (novoSprite != null)
+                {
+                    slotInfo.ImagemUI.sprite = novoSprite;
+                }
             }
+        }
+    }
+
+    // Limpa referências armazenadas caso o jogador morra ou saia da partida
+    private void LimparReferenciasJogador()
+    {
+        pistolaRef = null;
+        foreach (var par in slotsMap)
+        {
+            par.Value.Habilidade = null;
+            par.Value.UltimoEstadoPronto = true;
         }
     }
 
@@ -87,9 +105,8 @@ public class GerenciadorUI : MonoBehaviour
 
         foreach (var view in viewsNaCena)
         {
-            // PROCURA O DONO: Filtra apenas o boneco que pertence ao SEU computador (IsMine) 
-            // e que seja o objeto raiz "Pai" do herói.
-            if (view.IsMine && view.gameObject.name.Contains("Pai"))
+            // PROCURA O DONO: Filtra apenas o boneco do jogador local (IsMine) e raiz ("Pai")
+            if (view != null && view.IsMine && view.gameObject.name.Contains("Pai"))
             {
                 AtribuirJogadorLocal(view.gameObject);
                 break;
@@ -100,26 +117,27 @@ public class GerenciadorUI : MonoBehaviour
     // Método principal chamado para vincular a interface ao herói instanciado na rede
     public void AtribuirJogadorLocal(GameObject jogadorLocal)
     {
+        if (jogadorLocal == null) return;
+
+        LimparReferenciasJogador(); // Garante um vínculo limpo sem restos do personagem antigo
         jogador = jogadorLocal;
 
-        if (jogador == null) return;
-
-        // MULTIPLAYER SEGURO: Procura a arma e as habilidades APENAS dentro do corpo do seu próprio personagem
+        // MULTIPLAYER SEGURO: Procura a arma e as habilidades APENAS no seu próprio personagem
         pistolaRef = jogador.GetComponentInChildren<tiroPistola>();
 
-        // Se a referência da munição no tiroPistola estiver vazia, tenta encontrá-la no componente TextMeshPro do hud se necessário
+        // Associa o componente de texto da munição caso esteja nulo no script da arma
         if (pistolaRef != null && pistolaRef.ammunitionDisplay == null && meuTexto != null)
         {
             pistolaRef.ammunitionDisplay = meuTexto;
         }
 
-        // PEGA automaticamente todas as habilidades que estão no Jogador local (Parede, Cinto, Tônico)
+        // PEGA automaticamente todas as habilidades no Jogador local (Parede, Cinto, Tônico)
         IasUI[] habilidadesDoJogador = jogador.GetComponentsInChildren<IasUI>();
 
-        // Associa cada habilidade encontrada ao seu respetivo slot baseado no SlotIndex dela
+        // Associa cada habilidade encontrada ao seu respectivo slot baseado no SlotIndex
         foreach (var hab in habilidadesDoJogador)
         {
-            if (slotsMap.ContainsKey(hab.SlotIndex))
+            if (hab != null && slotsMap.ContainsKey(hab.SlotIndex))
             {
                 slotsMap[hab.SlotIndex].Habilidade = hab;
                 Debug.Log($"<color=yellow>[GerenciadorUI] Habilidade encontrada e encaixada no Slot {hab.SlotIndex}!</color>");
@@ -132,14 +150,13 @@ public class GerenciadorUI : MonoBehaviour
     {
         if (pistolaRef == null || meuTexto == null) return;
 
-        if (pistolaRef.balaZerada == true)
+        if (pistolaRef.balaZerada)
         {
             meuTexto.color = Color.blue; // Fica azul se estiver zerada/recarregando
         }
         else
         {
-            // Se ainda tem bala, pinta de branco
-            meuTexto.color = Color.white;
+            meuTexto.color = Color.white; // Se ainda tem bala, pinta de branco
         }
     }
 }
