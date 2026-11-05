@@ -839,7 +839,6 @@ GameObject:
   - component: {fileID: 8469832898379529611}
   - component: {fileID: 247128005760641348}
   - component: {fileID: 567622879855236882}
-  - component: {fileID: 1507123214049052803}
   - component: {fileID: 9047799671779093050}
   - component: {fileID: 6667235756849144756}
   m_Layer: 3
@@ -930,6 +929,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
+  animator: {fileID: 0}
   velocidade: 5
   gravidade: -9.81
   forcaPulo: 2
@@ -1103,19 +1103,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
   cameraFollowTarget: {fileID: 5900917891571902078}
---- !u!114 &1507123214049052803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
-  cameraTarget: {fileID: 5900917891571902078}
 --- !u!114 &9047799671779093050
 MonoBehaviour:
   m_ObjectHideFlags: 0
