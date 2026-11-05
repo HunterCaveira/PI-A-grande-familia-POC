@@ -113,6 +113,9 @@ MonoBehaviour:
     m_Bits: 1010
   lineRenderer: {fileID: 0}
   duracaoLinha: -0.03
+  audioSource: {fileID: 0}
+  somTiro: {fileID: 0}
+  somRecarga: {fileID: 0}
   meuPoolDeBalas: {fileID: 0}
   danoPorTiro: 20
   tipoDeDano: 0
@@ -497,7 +500,7 @@ Transform:
   m_GameObject: {fileID: 1852653123552085012}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2370918, y: 0.10665114, z: -0.026196161, w: 0.96525997}
-  m_LocalPosition: {x: -1090.9131, y: 40.396156, z: 956.6852}
+  m_LocalPosition: {x: -0.67907715, y: 1.6261673, z: -3.0355225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -839,7 +842,6 @@ GameObject:
   - component: {fileID: 8469832898379529611}
   - component: {fileID: 247128005760641348}
   - component: {fileID: 567622879855236882}
-  - component: {fileID: 1507123214049052803}
   - component: {fileID: 9047799671779093050}
   - component: {fileID: 6667235756849144756}
   m_Layer: 3
@@ -1103,19 +1105,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
   cameraFollowTarget: {fileID: 5900917891571902078}
---- !u!114 &1507123214049052803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
-  cameraTarget: {fileID: 5900917891571902078}
 --- !u!114 &9047799671779093050
 MonoBehaviour:
   m_ObjectHideFlags: 0
