@@ -52,6 +52,13 @@ MonoBehaviour:
   - RPC_AplicarLentidao
   - RPC_EstadoPuxao
   - ReceberDanoRPC
+<<<<<<< Updated upstream
+=======
+  - RPC_ExecutarTiro
+  - RPC_DesativarJogadorParaRespawn
+  - RPC_AlternarEstadoJogador
+  - RPC_ReceberPuxao
+>>>>>>> Stashed changes
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

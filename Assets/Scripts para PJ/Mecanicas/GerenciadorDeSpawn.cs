@@ -76,6 +76,39 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
             new object[] { meuTime }
         );
 
+<<<<<<< Updated upstream
         Debug.Log($"<color=green>[SPAWN] Personagem '{PrefabJogador}' instanciado para o Time {meuTime} em {pontoDeSpawn.name}</color>");
+=======
+    // 🌐 OPÇÃO 1: Aguarda o tempo e reativa a mesma instância do jogador no novo ponto de spawn
+    public void SolicitarRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempoEspera = 3f)
+    {
+        StartCoroutine(RotinaRespawnReaproveitado(sistemaVida, timeID, tempoEspera));
+    }
+
+    private IEnumerator RotinaRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempo)
+    {
+        yield return new WaitForSeconds(tempo);
+
+        if (sistemaVida != null)
+        {
+            Transform pontoDeSpawn = ObterPontoDeSpawn(timeID);
+
+            // 1. Move o boneco para a posição e rotação do ponto de spawn
+            sistemaVida.transform.position = pontoDeSpawn.position;
+            sistemaVida.transform.rotation = pontoDeSpawn.rotation;
+
+            // 2. Chama a função Renascer vazia, exatamente como o Sistemadevida.cs exige
+            sistemaVida.Renascer();
+        }
+    }
+
+    private Transform ObterPontoDeSpawn(int timeID)
+    {
+        List<Transform> lista = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
+        if (lista.Count > 0)
+            return lista[UnityEngine.Random.Range(0, lista.Count)];
+
+        return transform;
+>>>>>>> Stashed changes
     }
 }
