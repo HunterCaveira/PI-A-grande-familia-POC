@@ -1000,6 +1000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nomeDaCamera: Main Camera
   distanciaMaxima: 15
   camadaChao:
     serializedVersion: 2
@@ -1007,6 +1008,8 @@ MonoBehaviour:
   camadaParedesEObstaculos:
     serializedVersion: 2
     m_Bits: 128
+  audioSource: {fileID: 0}
+  somUsar: {fileID: 8300000, guid: 0b305eceeb3365b46a2c34a87be09df0, type: 3}
   larguraMaxima: 10
   larguraMinima: 1
   alturaMaxima: 3
@@ -1058,9 +1061,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
+  nomeDaCamera: Main Camera
   slotIndex: 3
   fotoPronta: {fileID: 21300000, guid: c224b572731bbe340ba8c9bc3a3fc814, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 089b6da5a6047e146889f5730ae763d4, type: 3}
+  audioSource: {fileID: 0}
+  somUsar: {fileID: 8300000, guid: 579de2a6bb009c04d815001bdf9c8625, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 20

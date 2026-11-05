@@ -8,6 +8,11 @@ using Photon.Pun;
 // A classe herda de MonoBehaviourPun para usar rede e IasUI para comunicar com a interface
 public class HabilidadeTonico : MonoBehaviourPun, IasUI
 {
+    [Header("Configurações da Câmera")]
+    [Tooltip("Nome exato da Câmera na cena (opcional, busca automática por padrão)")]
+    [SerializeField] private string nomeDaCamera = "Main Camera";
+    private Camera cameraPrincipal;
+
     [Header("Configuração do Slot e UI")]
     // Define que o tónico é a habilidade terciária/ultimate (Slot 3)
     [SerializeField] private int slotIndex = 3;
@@ -23,6 +28,10 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
 
     // Propriedade que guarda o tempo exato em que a habilidade estará pronta
     public float TempoProximouso { get; set; } = 0f;
+
+    [Header("Sons da Habilidade")]
+    public AudioSource audioSource;
+    public AudioClip somUsar;
 
     [Header("Configurações do Buff")]
     // A velocidade que o jogador atinge ao beber o tónico (O Cinto agora acompanha esta velocidade!)
@@ -60,6 +69,59 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
         // Procura os componentes automaticamente no próprio boneco se esquecer de arrastar no Inspector
         if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
         if (sistemaDeVida == null) sistemaDeVida = GetComponent<Sistemadevida>();
+
+        // Procura a câmera na cena logo ao iniciar
+        VerificarEConectarCamera();
+    }
+
+    private void Update()
+    {
+        if (photonView != null && !photonView.IsMine) return;
+
+        // Garante que a câmera e o AudioSource estão conectados caso mudem na cena
+        if (cameraPrincipal == null)
+        {
+            VerificarEConectarCamera();
+        }
+    }
+
+    // Método responsável por encontrar a câmera na cena dinamicamente
+    private void VerificarEConectarCamera()
+    {
+        if (cameraPrincipal != null) return;
+
+        // 1. Tenta pegar a câmera principal por Tag
+        cameraPrincipal = Camera.main;
+
+        // 2. Se não encontrou, procura pelo nome configurado
+        if (cameraPrincipal == null)
+        {
+            GameObject camObj = GameObject.Find(nomeDaCamera);
+            if (camObj != null)
+            {
+                cameraPrincipal = camObj.GetComponent<Camera>();
+            }
+        }
+
+        // 3. Fallback: Pega qualquer câmera ativa na cena
+        if (cameraPrincipal == null)
+        {
+            cameraPrincipal = FindFirstObjectByType<Camera>();
+        }
+
+        // Se o AudioSource não foi definido no Inspetor nem no Player, tenta utilizar/criar o da câmera
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null && cameraPrincipal != null)
+            {
+                audioSource = cameraPrincipal.GetComponent<AudioSource>();
+                if (audioSource == null)
+                {
+                    audioSource = cameraPrincipal.gameObject.AddComponent<AudioSource>();
+                }
+            }
+        }
     }
 
     // Chamado se o boneco for apagado da cena (ex: quando morre ou a partida acaba)
@@ -92,6 +154,8 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
     {
         // Garante que a habilidade só roda para quem é o dono do personagem
         if (photonView != null && !photonView.IsMine) return;
+
+        VerificarEConectarCamera();
 
         // Se estiver em cooldown, aborta e volta a puxar a arma principal (slot 0)
         if (!EstaPronta())
@@ -138,6 +202,12 @@ public class HabilidadeTonico : MonoBehaviourPun, IasUI
     private IEnumerator RotinaConsumirEAplicarTonico()
     {
         emUsoOuAnimacao = true; // Trava o script
+
+        // Toca o som ao iniciar o uso do tónico
+        if (audioSource != null && somUsar != null)
+        {
+            audioSource.PlayOneShot(somUsar);
+        }
 
         // Mostra o frasco na mão para todos na sala
         photonView.RPC("RPC_AlternarFrasco", RpcTarget.All, true);

@@ -11,7 +11,8 @@ using Photon.Pun;
 public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 {
     [Header("Configurações da Câmera e Raio")]
-    // Removido o SerializeField. A câmera agora é privada e pega a referência automaticamente.
+    [Tooltip("Nome exato da Câmera na cena (opcional, busca automática por padrão)")]
+    [SerializeField] private string nomeDaCamera = "Main Camera";
     private Camera cameraPrincipal;
     // Distância máxima que o jogador pode colocar a parede a partir da câmera
     [SerializeField] private float distanciaMaxima = 15f;
@@ -19,6 +20,10 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
     [SerializeField] private LayerMask camadaChao;
     // Define qual a camada representa obstáculos/paredes para limitar o crescimento da parede
     [SerializeField] private LayerMask camadaParedesEObstaculos;
+
+    [Header("Sons da Habilidade")]
+    public AudioSource audioSource;
+    public AudioClip somUsar;
 
     [Header("Dimensionamento da Parede")]
     // Largura máxima que a parede pode atingir
@@ -85,13 +90,47 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
         // Busca o gerenciador de equipamentos no próprio personagem
         gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
 
-        // MUDANÇA PRINCIPAL: Procura na cena automaticamente a câmera que possui a tag "MainCamera"
-        cameraPrincipal = Camera.main;
+        // Procura a câmera e o AudioSource na cena logo ao iniciar
+        VerificarEConectarCamera();
+    }
 
-        // Aviso de segurança para ajudar no Debug caso você esqueça de colocar a Tag na câmera
+    // Método responsável por encontrar a câmera e o AudioSource na cena dinamicamente
+    private void VerificarEConectarCamera()
+    {
         if (cameraPrincipal == null)
         {
-            Debug.LogError("[Habilidade Parede] Nenhuma câmera com a tag 'MainCamera' foi encontrada na cena!");
+            // 1. Tenta pegar a câmera principal por Tag
+            cameraPrincipal = Camera.main;
+
+            // 2. Se não encontrou, procura pelo nome configurado
+            if (cameraPrincipal == null)
+            {
+                GameObject camObj = GameObject.Find(nomeDaCamera);
+                if (camObj != null)
+                {
+                    cameraPrincipal = camObj.GetComponent<Camera>();
+                }
+            }
+
+            // 3. Fallback: Pega qualquer câmera ativa na cena
+            if (cameraPrincipal == null)
+            {
+                cameraPrincipal = FindFirstObjectByType<Camera>();
+            }
+        }
+
+        // Se o AudioSource não foi definido no Inspetor nem no Player, busca ou cria na câmera
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null && cameraPrincipal != null)
+            {
+                audioSource = cameraPrincipal.GetComponent<AudioSource>();
+                if (audioSource == null)
+                {
+                    audioSource = cameraPrincipal.gameObject.AddComponent<AudioSource>();
+                }
+            }
         }
     }
 
@@ -100,6 +139,12 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
     {
         // Trava de rede: Se o personagem não for do meu computador, não leio os inputs de parede dele
         if (photonView != null && !photonView.IsMine) return;
+
+        // Garante que a câmera está conectada caso tenha mudado ou nascido depois
+        if (cameraPrincipal == null || audioSource == null)
+        {
+            VerificarEConectarCamera();
+        }
 
         // Se o jogador ativou o holograma, atualiza a posição dele acompanhando a mira
         if (modoPosicionamentoAtivo)
@@ -125,6 +170,8 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
     {
         // Garante que só o dono do boneco pode ativar
         if (photonView != null && !photonView.IsMine) return;
+
+        VerificarEConectarCamera();
 
         // Se a habilidade estiver em cooldown
         if (!EstaPronta())
@@ -226,6 +273,12 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
                 // Se a parede foi criada com sucesso
                 if (paredeCriada != null)
                 {
+                    // Toca o som ao criar/posicionar a parede
+                    if (audioSource != null && somUsar != null)
+                    {
+                        audioSource.PlayOneShot(somUsar);
+                    }
+
                     // Copia o tamanho espremido/esticado do holograma para a parede real
                     paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
                     // Adiciona a parede nova na lista de controle
