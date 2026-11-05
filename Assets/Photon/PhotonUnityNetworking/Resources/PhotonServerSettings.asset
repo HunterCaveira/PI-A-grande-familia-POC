@@ -52,6 +52,9 @@ MonoBehaviour:
   - RPC_AplicarLentidao
   - RPC_EstadoPuxao
   - ReceberDanoRPC
+  - RPC_ExecutarTiro
+  - RPC_DesativarJogadorParaRespawn
+  - RPC_AlternarEstadoJogador
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

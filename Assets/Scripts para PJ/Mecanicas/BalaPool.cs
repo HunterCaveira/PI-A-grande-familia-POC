@@ -1,11 +1,11 @@
 ﻿// Importa apenas as bibliotecas essenciais da Unity
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class BalaPool : MonoBehaviour
 {
     [Header("Configurações do Pool")]
-    [Tooltip("O prefab da bala. NÃO precisa ter PhotonView, pois o RPC da pistola já sincroniza o tiro.")]
+    [Tooltip("O prefab da bala. NÃO deve ter PhotonView nem PhotonTransformView.")]
     [SerializeField] private GameObject balaPrefab;
 
     [Tooltip("Quantidade de balas criadas no início para evitar travamentos (ex: tamanho do carregador)")]
@@ -15,13 +15,11 @@ public class BalaPool : MonoBehaviour
     // Lista que guarda todas as balas criadas para reaproveitamento
     [SerializeField] private List<GameObject> listaDeBalas;
 
-    // Awake é chamado assim que o objeto nasce na cena
     private void Awake()
     {
         InicializarPool();
     }
 
-    // Prepara a piscina de balas antes de o jogador dar o primeiro tiro
     private void InicializarPool()
     {
         listaDeBalas = new List<GameObject>();
@@ -32,13 +30,11 @@ public class BalaPool : MonoBehaviour
         }
     }
 
-    // Método isolado para criar uma bala (usado no início e caso a piscina esvazie)
     private GameObject CriarNovaBala()
     {
-        // 🌐 ARQUITETURA MULTIPLAYER: Usa Instantiate normal (local).
-        // Como o RPC do tiroPistola roda em todos os clientes, cada computador puxa uma bala local ao mesmo tempo.
-        // O "this.transform" já define o parentesco diretamente na criação, economizando processamento.
-        GameObject novaBala = Instantiate(balaPrefab, this.transform);
+        // 🌐 ARQUITETURA MULTIPLAYER (RPC): Usa Instantiate local do Unity.
+        // Como o RPC do tiro roda em cada computador, cada cliente ativa sua própria bala local.
+        GameObject novaBala = Instantiate(balaPrefab, transform);
 
         // Desativa a bala na cena até que ela seja disparada
         novaBala.SetActive(false);
@@ -49,20 +45,18 @@ public class BalaPool : MonoBehaviour
         return novaBala;
     }
 
-    // Método chamado pelo tiroPistola para pegar uma bala pronta
     public GameObject GetitemFromPool()
     {
         // Procura a primeira bala que estiver invisível (desativada) na cena
         for (int i = 0; i < listaDeBalas.Count; i++)
         {
-            if (listaDeBalas[i].activeInHierarchy == false)
+            if (!listaDeBalas[i].activeInHierarchy)
             {
                 return listaDeBalas[i];
             }
         }
 
-        // Se o jogador atirar muito rápido e todas as 30 balas estiverem no ar ao mesmo tempo,
-        // o sistema cria uma bala extra de emergência e devolve para o cano da arma.
+        // Cria uma bala extra caso o pool esvazie
         return CriarNovaBala();
     }
 }

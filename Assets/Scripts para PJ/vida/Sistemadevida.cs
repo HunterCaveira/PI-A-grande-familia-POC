@@ -1,5 +1,6 @@
 ﻿// Importa a biblioteca padrão do C# para manipulação de eventos e dados
 using System;
+using System.Collections;
 // Importa a biblioteca principal da Unity
 using UnityEngine;
 // Importa a biblioteca do Photon para rede e sincronização multiplayer
@@ -66,7 +67,6 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
 
     private void OnDestroy()
     {
-        // Evita logs desnecessários se o photonView for nulo ao destruir o objeto
         if (!logsDeRede || photonView == null) return;
         Debug.Log($"[DESTROY] viewID={photonView.ViewID} souEu={photonView.IsMine}\n{Environment.StackTrace}");
     }
@@ -75,7 +75,6 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     // 3. FICHA DE ATRIBUTOS
     // ==========================================
 
-    // Atualiza os atributos do herói em tempo real (usado quando o Tónico é bebido)
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
     {
         if (novaFicha != null)
@@ -90,7 +89,6 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     // 4. DANO E MORTE (rede)
     // ==========================================
 
-    // Método antigo mantido por compatibilidade com outros scripts do projeto
     public void ReceberDano(InformacaoDano dano)
     {
         if (vidaAtual <= 0) return;
@@ -102,59 +100,43 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
                 return;
         }
 
-        // Se eu sou o dono, aplico o dano direto. Se não, mando um RPC para o dono do boneco.
         if (photonView.IsMine)
             AplicarDano(dano.quantidade);
         else
             photonView.RPC(nameof(RPC_AplicarDano), photonView.Owner, dano.quantidade);
     }
 
-    // ==========================================
-    // 🔗 PONTE COM A BALA (NOVO & OTIMIZADO)
-    // ==========================================
-    // Este é o método exato que o script da Bala.cs chama via RPC:
-    // pvInimigo.RPC("ReceberDanoRPC", RpcTarget.All, danoDaBala, viewIDDoAtirador);
     [PunRPC]
     public void ReceberDanoRPC(float quantidadeDano, int viewIDAtirador)
     {
-        // Trava de segurança: Se o personagem já estiver morto, ignora novos danos
         if (vidaAtual <= 0) return;
 
-        // Se este computador é o dono legítimo deste boneco, processa o dano na vida real
         if (photonView.IsMine)
         {
             AplicarDano(quantidadeDano);
         }
     }
 
-    // RPC auxiliar caso outros scripts chamem diretamente o dano cru na rede
     [PunRPC]
     private void RPC_AplicarDano(float quantidade)
     {
         AplicarDano(quantidade);
     }
 
-    // Só roda no dono do personagem (autoridade da vida)
     private void AplicarDano(float quantidade)
     {
         if (vidaAtual <= 0) return;
 
-        // Calcula o dano final aplicando a redução de armadura (ex: buff do tónico)
         float danoFinal = quantidade * (1f - PorcentagemReducaoDano);
-        // Subtrai a vida e garante que ela nunca fique abaixo de zero
         vidaAtual = Mathf.Max(vidaAtual - danoFinal, 0f);
 
-        // Atualiza a UI localmente
         NotificarMudancaDeVida();
-        // Sincroniza a vida atualizada com os outros jogadores na sala
         photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
 
-        // Se a vida chegou a zero, aciona o método de morte
         if (vidaAtual <= 0)
             Morrer();
     }
 
-    // RPC para atualizar o valor da vida em tempo real nos computadores dos outros jogadores
     [PunRPC]
     private void RPC_SincronizarVida(float novaVida)
     {
@@ -162,48 +144,79 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
         NotificarMudancaDeVida();
     }
 
-    // Restaura a vida máxima do herói ao renascer
-    public void Renascer()
-    {
-        if (dadosDoHeroi == null) return;
+    // ==========================================
+    // 5. RESPRAWN E RENASCER (OPÇÃO 1)
+    // ==========================================
 
-        vidaAtual = dadosDoHeroi.vidaMaxima;
-        PorcentagemReducaoDano = 0f;
-        NotificarMudancaDeVida();
-
-        // Avisa os outros jogadores que o herói renasceu com vida cheia
-        if (photonView.IsMine)
-            photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
-    }
-
-    // Dispara o evento de escuta para atualizar qualquer barra de vida conectada
-    private void NotificarMudancaDeVida()
-    {
-        if (dadosDoHeroi != null)
-            OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
-    }
-
-    // Processa a morte do herói e aciona o sistema centralizado de Respawn no GameManager
     private void Morrer()
     {
         if (!photonView.IsMine) return;
 
         Debug.Log($"[MORTE] {gameObject.name} viewID={photonView.ViewID} time={timeID}");
 
-        // Fluxo principal moderno: Usa o gerenciador de Respawn centralizado no GameManager do mapa
-        if (Respawn.Instancia != null)
+        // 1. Oculta o modelo 3D e desativa colisões em toda a rede via RPC
+        photonView.RPC(nameof(RPC_AlternarEstadoJogador), RpcTarget.All, false);
+
+        // 2. Solicita ao GerenciadorDeSpawn que aguarde o tempo e reposicione este mesmo objeto
+        if (GerenciadorDeSpawn.Instancia != null)
         {
-            Respawn.Instancia.SolicitarRespawn(timeID, "Pai");
-            PhotonNetwork.Destroy(gameObject);
+            GerenciadorDeSpawn.Instancia.SolicitarRespawnReaproveitado(this, timeID, 3f);
         }
-        else
+    }
+
+    // Método chamado pelo GerenciadorDeSpawn para renascer o jogador no ponto de spawn
+    public void Renascer(Vector3 posicaoSpawn, Quaternion rotacaoSpawn)
+    {
+        if (dadosDoHeroi != null)
+            vidaAtual = dadosDoHeroi.vidaMaxima;
+
+        PorcentagemReducaoDano = 0f;
+        NotificarMudancaDeVida();
+
+        // Reposiciona o jogador no ponto de nascimento
+        transform.position = posicaoSpawn;
+        transform.rotation = rotacaoSpawn;
+
+        // Reativa os visuais, colisores e controles em toda a rede
+        photonView.RPC(nameof(RPC_AlternarEstadoJogador), RpcTarget.All, true);
+
+        // Sincroniza a vida cheia com os outros jogadores
+        if (photonView.IsMine)
+            photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
+    }
+
+    [PunRPC]
+    private void RPC_AlternarEstadoJogador(bool estado)
+    {
+        // 1. Liga/Desliga os renderizadores visuais (modelo 3D do personagem)
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
-            // Fluxo antigo (fallback de segurança caso o GameManager não tenha o script Respawn)
-            GerenciadorRespawn gerenciador = FindFirstObjectByType<GerenciadorRespawn>();
-            if (gerenciador != null)
-                gerenciador.ProcessarMorte(gameObject);
-            else
-                Debug.LogWarning("Nenhum Respawn nem GerenciadorRespawn encontrado na cena!");
+            r.enabled = estado;
         }
+
+        // 2. Liga/Desliga os colisores para evitar tomar dano ou bloquear tiros enquanto morto
+        foreach (Collider c in GetComponentsInChildren<Collider>())
+        {
+            c.enabled = estado;
+        }
+
+        // 3. Liga/Desliga o CharacterController se o personagem utilizar
+        if (TryGetComponent<CharacterController>(out CharacterController cc))
+        {
+            cc.enabled = estado;
+        }
+
+        // 4. Liga/Desliga o script de disparo local durante a morte
+        tiroPistola scriptTiro = GetComponentInChildren<tiroPistola>();
+        if (scriptTiro != null)
+        {
+            scriptTiro.enabled = estado;
+        }
+    }
+
+    private void NotificarMudancaDeVida()
+    {
+        if (dadosDoHeroi != null)
+            OnVidaMudou?.Invoke(vidaAtual, dadosDoHeroi.vidaMaxima);
     }
 }
