@@ -152,7 +152,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 2
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &438985720561180426
@@ -833,7 +833,6 @@ GameObject:
   - component: {fileID: 8469832898379529611}
   - component: {fileID: 247128005760641348}
   - component: {fileID: 567622879855236882}
-  - component: {fileID: 1507123214049052803}
   - component: {fileID: 9047799671779093050}
   - component: {fileID: 6667235756849144756}
   m_Layer: 3
@@ -1034,17 +1033,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
+  nomeDaCamera: Main Camera
   distanciaMaxima: 10
+  audioSource: {fileID: 0}
+  "somLan\xE7ar": {fileID: 8300000, guid: 57aee42e49027f54489ccf4bd04be715, type: 3}
   tempoCooldown: 0
   velocidadeAvanco: 30
-  velocidadeRetorno: 20
   slotIndex: 2
   fotoPronta: {fileID: 21300000, guid: 9942e0d9f4e27614daea480c45a6e6b3, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: f7d0404cb8d7f434cb38ee8378d18ed9, type: 3}
   gerenciadorDeEquipamentos: {fileID: 247128005760641348}
   prefabCinto: {fileID: 5655468510688860589}
   pontoFivelaPontos: {fileID: 7780615101466668945}
-  pontoDestinoPuxao: {fileID: 8019647009318721997}
   idDoTime: 1
 --- !u!114 &8469832898379529611
 MonoBehaviour:
@@ -1097,19 +1097,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEvitaParede
   cameraFollowTarget: {fileID: 5900917891571902078}
---- !u!114 &1507123214049052803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 571947a6790e19041ac33967cb633f2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterCameraAnchor
-  cameraTarget: {fileID: 5900917891571902078}
 --- !u!114 &9047799671779093050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1130,7 +1117,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 6667235756849144756}
-  sceneViewId: 3
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &6667235756849144756
@@ -1636,7 +1623,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2698394403376183562, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: sceneViewId
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8264904805395110718, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: m_LocalPosition.x
