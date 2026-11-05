@@ -7,6 +7,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
     private CharacterController characterController;
     private AcoesPlayer acoesPlay;
     private bool inputAtivo = false; // true só no dono do personagem
+    [SerializeField] Animator animator;
 
     [Header("Configurações de Movimento")]
     [SerializeField] private float velocidade;
@@ -14,10 +15,6 @@ public class MovimentodoPlayer : MonoBehaviourPun
     [SerializeField] private float forcaPulo = 2f;
     [SerializeField] private float velocidadeVertical;
     private float velocidadeAtual;
-
-    [Header("Animações")]
-    [Tooltip("Arraste o componente Animator do seu modelo visual aqui")]
-    [SerializeField] private Animator animator;
 
     [Header("Ficha de Atributos")]
     [SerializeField] private AtributosPersonagem atributos;
@@ -30,22 +27,6 @@ public class MovimentodoPlayer : MonoBehaviourPun
     {
         characterController = GetComponent<CharacterController>();
         acoesPlay = new AcoesPlayer();
-
-        if (animator == null)
-            animator = GetComponentInChildren<Animator>();
-
-        // ==========================================
-        // TRAVA DE SEGURANÇA MULTIPLAYER (Merge Fix)
-        // Impede cruzamento de câmeras e duplo controle
-        // ==========================================
-        if (photonView != null && !photonView.IsMine)
-        {
-            Camera cam = GetComponentInChildren<Camera>();
-            if (cam != null) cam.gameObject.SetActive(false);
-
-            AudioListener audio = GetComponentInChildren<AudioListener>();
-            if (audio != null) audio.enabled = false;
-        }
     }
 
     private void Start()
@@ -92,6 +73,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
         AplicarGravidade();
         Correr();
         Andar();
+        
     }
 
     public void AtualizarFichaAtributos(AtributosPersonagem novaFicha)
@@ -119,20 +101,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
         {
             float forcaPuloFinal = (atributos != null) ? atributos.forcaPulo : forcaPulo;
             velocidadeVertical = Mathf.Sqrt(forcaPuloFinal * -2f * gravidade);
-
-            // ANIMAÇÃO DE PULO
-            if (animator != null)
-            {
-                animator.SetTrigger("Pular");
-                photonView.RPC(nameof(RPC_DispararTriggerPulo), RpcTarget.Others);
-            }
         }
-    }
-
-    [PunRPC]
-    private void RPC_DispararTriggerPulo()
-    {
-        if (animator != null) animator.SetTrigger("Pular");
     }
 
     private void Correr()
@@ -156,13 +125,12 @@ public class MovimentodoPlayer : MonoBehaviourPun
 
         characterController.Move(movimentoFinal * Time.deltaTime);
 
-        // ATUALIZAÇÃO DA ANIMAÇÃO DE MOVIMENTO
-        if (animator != null)
+        if (movimentoHorizontal != Vector3.zero)
         {
-            float inputMagnitude = leituraInput.magnitude;
-            if (acoesPlay.MovimentoPlayer.Correr.IsPressed() && inputMagnitude > 0f) inputMagnitude = 2f;
-
-            animator.SetFloat("Velocidade", inputMagnitude, 0.1f, Time.deltaTime);
+            animator.SetFloat("horizontal", 1);
+        }
+        else{
+            animator.SetFloat("horizontal", 0);
         }
     }
 
