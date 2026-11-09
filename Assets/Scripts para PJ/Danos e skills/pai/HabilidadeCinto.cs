@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class HabilidadeCinto : MonoBehaviourPun, IasUI
 {
@@ -19,6 +20,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     public float TempoProximouso => tempoProximoUso;
 
     [SerializeField] private float velocidadeAvanco = 30f;
+    [SerializeField] private float velocidadeRetorno = 20f;
 
     [Header("Configuração de Slot e UI")]
     [SerializeField] private int slotIndex = 1;
@@ -38,8 +40,15 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [SerializeField] private int idDoTime = 1;
     public int IdDoTime => idDoTime;
 
-    private enum EstadoCinto { Inativo, Avancando, RecolhendoVazio }
+    private enum EstadoCinto { Inativo, Avancando, PuxandoInimigo, RecolhendoVazio }
     private EstadoCinto estadoAtual = EstadoCinto.Inativo;
+
+    private Transform inimigoCapturado;
+    private PhotonView pvInimigo;
+
+    // VARIÁVEIS DE REDE PARA O FEEDBACK
+    private int donoOriginalActorNr;
+    private int viewIDVitima;
 
     private Vector3 posicaoInicialLocal;
     private float distanciaAtualVoo = 0f;
@@ -51,9 +60,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         VerificarEConectarReferenciasDaCena();
 
         if (prefabCinto != null)
-        {
             posicaoInicialLocal = prefabCinto.transform.localPosition;
-        }
     }
 
     private void VerificarEConectarReferenciasDaCena()
@@ -108,6 +115,9 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
             case EstadoCinto.Avancando:
                 ProcessarAvanco();
                 break;
+            case EstadoCinto.PuxandoInimigo:
+                ProcessarPuxao();
+                break;
             case EstadoCinto.RecolhendoVazio:
                 ProcessarRecolhimento();
                 break;
@@ -121,16 +131,10 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         distanciaAtualVoo += velocidadeAvanco * Time.deltaTime;
         prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
 
-        if (ChecarEImpactarInimigo())
-        {
-            estadoAtual = EstadoCinto.RecolhendoVazio;
-            return;
-        }
+        if (ChecarEPrenderInimigo()) return;
 
         if (distanciaAtualVoo >= distanciaMaxima)
-        {
             estadoAtual = EstadoCinto.RecolhendoVazio;
-        }
     }
 
     private void ProcessarRecolhimento()
@@ -140,13 +144,12 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         distanciaAtualVoo -= velocidadeAvanco * Time.deltaTime;
         prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
 
-        if (distanciaAtualVoo <= 0f)
-        {
-            FinalizarHabilidade();
-        }
+        if (ChecarEPrenderInimigo()) return;
+
+        if (distanciaAtualVoo <= 0f) FinalizarHabilidade();
     }
 
-    private bool ChecarEImpactarInimigo()
+    private bool ChecarEPrenderInimigo()
     {
         Vector3 posicaoCheck = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
         Collider[] hits = Physics.OverlapSphere(posicaoCheck, 0.6f);
@@ -155,32 +158,85 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         {
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
-            Sistemadevida vidaAlvo = col.GetComponent<Sistemadevida>();
+            Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
             int timeAlvo = -1;
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
 
             if (timeAlvo != -1 && timeAlvo != this.idDoTime)
             {
+                inimigoCapturado = vidaAlvo.transform;
+                pvInimigo = inimigoCapturado.GetComponent<PhotonView>();
+
+                if (pvInimigo != null)
+                {
+                    donoOriginalActorNr = pvInimigo.OwnerActorNr;
+                    viewIDVitima = pvInimigo.ViewID;
+
+                    photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, true);
+                    pvInimigo.RequestOwnership();
+                }
+
+                estadoAtual = EstadoCinto.PuxandoInimigo;
                 return true;
             }
         }
         return false;
     }
 
+    private void ProcessarPuxao()
+    {
+        if (prefabCinto == null) return;
+
+        distanciaAtualVoo -= velocidadeRetorno * Time.deltaTime;
+        distanciaAtualVoo = Mathf.Max(0, distanciaAtualVoo);
+        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
+
+        if (inimigoCapturado != null)
+        {
+            Vector3 posicaoFivela = pontoFivelaPontos != null ? pontoFivelaPontos.position : prefabCinto.transform.position;
+            inimigoCapturado.position = posicaoFivela;
+        }
+
+        if (distanciaAtualVoo <= 0.2f) FinalizarHabilidade();
+    }
+
     private void FinalizarHabilidade()
     {
-        CancelarHabilidade();
+        estadoAtual = EstadoCinto.Inativo;
+        distanciaAtualVoo = 0f;
 
-        if (gerenciadorDeEquipamentos != null)
+        if (inimigoCapturado != null)
         {
-            gerenciadorDeEquipamentos.TrocarEquipamento(0);
+            if (pvInimigo != null)
+            {
+                photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, false);
+
+                Player donoAntigo = PhotonNetwork.CurrentRoom.GetPlayer(donoOriginalActorNr);
+                if (donoAntigo != null) pvInimigo.TransferOwnership(donoAntigo);
+            }
+
+            inimigoCapturado = null;
+            pvInimigo = null;
         }
+
+        CancelarHabilidade();
+        if (gerenciadorDeEquipamentos != null) gerenciadorDeEquipamentos.TrocarEquipamento(0);
     }
 
     public void CancelarHabilidade()
     {
         estadoAtual = EstadoCinto.Inativo;
         distanciaAtualVoo = 0f;
+
+        if (pvInimigo != null)
+        {
+            photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, false);
+            Player donoAntigo = PhotonNetwork.CurrentRoom.GetPlayer(donoOriginalActorNr);
+            if (donoAntigo != null) pvInimigo.TransferOwnership(donoAntigo);
+        }
+
+        inimigoCapturado = null;
+        pvInimigo = null;
 
         if (prefabCinto != null)
         {
@@ -190,11 +246,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         }
     }
 
-    public bool EstaPronta()
-    {
-        return Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
-    }
-    public bool PodeUsar() { return EstaPronta(); }
+    public bool EstaPronta() => Time.time >= tempoProximoUso && estadoAtual == EstadoCinto.Inativo;
+    public bool PodeUsar() => EstaPronta();
 
     public void AtivarHabilidade()
     {
@@ -214,7 +267,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
             prefabCinto.SetActive(true);
         }
 
-        // Toca apenas o som de lançar/jogar
+        // Toca o som de lançar
         if (audioSource != null && somLançar != null)
         {
             audioSource.PlayOneShot(somLançar);
@@ -223,5 +276,27 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         distanciaAtualVoo = 0f;
         tempoProximoUso = Time.time + tempoCooldown;
         estadoAtual = EstadoCinto.Avancando;
+    }
+
+    [PunRPC]
+    public void RPC_AvisarVitima(int idObjetoVitima, int idDonoOriginal, bool sendoPuxado)
+    {
+        if (PhotonNetwork.LocalPlayer.ActorNumber == idDonoOriginal)
+        {
+            PhotonView pvVitima = PhotonView.Find(idObjetoVitima);
+            if (pvVitima != null)
+            {
+                MovimentodoPlayer mov = pvVitima.GetComponent<MovimentodoPlayer>();
+                if (mov != null) mov.enabled = !sendoPuxado;
+
+                CharacterController cc = pvVitima.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = !sendoPuxado;
+
+                if (sendoPuxado)
+                    Debug.Log("<color=red>⚠️ VOCÊ FOI LAÇADO E ESTÁ SENDO PUXADO!</color>");
+                else
+                    Debug.Log("<color=green>Você foi solto e pode voltar a andar.</color>");
+            }
+        }
     }
 }

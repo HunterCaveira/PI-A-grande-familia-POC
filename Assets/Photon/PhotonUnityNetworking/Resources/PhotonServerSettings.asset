@@ -55,6 +55,8 @@ MonoBehaviour:
   - RPC_ExecutarTiro
   - RPC_DesativarJogadorParaRespawn
   - RPC_AlternarEstadoJogador
+  - RPC_AvisarVitima
+  - RPC_DispararTriggerPulo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
