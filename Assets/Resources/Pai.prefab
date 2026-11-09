@@ -114,8 +114,8 @@ MonoBehaviour:
   lineRenderer: {fileID: 0}
   duracaoLinha: -0.03
   audioSource: {fileID: 0}
-  somTiro: {fileID: 0}
-  somRecarga: {fileID: 0}
+  somTiro: {fileID: 8300000, guid: 4d9bee6b5bff1974ca173b0035c796c3, type: 3}
+  somRecarga: {fileID: 8300000, guid: 1ee2862f17b812c4bac67dce7ac6d55f, type: 3}
   meuPoolDeBalas: {fileID: 0}
   danoPorTiro: 20
   tipoDeDano: 0
@@ -481,7 +481,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5216189478530170932}
   - component: {fileID: 214370613887720223}
-  - component: {fileID: 6249894465784022372}
   - component: {fileID: 8272167051634859774}
   - component: {fileID: 5116386871671960872}
   m_Layer: 3
@@ -500,7 +499,7 @@ Transform:
   m_GameObject: {fileID: 1852653123552085012}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2370918, y: 0.10665114, z: -0.026196161, w: 0.96525997}
-  m_LocalPosition: {x: -0.67907715, y: 1.6261673, z: -3.0355225}
+  m_LocalPosition: {x: -1474.6539, y: 40.396088, z: -476.89728}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -557,14 +556,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &6249894465784022372
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1852653123552085012}
-  m_Enabled: 1
 --- !u!114 &8272167051634859774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,6 +923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
+  animator: {fileID: 0}
   velocidade: 5
   gravidade: -9.81
   forcaPulo: 2
@@ -1009,6 +1001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nomeDaCamera: Main Camera
   distanciaMaxima: 15
   camadaChao:
     serializedVersion: 2
@@ -1016,6 +1009,8 @@ MonoBehaviour:
   camadaParedesEObstaculos:
     serializedVersion: 2
     m_Bits: 128
+  audioSource: {fileID: 0}
+  somUsar: {fileID: 8300000, guid: 0b305eceeb3365b46a2c34a87be09df0, type: 3}
   larguraMaxima: 10
   larguraMinima: 1
   alturaMaxima: 3
@@ -1027,8 +1022,8 @@ MonoBehaviour:
   limiteParedes: 2
   tempoCooldown: 1
   slotIndex: 1
-  fotoPronta: {fileID: 21300000, guid: 5871ef8a91521d6408407dfafdb7a0a4, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+  fotoPronta: {fileID: 21300000, guid: dd8dea172a804ef48ab78f6b8ae3b3a7, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: c4b4bdabdf5192444b344d046a928c62, type: 3}
   tempoDeRecarga: 1
 --- !u!114 &376925669326752263
 MonoBehaviour:
@@ -1042,17 +1037,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
+  nomeDaCamera: Main Camera
   distanciaMaxima: 10
+  audioSource: {fileID: 0}
+  "somLan\xE7ar": {fileID: 8300000, guid: 57aee42e49027f54489ccf4bd04be715, type: 3}
   tempoCooldown: 0
   velocidadeAvanco: 30
-  velocidadeRetorno: 20
   slotIndex: 2
-  fotoPronta: {fileID: 21300000, guid: fe79c05c3225f7a4696d642ac859cb6e, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+  fotoPronta: {fileID: 21300000, guid: 9942e0d9f4e27614daea480c45a6e6b3, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: f7d0404cb8d7f434cb38ee8378d18ed9, type: 3}
   gerenciadorDeEquipamentos: {fileID: 247128005760641348}
   prefabCinto: {fileID: 5655468510688860589}
   pontoFivelaPontos: {fileID: 7780615101466668945}
-  pontoDestinoPuxao: {fileID: 8019647009318721997}
   idDoTime: 1
 --- !u!114 &8469832898379529611
 MonoBehaviour:
@@ -1066,14 +1062,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
+  nomeDaCamera: Main Camera
   slotIndex: 3
-<<<<<<< HEAD
-  fotoPronta: {fileID: 21300000, guid: 717c2d2799ae8f147913049e0fdf9539, type: 3}
-  fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
-=======
   fotoPronta: {fileID: 21300000, guid: c224b572731bbe340ba8c9bc3a3fc814, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 089b6da5a6047e146889f5730ae763d4, type: 3}
->>>>>>> parent of 5729c28 (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
+  audioSource: {fileID: 0}
+  somUsar: {fileID: 8300000, guid: 579de2a6bb009c04d815001bdf9c8625, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 20
@@ -1633,6 +1627,10 @@ PrefabInstance:
     - target: {fileID: 1628621382219814619, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: m_Name
       value: PrefabParedeReal
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698394403376183562, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
+      propertyPath: sceneViewId
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8264904805395110718, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
       propertyPath: m_LocalPosition.x
