@@ -1,6 +1,5 @@
 using UnityEngine;
-using Unity.Cinemachine; // Cinemachine v3
-using Photon.Pun;   
+using Unity.Cinemachine;
 
 public class CorrecaoCameraPersonagem : MonoBehaviour
 {
@@ -10,40 +9,36 @@ public class CorrecaoCameraPersonagem : MonoBehaviour
 
     [Header("Rotação do Personagem")]
     [SerializeField] private float velocidadeRotacao = 10f;
-    [Tooltip("Gira o personagem apenas quando ele estiver se movendo? (Recomendado para jogos estilo Marvel Rivals)")]
+    [Tooltip("Gira o personagem apenas quando ele estiver se movendo?")]
     [SerializeField] private bool girarApenasEmMovimento = false;
 
     private Transform cameraTransform;
 
-    private PhotonView view;
-
-
-    void Start()
+    private void Start()
     {
-        view = GetComponent<PhotonView>();
-        // Encontra a câmera principal
         if (Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
         }
 
-        // Se não atribuiu o ponto no ombro no Inspector, tenta achar o objeto filho "CameraTarget"
+        // Tenta encontrar o ponto de foco no próprio clone caso não esteja configurado
         if (cameraTarget == null)
         {
             Transform encontrado = transform.Find("CameraTarget");
-            cameraTarget = encontrado != null ? encontrado : transform;
+            cameraTarget = (encontrado != null) ? encontrado : transform;
         }
 
-        // Conecta o alvo do Cinemachine v3 de forma correta
+        // Conecta o ponto de foco do clone à câmera principal do Cinemachine 3
         CinemachineCamera freeLookCam = FindFirstObjectByType<CinemachineCamera>();
         if (freeLookCam != null)
         {
-            if(view.IsMine)
             freeLookCam.Target.TrackingTarget = cameraTarget;
+            freeLookCam.Follow = cameraTarget;
+            freeLookCam.LookAt = cameraTarget;
         }
     }
 
-    void Update()
+    private void Update()
     {
         AlinharPersonagemComCamera();
     }
@@ -52,7 +47,6 @@ public class CorrecaoCameraPersonagem : MonoBehaviour
     {
         if (cameraTransform == null) return;
 
-        // Se a opção estiver ativa, só gira se houver input de movimento
         if (girarApenasEmMovimento)
         {
             float inputHorizontal = Input.GetAxisRaw("Horizontal");
@@ -61,13 +55,11 @@ public class CorrecaoCameraPersonagem : MonoBehaviour
             if (inputHorizontal == 0 && inputVertical == 0) return;
         }
 
-        // Obtém a direção para onde a câmera está olhando no plano horizontal
         Vector3 direcaoCamera = cameraTransform.forward;
         direcaoCamera.y = 0;
 
         if (direcaoCamera.sqrMagnitude < 0.0001f) return;
 
-        // Rotaciona APENAS o corpo do personagem suavemente
         Quaternion rotacaoAlvo = Quaternion.LookRotation(direcaoCamera);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotacaoAlvo, velocidadeRotacao * Time.deltaTime);
     }

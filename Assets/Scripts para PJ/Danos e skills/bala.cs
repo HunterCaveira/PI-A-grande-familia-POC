@@ -1,86 +1,57 @@
-Ôªø// Importa as cole√ß√µes para usar Coroutines (temporizadores invis√≠veis)
-using System.Collections;
-// Importa a biblioteca base da Unity
 using UnityEngine;
-// Importa a biblioteca do Photon para usarmos o PhotonView e RPCs
-using Photon.Pun;
 
-// A classe foi renomeada de 'balacustom' para 'Bala' para funcionar com o script tiroPistola
 public class Bala : MonoBehaviour
 {
-    [Tooltip("Tempo m√°ximo de vida da bala caso ela n√£o acerte em nada (evita pesar o jogo).")]
-    public float tempoVidaMaximo = 5f;
+    private float dano;
+    private TipoDano tipoDano;
+    private GameObject atirador;
+    private string nomeArma;
 
-    // Vari√°veis internas para guardar a "ficha criminal" do tiro
-    private float danoDaBala;
-    private TipoDano tipoDanoBala;
-    private GameObject donoDaArma;
-    private string nomeDaArmaOrigem;
+    [Header("ConfiguraÁıes de Colis„o")]
+    [Tooltip("Camadas que a bala deve ignorar completamente.")]
+    [SerializeField] private LayerMask camadasParaIgnorar;
 
-    // MUDAN√áA: Substitu√≠mos o Start() por OnEnable().
-    // O OnEnable roda SEMPRE que o objeto √© ativado (SetActive(true)), perfeito para o BalaPool!
-    private void OnEnable()
+    // MÈtodo de inicializaÁ„o invocado pela arma ao disparar
+    public void Inicializar(float danoBase, TipoDano tipo, GameObject dono, string nomeDaArma)
     {
-        // Inicia o cron√≥metro para desativar a bala se ela voar para o infinito
-        StartCoroutine(StartDisableObject());
+        dano = danoBase;
+        tipoDano = tipo;
+        atirador = dono;
+        nomeArma = nomeDaArma;
+
+        // AutodestrÛi a bala apÛs 5 segundos se n„o atingir nada (evita ac˙mulo na memÛria)
+        // Destroy(gameObject, 5f);
     }
 
-    // M√©todo que o nosso tiroPistola usa para "ensinar" a bala quem a atirou e quanto de dano ela d√°
-    public void Inicializar(float dano, TipoDano tipo, GameObject dono, string arma)
+    private void OnTriggerEnter(Collider other)
     {
-        danoDaBala = dano;
-        tipoDanoBala = tipo;
-        donoDaArma = dono;
-        nomeDaArmaOrigem = arma;
-    }
+        // 1. Evita colidir com o prÛprio atirador no momento do disparo
+        if (other.gameObject == atirador) return;
 
-    // Este m√©todo √© chamado automaticamente pela Unity quando a bala f√≠sica (Rigidbody) bate noutro Collider
-    private void OnCollisionEnter(Collision collision)
-    {
-        // 1. TRAVA MULTIPLAYER VITAL: S√≥ o computador do ATIRADOR tem o direito de calcular o dano.
-        // Isso impede que, se 4 jogadores virem a bala bater, o inimigo tome 4 vezes o mesmo dano.
-        if (donoDaArma != null)
+        // 2. Evita colidir com outras balas
+        if (other.gameObject.CompareTag("Bala")) return;
+
+        // 3. Ignora se o objeto pertencer a uma Layer configurada para ser ignorada
+        // (Converte a layer do objeto em bitmask e verifica se est· inclusa na LayerMask)
+        if ((camadasParaIgnorar.value & (1 << other.gameObject.layer)) != 0) return;
+
+        // 4. Se atingiu alguÈm que possui o Sistema de Vida
+        if (other.TryGetComponent<Sistemadevida>(out Sistemadevida vidaAtingida))
         {
-            PhotonView pvDono = donoDaArma.GetComponent<PhotonView>();
-            // Se a arma que atirou n√£o for a minha, eu apenas desativo o visual da bala e saio do m√©todo (n√£o dou dano)
-            if (pvDono != null && !pvDono.IsMine)
-            {
-                gameObject.SetActive(false);
-                return;
-            }
+            // Monta a struct de transporte de dano
+            InformacaoDano infoDano = new InformacaoDano(
+                dano,
+                tipoDano,
+                atirador,
+                nomeArma
+            );
+
+            // Aplica o dano
+            vidaAtingida.ReceberDano(infoDano);
         }
 
-        // Se cheguei aqui, EU sou o atirador. Procura o Sistema de Vida no objeto em que a bala bateu.
-        Sistemadevida vidaAlvo = collision.gameObject.GetComponent<Sistemadevida>();
-
-        // 2. EVITAR FOGO AMIGO/SUIC√çDIO: Verifica se bateu em algu√©m com vida E se n√£o bateu no pr√≥prio atirador
-        if (vidaAlvo != null && collision.gameObject != donoDaArma)
-        {
-            // Pega o componente de rede do inimigo atingido
-            PhotonView pvInimigo = collision.gameObject.GetComponent<PhotonView>();
-
-            if (pvInimigo != null)
-            {
-                // 3. ENVIANDO O DANO: 
-                // O meu computador manda uma mensagem pela internet direto para o inimigo: "Toma X de dano!"
-                // (Nota: O script Sistemadevida do inimigo precisa de ter a fun√ß√£o "ReceberDanoRPC" com [PunRPC])
-                pvInimigo.RPC("ReceberDanoRPC", RpcTarget.All, danoDaBala, donoDaArma.GetComponent<PhotonView>().ViewID);
-            }
-        }
-
-        // 4. Opcional: Criar um efeito de fa√≠sca ou poeira no ponto do impacto (sangue, poeira da parede)
-        // Instantiate(efeitoImpacto, collision.contacts[0].point, Quaternion.LookRotation(collision.contacts[0].normal));
-
-        // 5. Devolve o objeto da bala para o Pool imediatamente, escondendo-a da cena
+        // 5. Desativa a bala apenas se passou por todas as verificaÁıes anteriores
+        // (Isso garante que ela n„o ser· desativada ao cruzar layers ignoradas)
         gameObject.SetActive(false);
-    }
-
-    // Rotina que desliga a bala ap√≥s os 5 segundos se ela n√£o bater em nada
-    IEnumerator StartDisableObject()
-    {
-        // Espera o tempo m√°ximo
-        yield return new WaitForSeconds(tempoVidaMaximo);
-        // Esconde a bala (o que a devolve automaticamente para ser reutilizada pelo BalaPool)
-        this.gameObject.SetActive(false);
     }
 }

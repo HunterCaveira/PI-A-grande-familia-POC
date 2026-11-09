@@ -1,20 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
-public class Respawn : MonoBehaviourPunCallbacks
+public class Respawn : MonoBehaviour
 {
     public static Respawn Instancia { get; private set; }
 
-    [Header("Pontos de Spawn no Mapa (Automáticos)")]
-    [SerializeField] private List<Transform> pontosSpawnTime1 = new List<Transform>();
-    [SerializeField] private List<Transform> pontosSpawnTime2 = new List<Transform>();
+    [Header("Pontos de Spawn no Mapa")]
+    [SerializeField] private List<Transform> pontosSpawnTime1;
+    [SerializeField] private List<Transform> pontosSpawnTime2;
 
     [Header("Regras de Partida")]
     [SerializeField] private float tempoParaRespawn = 5f;
-
-    private const string PrefabJogador = "Pai"; // Prefab dentro de Assets/Resources
 
     private void Awake()
     {
@@ -24,76 +21,59 @@ public class Respawn : MonoBehaviourPunCallbacks
         }
         else
         {
-            // Destroy(this) remove só o componente duplicado, sem apagar o GameObject inteiro
-            Destroy(this);
+            gameObject.SetActive(false);
         }
     }
 
-    private void OnDestroy()
+    public void SolicitarRespawn(GameObject bonecoAntigo)
     {
-        if (Instancia == this)
-            Instancia = null;
+        StartCoroutine(RotinaRespawn(bonecoAntigo));
     }
 
-    private void Start()
+    private IEnumerator RotinaRespawn(GameObject bonecoAntigo)
     {
-        BuscarPontosDeSpawnAutomaticos();
-    }
-
-    private void BuscarPontosDeSpawnAutomaticos()
-    {
-        pontosSpawnTime1.Clear();
-        pontosSpawnTime2.Clear();
-
-        GameObject[] todosObjetos = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-
-        foreach (GameObject obj in todosObjetos)
+        // 1. Desativa o herói na cena durante o tempo de respawn
+        if (bonecoAntigo != null)
         {
-            if (obj.name.Contains("Ponto de Respawn2"))
-                pontosSpawnTime2.Add(obj.transform);
-            else if (obj.name.Contains("Ponto de Respawn"))
-                pontosSpawnTime1.Add(obj.transform);
+            bonecoAntigo.SetActive(false);
         }
-    }
 
-    // Deve ser chamado apenas no cliente DONO do personagem que morreu.
-    // O parâmetro nomePrefabHeroi é mantido por compatibilidade; sempre usa "Pai".
-    public void SolicitarRespawn(int timeID, string nomePrefabHeroi = PrefabJogador)
-    {
-        StartCoroutine(RotinaRespawn(timeID));
-    }
-
-    private IEnumerator RotinaRespawn(int timeID)
-    {
+        // 2. Aguarda a contagem regressiva
         yield return new WaitForSeconds(tempoParaRespawn);
 
-        // Se o jogador saiu da sala durante a espera, não recria
-        if (!PhotonNetwork.InRoom)
+        // 3. Lê a escolha do time/personagem salva no PlayerPrefs
+        int timeID = PlayerPrefs.GetInt("PersonagemEscolhido", 1);
+
+        // 4. Seleciona um ponto de spawn aleatório
+        Transform pontoEscolhido = ObterPontoDeSpawn(timeID);
+
+        // 5. Reposiciona o clone e o reativa
+        if (bonecoAntigo != null)
         {
-            Debug.LogWarning("[RESPAWN] Cancelado: jogador não está mais na sala.");
-            yield break;
+            if (pontoEscolhido != null)
+            {
+                bonecoAntigo.transform.position = pontoEscolhido.position;
+                bonecoAntigo.transform.rotation = pontoEscolhido.rotation;
+            }
+
+            bonecoAntigo.SetActive(true);
+
+            if (bonecoAntigo.TryGetComponent<Sistemadevida>(out Sistemadevida vida))
+            {
+                vida.Renascer();
+            }
         }
 
-        Transform ponto = ObterPontoDeSpawn(timeID);
-        if (ponto == null) ponto = this.transform;
-
-        // O TimeID viaja em InstantiationData e é lido pelo OnPhotonInstantiate
-        // do Sistemadevida em TODOS os clientes (não precisa setar depois).
-        PhotonNetwork.Instantiate(
-            PrefabJogador,
-            ponto.position,
-            ponto.rotation,
-            0,
-            new object[] { timeID }
-        );
-
-        Debug.Log($"<color=cyan>[RESPAWN] Jogador renasceu como '{PrefabJogador}' no Time {timeID}!</color>");
+        Debug.Log($"[RESPAWN] Jogador reposicionado com sucesso! Time {timeID}");
     }
 
     private Transform ObterPontoDeSpawn(int timeID)
     {
-        List<Transform> lista = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
-        if (lista == null || lista.Count == 0) return null;
-        return lista[Random.Range(0, lista.Count)];
+        List<Transform> listaPontos = (timeID == 1) ? pontosSpawnTime1 : pontosSpawnTime2;
+
+        if (listaPontos == null || listaPontos.Count == 0) return null;
+
+        int indiceAleatorio = Random.Range(0, listaPontos.Count);
+        return listaPontos[indiceAleatorio];
     }
 }
