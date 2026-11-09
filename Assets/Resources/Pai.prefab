@@ -923,7 +923,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f337c305ee96024ea88ce2e5e6217f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimentodoPlayer
-  animator: {fileID: 0}
   velocidade: 5
   gravidade: -9.81
   forcaPulo: 2
@@ -1001,7 +1000,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37b83c274e83666438fa0c8d2434af33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nomeDaCamera: Main Camera
   distanciaMaxima: 15
   camadaChao:
     serializedVersion: 2
@@ -1009,8 +1007,6 @@ MonoBehaviour:
   camadaParedesEObstaculos:
     serializedVersion: 2
     m_Bits: 128
-  audioSource: {fileID: 0}
-  somUsar: {fileID: 8300000, guid: 0b305eceeb3365b46a2c34a87be09df0, type: 3}
   larguraMaxima: 10
   larguraMinima: 1
   alturaMaxima: 3
@@ -1037,18 +1033,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2bebaa67c76854b9f5494ce78dedd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
-  nomeDaCamera: Main Camera
   distanciaMaxima: 10
-  audioSource: {fileID: 0}
-  "somLan\xE7ar": {fileID: 8300000, guid: 57aee42e49027f54489ccf4bd04be715, type: 3}
   tempoCooldown: 0
   velocidadeAvanco: 30
+  velocidadeRetorno: 20
   slotIndex: 2
   fotoPronta: {fileID: 21300000, guid: 9942e0d9f4e27614daea480c45a6e6b3, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: f7d0404cb8d7f434cb38ee8378d18ed9, type: 3}
   gerenciadorDeEquipamentos: {fileID: 247128005760641348}
   prefabCinto: {fileID: 5655468510688860589}
   pontoFivelaPontos: {fileID: 7780615101466668945}
+  pontoDestinoPuxao: {fileID: 0}
   idDoTime: 1
 --- !u!114 &8469832898379529611
 MonoBehaviour:
@@ -1062,12 +1057,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0570a497cea3db140a61ab7ff97f518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
-  nomeDaCamera: Main Camera
   slotIndex: 3
   fotoPronta: {fileID: 21300000, guid: c224b572731bbe340ba8c9bc3a3fc814, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 089b6da5a6047e146889f5730ae763d4, type: 3}
-  audioSource: {fileID: 0}
-  somUsar: {fileID: 8300000, guid: 579de2a6bb009c04d815001bdf9c8625, type: 3}
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 20
@@ -1120,7 +1112,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 0
   ObservedComponents:
   - {fileID: 6667235756849144756}
