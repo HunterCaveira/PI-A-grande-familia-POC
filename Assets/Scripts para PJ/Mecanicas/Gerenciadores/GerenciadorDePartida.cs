@@ -25,6 +25,10 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     [Header("Configurações da Partida")]
     [Tooltip("Duração total da partida em segundos (ex: 300s = 5 minutos)")]
     public float tempoDePartida = 300f;
+
+    [Tooltip("Tempo total em segundos necessário para um time dominar a área (180s = 100%)")]
+    public float tempoParaVencer = 180f;
+
     private float tempoRestante;
     private bool partidaAcabou = false;
 
@@ -95,8 +99,8 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
                 }
             }
 
-            // Condições de término: O tempo acabou OU algum dos times atingiu 100% de dominação
-            if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
+            // Condições de término: O tempo acabou OU algum dos times atingiu o tempo de vitória (180s)
+            if (tempoRestante <= 0 || tempoTotalTime1 >= tempoParaVencer || tempoTotalTime2 >= tempoParaVencer)
             {
                 // Manda uma ordem via RPC para todos os computadores da sala encerrarem a partida juntos
                 photonView.RPC("RPC_FinalizarPartida", RpcTarget.All);
@@ -141,18 +145,17 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
             textoCronometro.text = FormatarTempo(tempoVisual);
         }
 
-        // Atualiza a barragem de porcentagem do Time Roxo
+        // Atualiza a barra de porcentagem do Time Roxo (converte os segundos acumulados para 0% a 100%)
         if (dominaçãoRoxo != null)
         {
-            // Arredonda o valor para cima e trava entre 0% e 100%
-            float pctTime1 = Mathf.Clamp(Mathf.Round(tempoTotalTime1), 0f, 100f);
+            float pctTime1 = Mathf.Clamp(Mathf.Round((tempoTotalTime1 / tempoParaVencer) * 100f), 0f, 100f);
             dominaçãoRoxo.text = string.Format($"{pctTime1} %");
         }
 
-        // Atualiza a barragem de porcentagem do Time Amarelo
+        // Atualiza a barra de porcentagem do Time Amarelo (converte os segundos acumulados para 0% a 100%)
         if (dominaçãoAmarelo != null)
         {
-            float pctTime2 = Mathf.Clamp(Mathf.Round(tempoTotalTime2), 0f, 100f);
+            float pctTime2 = Mathf.Clamp(Mathf.Round((tempoTotalTime2 / tempoParaVencer) * 100f), 0f, 100f);
             dominaçãoAmarelo.text = string.Format($"{pctTime2} %");
         }
     }
@@ -180,11 +183,11 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
         Debug.Log($"Fim de Partida! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
 
         // Compara os pontos acumulados e exibe o painel de vitória correspondente
-        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
+        if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= tempoParaVencer)
         {
             if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
         }
-        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= 100f)
+        else if (tempoTotalTime2 > tempoTotalTime1 || tempoTotalTime2 >= tempoParaVencer)
         {
             if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(true);
         }

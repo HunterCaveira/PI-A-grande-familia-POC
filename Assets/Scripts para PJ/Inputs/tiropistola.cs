@@ -96,6 +96,12 @@ public class tiroPistola : MonoBehaviourPun
     {
         if (pvRaiz != null && !pvRaiz.IsMine) return;
 
+        // Tenta reconectar a câmera continuamente se ela ainda não existir
+        if (playerCamera == null)
+        {
+            VerificarEConectarReferenciasDaCena();
+        }
+
         MyInput();
 
         if (ammunitionDisplay != null)
@@ -108,16 +114,32 @@ public class tiroPistola : MonoBehaviourPun
 
     private void VerificarEConectarReferenciasDaCena()
     {
+        // 1. Busca pelo GameObject ativo na hierarquia
         if (playerCamera == null)
         {
             GameObject camObj = GameObject.Find(nomeDaCamera);
+
+            // 2. Caso o GameObject.Find não encontre, busca entre todas as câmeras ativas no projeto
+            if (camObj == null)
+            {
+                Camera[] camerasNaCena = FindObjectsByType<Camera>(FindObjectsSortMode.None);
+                foreach (Camera cam in camerasNaCena)
+                {
+                    if (cam.gameObject.name == nomeDaCamera)
+                    {
+                        camObj = cam.gameObject;
+                        break;
+                    }
+                }
+            }
+
             if (camObj != null)
             {
                 playerCamera = camObj.GetComponent<Camera>();
             }
         }
 
-        // Pega o AudioSource da Câmera encontrada
+        // 3. Conecta o AudioSource da Câmera assim que ela for encontrada
         if (audioSource == null && playerCamera != null)
         {
             audioSource = playerCamera.GetComponent<AudioSource>();

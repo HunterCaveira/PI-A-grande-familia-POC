@@ -2,10 +2,9 @@
 using UnityEngine;
 // Importa a biblioteca do Cinemachine 3
 using Unity.Cinemachine;
-// MUDANÇA: Importa o Photon para permitir o bloqueio de rede
+// Importa o Photon para permitir o bloqueio de rede
 using Photon.Pun;
 
-// MUDANÇA: Agora herda de MonoBehaviourPun para usar o photonView
 public class CameraEvitaParede : MonoBehaviourPun
 {
     [Header("Configurações do Alvo")]
@@ -13,79 +12,85 @@ public class CameraEvitaParede : MonoBehaviourPun
     [SerializeField] private Transform cameraFollowTarget;
 
     // Caches privados para alta performance e suporte a P2P/Multiplayer
-    // MUDANÇA: Retirámos o [SerializeField] da câmera. O código vai achá-la sozinho agora!
     private CinemachineCamera virtualCamera;
     private CinemachineOrbitalFollow orbitalFollow;
     private Transform mainCameraTransform;
 
-    // Start é chamado quando o personagem nasce na cena
     void Start()
     {
-        // 🔒 MUDANÇA CRÍTICA: Trava de Rede!
-        // Se este script estiver rodando no boneco de outro jogador (inimigo), 
-        // ele aborta a execução na hora. Assim, ninguém rouba a sua câmera.
-        if (photonView != null && !photonView.IsMine) return;
+        // 🔒 TRAVA DE REDE CRÍTICA: Se não for o meu boneco, desliga este script completamente
+        // para economizar processamento e evitar conflitos de câmara.
+        if (photonView != null && !photonView.IsMine)
+        {
+            enabled = false;
+            return;
+        }
 
-        // 1. Cache da Câmera Principal da cena (evita lag de busca)
+        // Cache da Câmera Principal da cena
         if (Camera.main != null)
         {
             mainCameraTransform = Camera.main.transform;
         }
 
-        // 2. MUDANÇA: Busca a CinemachineCamera (Virtual Camera) automaticamente no mapa.
+        // Configuração inicial do alvo de seguimento
+        ConfigurarAlvoDaCamera();
+    }
+
+    private void ConfigurarAlvoDaCamera()
+    {
+        // Busca a CinemachineCamera (Virtual Camera) ativa na cena
         virtualCamera = Object.FindFirstObjectByType<CinemachineCamera>();
 
-        // 3. Cache do componente orbital e configuração do alvo
         if (virtualCamera != null)
         {
+            // Tenta obter o componente Orbital Follow do Cinemachine 3 de forma segura
             orbitalFollow = virtualCamera.GetComponent<CinemachineOrbitalFollow>();
 
-            if (orbitalFollow == null)
-            {
-                Debug.LogWarning("A câmera não tem 'Cinemachine Orbital Follow'!");
-            }
-
-            // MUDANÇA: Autocorreção caso esqueça de arrastar o CameraTarget no Inspector
+            // Autocorreção caso esqueça de arrastar o CameraTarget no Inspector
             if (cameraFollowTarget == null)
             {
                 Transform achado = transform.Find("CameraTarget");
-                // Se achar o filho "CameraTarget", usa ele. Se não achar, foca na barriga (transform raiz).
                 cameraFollowTarget = achado != null ? achado : transform;
             }
 
-            // Define oficialmente que a câmera da cena deve seguir o ombro DESTE jogador
+            // Define oficialmente que a câmara da cena deve seguir o ombro DESTE jogador
             virtualCamera.Target.TrackingTarget = cameraFollowTarget;
+        }
+        else
+        {
+            Debug.LogWarning("[CameraEvitaParede] Nenhuma CinemachineCamera foi encontrada na cena!");
         }
     }
 
-    // Usamos LateUpdate para sincronizar enquadramentos APÓS a física do personagem (evita tremedeira)
     void LateUpdate()
     {
-        // 🔒 Trava de Rede de Segurança
+        // Trava de segurança extra de rede
         if (photonView != null && !photonView.IsMine) return;
 
-        // Validação de segurança para evitar erros vermelhos na consola
-        if (virtualCamera == null || cameraFollowTarget == null || orbitalFollow == null)
-            return;
+        // Validação contínua: se por algum motivo a câmara perdeu o alvo (ex: após um respawn), reconfigura automaticamente
+        if (virtualCamera != null && virtualCamera.Target.TrackingTarget == null)
+        {
+            if (cameraFollowTarget != null)
+            {
+                virtualCamera.Target.TrackingTarget = cameraFollowTarget;
+            }
+        }
 
         // NOTA DE DESIGN DO HERO SHOOTER:
-        // A colisão com paredes agora é gerenciada 100% pelo componente "Cinemachine Deoccluder" 
-        // que você deve adicionar diretamente no Inspector da própria Virtual Camera que fica na cena.
-        // Como o Deoccluder faz tudo, não precisamos forçar Raycasts complexos aqui dentro, 
-        // mantendo a mira estável e o jogo muito mais leve em rede!
+        // A colisão com paredes é gerida pelo componente "Cinemachine Deoccluder" 
+        // adicionado diretamente no Inspector da Virtual Camera na cena.
     }
 
     /// <summary>
-    /// Permite alterar a referência do jogador dinamicamente (ex: reviver com outro herói).
+    /// Permite alterar a referência do jogador dinamicamente (ex: respawn ou troca de herói).
     /// </summary>
     public void ConfigurarNovoHeroi(Transform novoTarget)
     {
-        // 🔒 Trava de Rede de Segurança
         if (photonView != null && !photonView.IsMine) return;
 
         cameraFollowTarget = novoTarget;
 
-        if (virtualCamera != null)
+        if (virtualCamera != null && cameraFollowTarget != null)
         {
             virtualCamera.Target.TrackingTarget = cameraFollowTarget;
         }
