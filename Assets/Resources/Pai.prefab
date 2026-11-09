@@ -776,7 +776,6 @@ GameObject:
   - component: {fileID: 7290812220852788183}
   - component: {fileID: 771253255416535208}
   - component: {fileID: 8364777955370474253}
-  - component: {fileID: 8406817100898973625}
   - component: {fileID: 8594573616931162813}
   - component: {fileID: 376925669326752263}
   - component: {fileID: 8469832898379529611}
@@ -922,23 +921,6 @@ MonoBehaviour:
   dadosDoHeroi: {fileID: 11400000, guid: 2f10479388fcc4e42a57cce4f5cca684, type: 2}
   timeID: 1
   vidaAtual: 500
---- !u!114 &8406817100898973625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317283540011002145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f4832feae4d7304e88eea6d0ac9fe7c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pontosSpawnTime1:
-  - {fileID: 0}
-  pontosSpawnTime2:
-  - {fileID: 1100983017872450593, guid: b85fc1013138bba40a8a280bd741abee, type: 3}
-  tempoParaRespawn: 3
 --- !u!114 &8594573616931162813
 MonoBehaviour:
   m_ObjectHideFlags: 0
