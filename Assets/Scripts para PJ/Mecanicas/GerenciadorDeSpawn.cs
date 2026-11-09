@@ -67,7 +67,7 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 
         Transform pontoDeSpawn = ObterPontoDeSpawn(meuTime);
 
-        // Validação de segurança para garantir que o prefab existe na pasta Resources antes de chamar o Photon
+        // Validação de segurança para garantir que o prefab existe na pasta Resources
         GameObject prefabTeste = Resources.Load<GameObject>(PrefabJogador);
         if (prefabTeste == null)
         {
@@ -84,7 +84,7 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
         );
     }
 
-    // 🌐 Aguarda o tempo e reposiciona/renasce o jogador no novo ponto de spawn
+    // Aguarda o tempo de espera e solicita o respawn reaproveitado enviando os dados para o Sistemadevida
     public void SolicitarRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempoEspera = 3f)
     {
         StartCoroutine(RotinaRespawnReaproveitado(sistemaVida, timeID, tempoEspera));
@@ -98,12 +98,8 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
         {
             Transform pontoDeSpawn = ObterPontoDeSpawn(timeID);
 
-            // Posiciona o jogador no ponto correto
-            sistemaVida.transform.position = pontoDeSpawn.position;
-            sistemaVida.transform.rotation = pontoDeSpawn.rotation;
-
-            // Chama o Renascer passando o timeID correspondente (se o seu Sistemadevida exigir)
-            sistemaVida.Renascer(timeID);
+            // Chama o método Renascer passando a posição e rotação exatamente como o Sistemadevida exige
+            sistemaVida.Renascer(pontoDeSpawn.position, pontoDeSpawn.rotation);
         }
     }
 
