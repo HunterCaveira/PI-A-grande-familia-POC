@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6220591073685751629}
   - component: {fileID: 7643895223355425182}
   - component: {fileID: 2732845165014215290}
-  - component: {fileID: 6494084348163216174}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -46,16 +45,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b1e7f418706fbb46ae782b1ae137f87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textoCronometro: {fileID: 0}
-  "domina\xE7\xE3oRoxo": {fileID: 0}
-  "domina\xE7\xE3oAmarelo": {fileID: 0}
-  imagemVitoriaTime1: {fileID: 0}
-  imagemVitoriaTime2: {fileID: 0}
-  imagemEmpate: {fileID: 0}
-  tempoDePartida: 300
+  textoCronometro: {fileID: 1997258137465205397, guid: 557fc4eba4280aa45a56a18d6512926d, type: 3}
+  "domina\xE7\xE3oRoxo": {fileID: 1900833058236745462, guid: b1c8ffb13cc660944b11099d7abb46c6, type: 3}
+  "domina\xE7\xE3oAmarelo": {fileID: 3527367587928475577, guid: d98d6acec51598247801a2ff07f2c422, type: 3}
+  imagemVitoriaTime1: {fileID: 3050047879295728930, guid: 98d73984c2f1dc84d8caf5e8fa6c3959, type: 3}
+  imagemVitoriaTime2: {fileID: 6656817076986614127, guid: e1552a951fffb9a438ac70f40a2ebb3a, type: 3}
+  imagemEmpate: {fileID: 3651696079539538992, guid: b14e4bbbf8a634c4e8abf94c87f1e5cf, type: 3}
+  tempoDePartida: 150
   tempoTotalTime1: 0
   tempoTotalTime2: 0
-  areaDeDominacao: {fileID: 0}
+  areaDeDominacao: {fileID: 294291535267127629, guid: b60a8b8825567a84696d2a26d4e7b6ff, type: 3}
 --- !u!114 &2732845165014215290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,25 +67,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97bdc365348fed8408a965ed4a41d9d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GerenciadorUI
-  jogador: {fileID: 0}
-  imagemSlotQ: {fileID: 0}
-  imagemSlotE: {fileID: 0}
-  imagemSlotF: {fileID: 0}
-  meuTexto: {fileID: 0}
-  pistolaRef: {fileID: 0}
---- !u!114 &6494084348163216174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4136945313930268639}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed03dd7332f2ba45999f887b800f55d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeSpawn
-  pontosSpawnTime1:
-  - {fileID: 0}
-  pontosSpawnTime2:
-  - {fileID: 0}
+  jogador: {fileID: 3375185681077528402, guid: 5b3c90747a67f2a4ab62d7a7e1a9efca, type: 3}
+  imagemSlotQ: {fileID: 3528102358592265409, guid: c43fb68f96e5bae4888c873aeb346979, type: 3}
+  imagemSlotE: {fileID: 339096473678572344, guid: 800ee355af0f0fe4c936eea94e5c5def, type: 3}
+  imagemSlotF: {fileID: 8829705818854735091, guid: af42d23171fd0924799bba9341159bab, type: 3}
+  meuTexto: {fileID: 4420596570504911777, guid: efcecafffc55a6f4b9afb847eb96076e, type: 3}
+  pistolaRef: {fileID: 8248615906336370963, guid: 9b245d7c7ebe1c34db2ce0ebf914ff58, type: 3}

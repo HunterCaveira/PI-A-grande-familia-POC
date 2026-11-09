@@ -67,14 +67,6 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
 
         Transform pontoDeSpawn = ObterPontoDeSpawn(meuTime);
 
-        // Validação de segurança para garantir que o prefab existe na pasta Resources
-        GameObject prefabTeste = Resources.Load<GameObject>(PrefabJogador);
-        if (prefabTeste == null)
-        {
-            Debug.LogError($"[GerenciadorDeSpawn] ERRO CRÍTICO: O prefab '{PrefabJogador}' NÃO FOI ENCONTRADO na pasta 'Resources'! Verifique o nome e o local do arquivo.");
-            return;
-        }
-
         PhotonNetwork.Instantiate(
             PrefabJogador,
             pontoDeSpawn.position,
@@ -84,7 +76,7 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
         );
     }
 
-    // Aguarda o tempo de espera e solicita o respawn reaproveitado enviando os dados para o Sistemadevida
+    // 🌐 OPÇÃO 1: Aguarda o tempo e reativa a mesma instância do jogador no novo ponto de spawn
     public void SolicitarRespawnReaproveitado(Sistemadevida sistemaVida, int timeID, float tempoEspera = 3f)
     {
         StartCoroutine(RotinaRespawnReaproveitado(sistemaVida, timeID, tempoEspera));
@@ -97,8 +89,6 @@ public class GerenciadorDeSpawn : MonoBehaviourPunCallbacks
         if (sistemaVida != null)
         {
             Transform pontoDeSpawn = ObterPontoDeSpawn(timeID);
-
-            // Chama o método Renascer passando a posição e rotação exatamente como o Sistemadevida exige
             sistemaVida.Renascer(pontoDeSpawn.position, pontoDeSpawn.rotation);
         }
     }
