@@ -1067,8 +1067,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeTonico
   slotIndex: 3
+<<<<<<< HEAD
   fotoPronta: {fileID: 21300000, guid: 717c2d2799ae8f147913049e0fdf9539, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: 25ebed0423abbee4e974ecfca9e4b759, type: 3}
+=======
+  fotoPronta: {fileID: 21300000, guid: c224b572731bbe340ba8c9bc3a3fc814, type: 3}
+  fotoRecarregando: {fileID: 21300000, guid: 089b6da5a6047e146889f5730ae763d4, type: 3}
+>>>>>>> parent of 5729c28 (Merge branch 'main' of https://github.com/HunterCaveira/PI-A-grande-familia-POC)
   velocidadeComBuff: 50
   porcentagemReducaoDano: 0.3
   duracaoDoEfeito: 20
