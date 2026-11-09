@@ -883,10 +883,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.75
-  m_Height: 5.51
+  m_Radius: 0.79
+  m_Height: 4.73
   m_Direction: 1
-  m_Center: {x: -1.25, y: 0.26, z: 0}
+  m_Center: {x: -1.25, y: 0.11, z: 0}
 --- !u!143 &2763244992418624102
 CharacterController:
   m_ObjectHideFlags: 0
@@ -905,13 +905,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 5.01
+  m_Height: 4.96
   m_Radius: 0.76
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.45
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: -1.23, y: 0.03, z: 0}
+  m_Center: {x: -1.25, y: 0.11, z: 0}
 --- !u!114 &6732457744592020155
 MonoBehaviour:
   m_ObjectHideFlags: 0
