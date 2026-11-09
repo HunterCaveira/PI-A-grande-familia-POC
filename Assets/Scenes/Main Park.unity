@@ -7081,6 +7081,10 @@ PrefabInstance:
       propertyPath: m_VersionIndex
       value: 701
       objectReference: {fileID: 0}
+    - target: {fileID: 1978787448368404740, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: sceneViewId
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2096188682957345504, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Name
       value: Mapa
@@ -7089,6 +7093,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2301180662179477881, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7fe24bfa0bbd48f40ac3fcb4ebcebd18, type: 2}
     - target: {fileID: 2460729341916407435, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -7232,7 +7240,7 @@ PrefabInstance:
     - target: {fileID: 4457538225278547822, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1811727437}
     - target: {fileID: 4485544294366595923, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -7243,7 +7251,7 @@ PrefabInstance:
       objectReference: {fileID: 1062772702}
     - target: {fileID: 4530712795372859255, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_VersionIndex
-      value: 217
+      value: 223
       objectReference: {fileID: 0}
     - target: {fileID: 4655712873486095348, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7341,6 +7349,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 623.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6277835007162153726, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f8bbcd8b194f60243979a35e25f4bedc, type: 2}
     - target: {fileID: 6324330862367575479, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -7405,6 +7417,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -23.663
       objectReference: {fileID: 0}
+    - target: {fileID: 7482943670619145239, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7fe24bfa0bbd48f40ac3fcb4ebcebd18, type: 2}
     - target: {fileID: 7544576740699971314, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -7425,6 +7441,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -72.2
       objectReference: {fileID: 0}
+    - target: {fileID: 8495649234748496240, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7fe24bfa0bbd48f40ac3fcb4ebcebd18, type: 2}
+    - target: {fileID: 8536648805429402341, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f8bbcd8b194f60243979a35e25f4bedc, type: 2}
     - target: {fileID: 8681481067075494434, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -7445,6 +7469,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 7fe24bfa0bbd48f40ac3fcb4ebcebd18, type: 2}
+    - target: {fileID: 9138962628673667478, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f8bbcd8b194f60243979a35e25f4bedc, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 7172487335888422139, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
@@ -13876,7 +13904,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 4729419530920185851}
-  sceneViewId: 2
+  sceneViewId: 6
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1001 &5362060730212694196
