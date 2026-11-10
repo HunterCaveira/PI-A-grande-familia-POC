@@ -1,30 +1,30 @@
-using Photon.Pun;
-using Photon.Realtime;
-using System.Collections;
-using TMPro;
+// Importa bibliotecas básicas da Unity, TextMeshPro e do Photon para multiplayer
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
-using UnityEngine.SceneManagement;
+using TMPro;
+using Photon.Pun;
 
-public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
+// A classe herda de MonoBehaviourPun e implementa IPunObservable para sincronizar dados em tempo real pela rede
+public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 {
     [Header("Interface (UI)")]
+    [Tooltip("Arraste o objeto de Texto (TextMeshPro) do cronômetro da partida aqui")]
     public TextMeshProUGUI textoCronometro;
+    [Tooltip("Texto da UI que exibe a porcentagem do Time Roxo")]
     public TextMeshProUGUI dominaçãoRoxo;
+    [Tooltip("Texto da UI que exibe a porcentagem do Time Amarelo")]
     public TextMeshProUGUI dominaçãoAmarelo;
 
     [Header("Telas de Fim de Jogo")]
+    [Tooltip("Tela exibida se o Time 1 vencer")]
     public GameObject imagemVitoriaTime1;
+    [Tooltip("Tela exibida se o Time 2 vencer")]
     public GameObject imagemVitoriaTime2;
+    [Tooltip("Tela exibida em caso de empate")]
     public GameObject imagemEmpate;
 
     [Header("Configurações da Partida")]
+    [Tooltip("Duração total da partida em segundos (ex: 300s = 5 minutos)")]
     public float tempoDePartida = 300f;
-    [Tooltip("Tempo em segundos que as telas de vitória ficam visíveis antes de voltar ao menu")]
-    public float tempoEsperaFimDePartida = 5f;
-    [Tooltip("Nome exato da cena do Menu/Lobby no Build Settings")]
-    public string nomeCenaMenu = "MenuInicial";
-
     private float tempoRestante;
     private bool partidaAcabou = false;
 
@@ -33,16 +33,18 @@ public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
     public float tempoTotalTime2 = 0f;
 
     [Header("Conexão com a Área")]
+    [Tooltip("Referência ao script de Dominação do mapa (Pode ser deixado vazio para busca automática)")]
     public Dominacao areaDeDominacao;
 
+    // Start é chamado no primeiro frame da cena
     private void Start()
     {
+        // Garante que todas as imagens de vitória/derrota comecem desativadas (invisíveis)
         if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(false);
         if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(false);
         if (imagemEmpate != null) imagemEmpate.SetActive(false);
 
-        tempoRestante = tempoDePartida;
-
+        // MUDANÇA DE MELHORIA: Se esqueceu de arrastar no Inspector, procura o objeto de dominação sozinho na cena
         if (areaDeDominacao == null)
         {
             areaDeDominacao = Object.FindFirstObjectByType<Dominacao>();
@@ -52,6 +54,7 @@ public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
+        // Apenas o líder da sala (Master Client) inicializa os valores oficiais do tempo e placar
         if (PhotonNetwork.IsMasterClient)
         {
             tempoRestante = tempoDePartida;
@@ -60,73 +63,101 @@ public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    // Update roda a cada frame do jogo
     private void Update()
     {
+        // Se a partida já acabou, interrompe a execução do Update
         if (partidaAcabou) return;
 
+        // 2. REGRA DE OURO DO MULTIPLAYER: APENAS O LÍDER DA SALA (Master Client) FAZ A MATEMÁTICA E CONTAGEM
+        // Isso evita conflitos de relógio e lag desincronizado entre os jogadores.
         if (PhotonNetwork.IsMasterClient)
         {
+            // O cronômetro regride baseando-se no tempo real do Unity
             tempoRestante -= Time.deltaTime;
 
-            if (areaDeDominacao != null && !areaDeDominacao.emDisputa)
+            // Lógica de pontuação do território de dominação
+            if (areaDeDominacao != null)
             {
-                if (areaDeDominacao.timeDonoDoTerritorio == 1)
+                // Se a zona não estiver a ser disputada por dois inimigos ao mesmo tempo
+                if (!areaDeDominacao.emDisputa)
                 {
-                    tempoTotalTime1 += Time.deltaTime;
-                }
-                else if (areaDeDominacao.timeDonoDoTerritorio == 2)
-                {
-                    tempoTotalTime2 += Time.deltaTime;
+                    // Se o dono for o Time 1, acumula tempo para o Time 1
+                    if (areaDeDominacao.timeDonoDoTerritorio == 1)
+                    {
+                        tempoTotalTime1 += Time.deltaTime;
+                    }
+                    // Se o dono for o Time 2, acumula tempo para o Time 2
+                    else if (areaDeDominacao.timeDonoDoTerritorio == 2)
+                    {
+                        tempoTotalTime2 += Time.deltaTime;
+                    }
                 }
             }
 
+            // Condições de término: O tempo acabou OU algum dos times atingiu 100% de dominação
             if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
             {
-                photonView.RPC(nameof(RPC_FinalizarPartida), RpcTarget.AllViaServer);
+                // Manda uma ordem via RPC para todos os computadores da sala encerrarem a partida juntos
+                photonView.RPC("RPC_FinalizarPartida", RpcTarget.All);
             }
         }
 
+        // 3. TODOS os computadores atualizam as suas telas locais com base nos números sincronizados pelo Líder
         AtualizarRelogiosNaTela();
     }
 
+    // ==========================================
+    // MÉTODO OBRIGATÓRIO PARA O IPunObservable
+    // Sincroniza as variáveis de tempo e pontuação de forma fluida pela rede
+    // ==========================================
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
+            // O Líder transmite os seus dados atuais para os clientes conectados
             stream.SendNext(tempoRestante);
             stream.SendNext(tempoTotalTime1);
             stream.SendNext(tempoTotalTime2);
         }
         else
         {
+            // Os demais jogadores recebem e aplicam os valores enviados pelo Líder
             tempoRestante = (float)stream.ReceiveNext();
             tempoTotalTime1 = (float)stream.ReceiveNext();
             tempoTotalTime2 = (float)stream.ReceiveNext();
         }
     }
 
+    // Gerencia a atualização visual de todos os textos na interface
     private void AtualizarRelogiosNaTela()
     {
+        // Trava matemática para o relógio nunca exibir números negativos na tela
         float tempoVisual = Mathf.Max(0, tempoRestante);
 
+        // Atualiza o texto do cronômetro principal
         if (textoCronometro != null)
         {
             textoCronometro.text = FormatarTempo(tempoVisual);
         }
 
+        // Atualiza a barragem de porcentagem do Time Roxo
         if (dominaçãoRoxo != null)
         {
+            // Arredonda o valor para cima e trava entre 0% e 100%
             float pctTime1 = Mathf.Clamp(Mathf.Round(tempoTotalTime1), 0f, 100f);
-            dominaçãoRoxo.text = $"{pctTime1} %";
+            dominaçãoRoxo.text = string.Format($"{pctTime1} %");
         }
 
+        // Atualiza a barragem de porcentagem do Time Amarelo
         if (dominaçãoAmarelo != null)
         {
             float pctTime2 = Mathf.Clamp(Mathf.Round(tempoTotalTime2), 0f, 100f);
-            dominaçãoAmarelo.text = $"{pctTime2} %";
+            dominaçãoAmarelo.text = string.Format($"{pctTime2} %");
         }
     }
 
+    // Função utilitária que converte segundos crus em formato de cronômetro clássico (Minutos:Segundos)
     private string FormatarTempo(float tempoEmSegundos)
     {
         int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
@@ -135,18 +166,20 @@ public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     // ==========================================
-    // FIM DE JOGO E DESCONEXÃO
+    // EVENTO DE FIM DE JOGO (Executado simultaneamente em todos os PCs via RPC)
     // ==========================================
     [PunRPC]
     private void RPC_FinalizarPartida()
     {
-        if (partidaAcabou) return;
+        if (partidaAcabou) return; // Trava para impedir que o fim de jogo dispare duas vezes por acidente
 
         partidaAcabou = true;
         tempoRestante = 0f;
         AtualizarRelogiosNaTela();
 
-        // 1. Exibe o painel do vencedor correspondente
+        Debug.Log($"Fim de Partida! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
+
+        // Compara os pontos acumulados e exibe o painel de vitória correspondente
         if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
         {
             if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
@@ -159,35 +192,5 @@ public class GerenciadorDePartida : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (imagemEmpate != null) imagemEmpate.SetActive(true);
         }
-
-        // 2. Inicia a contagem regressiva para fechar a sala e mandar todos ao menu
-        StartCoroutine(RotinaSairDaPartida());
-    }
-
-    private IEnumerator RotinaSairDaPartida()
-    {
-        // Aguarda os segundos definidos para que os jogadores leiam a mensagem de vitória/derrota
-        yield return new WaitForSeconds(tempoEsperaFimDePartida);
-
-        // Se estiver conectado à sala, sai da sala de rede do Photon
-        if (PhotonNetwork.InRoom)
-        {
-            PhotonNetwork.LeaveRoom();
-        }
-        else
-        {
-            SceneManager.LoadScene("HUD Server");
-            UnityEngine.Cursor.visible = true;
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
-        }
-    }
-
-    // Callback executado automaticamente assim que a desconexão da sala for concluída pelo Photon
-    public override void OnLeftRoom()
-    {
-        // Carrega a cena do Menu para o jogador
-        SceneManager.LoadScene("HUD Server");
-        UnityEngine.Cursor.visible = true;
-        UnityEngine.Cursor.lockState = CursorLockMode.None;
     }
 }

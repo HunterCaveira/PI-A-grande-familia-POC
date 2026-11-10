@@ -10,7 +10,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
 {
     [Header("Configurações Visuais das Mãos")]
     [Tooltip("Arraste o objeto 'arma' ou 'Ponto_Maos' que contém as habilidades como filhos.")]
-    // Ponto onde as armas e itens ficam anexados.
+    // Ponto onde as armas e itens ficam anexados. A ORDEM DOS FILHOS NA HIERARQUIA IMPORTA MUITO AQUI!
     // Ex: Filho 0 (Pistola), Filho 1 (Parede), Filho 2 (Cinto), Filho 3 (Tonico)
     [SerializeField] private Transform pontoMaos;
 
@@ -39,7 +39,8 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Start roda na primeira frame em que o boneco existe
     void Start()
     {
-        // Força o boneco a segurar a arma primária (0) ao dar spawn.
+        // MUDANÇA CRÍTICA: Força o boneco a segurar a arma primária (0) ao dar respawn.
+        // O AllBuffered garante que todos (mesmo quem entrar na sala depois) vejam a sua pistola.
         if (photonView != null && photonView.IsMine)
         {
             photonView.RPC("RPC_SincronizarMaos", RpcTarget.AllBuffered, 0);
@@ -49,9 +50,8 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Update roda a todos os frames
     void Update()
     {
-        // 🔒 Trava de Rede e Morte: Se o personagem for de outro jogador OU se este script estiver desativado por morte, ignora os inputs
+        // Trava de rede: Se o personagem for de outro jogador, o teclado do MEU PC não o pode controlar
         if (photonView != null && !photonView.IsMine) return;
-        if (!enabled) return;
 
         // Verifica se o teclado não está desconectado
         if (Keyboard.current != null)
@@ -104,15 +104,15 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
         // Se a troca for permitida, manda cancelar qualquer fantasma de parede ou mira ativada
         CancelarTodasAsHabilidades();
 
-        // Atualiza a memória interna do equipamento
-        indiceEquipamentoAtual = novoIndice;
-
-        // RPC avisa todos os PCs da sala para mudarem o modelo 3D da sua mão
+        // MUDANÇA CRÍTICA: O RPC avisa todos os PCs da sala para mudarem o modelo 3D da sua mão
+        // AllBuffered faz a mensagem ficar na memória do servidor para os "Late Joiners"
         photonView.RPC("RPC_SincronizarMaos", RpcTarget.AllBuffered, novoIndice);
 
         // Dá a ordem para a habilidade nova começar a funcionar
         AtivarHabilidadePorSlot(novoIndice);
 
+        // Atualiza a memória para sabermos o que está na mão agora
+        indiceEquipamentoAtual = novoIndice;
         // Tranca o sistema de troca por uns milissegundos para evitar falhas ou spam visual
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
     }
@@ -127,47 +127,8 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
             // Faz um Loop por todos os filhos guardados dentro das Mãos (Pistola, Cinto, etc)
             for (int i = 0; i < pontoMaos.childCount; i++)
             {
-                GameObject objFilho = pontoMaos.GetChild(i).gameObject;
-                bool deveAtivar = (i == novoIndice);
-
-                // Liga o filho ativo e desliga os inativos
-                objFilho.SetActive(deveAtivar);
-
-                // 🔧 CORREÇÃO DO MESH: Força a reativação de todos os Renderers visuais no objeto ativado
-                if (deveAtivar)
-                {
-                    foreach (Renderer r in objFilho.GetComponentsInChildren<Renderer>(true))
-                    {
-                        r.enabled = true;
-                    }
-                }
-            }
-        }
-    }
-
-    // 🌐 [PunRPC]: Chamado pelo Sistemadevida ao morrer/renascer para ocultar ou exibir todos os itens da mão na rede
-    [PunRPC]
-    public void RPC_AlternarMaos(bool estado)
-    {
-        CancelarTodasAsHabilidades();
-
-        if (pontoMaos != null)
-        {
-            if (!estado)
-            {
-                // Se morreu, esconde todos os equipamentos/armas da mão
-                for (int i = 0; i < pontoMaos.childCount; i++)
-                {
-                    pontoMaos.GetChild(i).gameObject.SetActive(false);
-                }
-                // 🔧 CORREÇÃO DO RESPAWN: Reseta a memória para forçar a reativação da pistola ao renascer
-                indiceEquipamentoAtual = -1;
-            }
-            else
-            {
-                // Se renasceu, força o reequipamento da pistola (Slot 0)
-                indiceEquipamentoAtual = 0;
-                RPC_SincronizarMaos(0);
+                // Se o número do filho (i) for o mesmo do novoIndice, liga-o. Caso contrário, desliga-o.
+                pontoMaos.GetChild(i).gameObject.SetActive(i == novoIndice);
             }
         }
     }
@@ -175,20 +136,24 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Procura na lista de habilidades para ver se a que o jogador clicou está pronta para uso
     private bool PodeTrocarParaHabilidade(int slotIndex)
     {
+        // Prevenção de erro caso a lista esteja vazia
         if (habilidadesDoPersonagem == null) return true;
 
+        // Varre script por script de habilidade anexado no boneco
         foreach (var hab in habilidadesDoPersonagem)
         {
+            // Se encontrou o script que tem o número certo (ex: Slot 2)
             if (hab.SlotIndex == slotIndex)
             {
+                // Devolve a resposta (True se estiver pronto, False se estiver em recarga)
                 return hab.PodeUsar();
             }
         }
         return true;
     }
 
-    // Varre todas as habilidades forçando-as a guardarem-se (usado antes de puxar uma arma nova ou morrer)
-    public void CancelarTodasAsHabilidades()
+    // Varre todas as habilidades forçando-as a guardarem-se (usado antes de puxar uma arma nova)
+    private void CancelarTodasAsHabilidades()
     {
         if (habilidadesDoPersonagem == null) return;
 
@@ -208,7 +173,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
             if (hab.SlotIndex == slotIndex)
             {
                 hab.AtivarHabilidade();
-                break;
+                break; // Sai da busca imediatamente após encontrar, poupando CPU
             }
         }
     }

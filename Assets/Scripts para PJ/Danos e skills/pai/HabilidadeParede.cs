@@ -1,188 +1,254 @@
-Ôªø// Importa a biblioteca base da Unity
+// Importa a biblioteca base da Unity
 using UnityEngine;
 // Importa o novo sistema de inputs da Unity (teclado/rato)
 using UnityEngine.InputSystem;
-// Importa o sistema de Listas (cole√ß√µes de dados)
+// Importa o sistema de Listas (coleÁıes de dados)
 using System.Collections.Generic;
-// Importa a biblioteca do Photon para fun√ß√µes multiplayer (rede)
+// Importa a biblioteca do Photon para funÁıes multiplayer (rede)
 using Photon.Pun;
 
 // A classe herda de MonoBehaviourPun (para ter acesso ao photonView) e usa interfaces da Habilidade e UI
 public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
 {
-    [Header("Configura√ß√µes da C√¢mera e Raio")]
+    [Header("ConfiguraÁıes da C‚mera e Raio")]
+    // Removido o SerializeField. A c‚mera agora È privada e pega a referÍncia automaticamente.
     private Camera cameraPrincipal;
+    // Dist‚ncia m·xima que o jogador pode colocar a parede a partir da c‚mera
     [SerializeField] private float distanciaMaxima = 15f;
+    // Define qual a camada (Layer) que representa o ch„o para a parede n„o atravessar
     [SerializeField] private LayerMask camadaChao;
+    // Define qual a camada representa obst·culos/paredes para limitar o crescimento da parede
     [SerializeField] private LayerMask camadaParedesEObstaculos;
 
     [Header("Dimensionamento da Parede")]
+    // Largura m·xima que a parede pode atingir
     [SerializeField] private float larguraMaxima = 5f;
+    // Largura mÌnima que a parede pode atingir se estiver num corredor apertado
     [SerializeField] private float larguraMinima = 1f;
+    // Altura m·xima da parede
     [SerializeField] private float alturaMaxima = 4f;
+    // Altura mÌnima da parede caso o teto seja baixo
     [SerializeField] private float alturaMinima = 0.5f;
 
     [Header("Teclas e Estado")]
+    // Vari·vel que diz se o jogador est· com o holograma fantasma ativado na tela
     private bool modoPosicionamentoAtivo = false;
 
     [Header("Prefabs da Parede")]
+    // O modelo transparente (holograma) que aparece antes de construir
     [SerializeField] private GameObject prefabParedeFantasma;
+    // O modelo sÛlido da parede (n„o È mais instanciado por aqui, mas mantido por compatibilidade)
     [SerializeField] private GameObject prefabParedeReal;
+    // Nome EXATO do prefab sÛlido que deve estar obrigatoriamente na pasta "Resources"
     [SerializeField] private string nomePrefabRede = "ParedeReal";
 
     [Header("Regras de Uso (Cooldown e Limites)")]
+    // Quanto tempo a parede dura no mapa antes de sumir
     [SerializeField] private float tempoDeVida = 10f;
+    // N˙mero m·ximo de paredes que este jogador pode ter ativas ao mesmo tempo
     [SerializeField] private int limiteParedes = 2;
+    // Tempo de espera (cooldown) para usar a habilidade novamente
     [SerializeField] private float tempoCooldown = 5f;
 
-    [Header("Configura√ß√£o do Slot")]
+    [Header("ConfiguraÁ„o do Slot")]
+    // Indica em qual slot da interface (UI) esta habilidade fica
     [SerializeField] private int slotIndex = 1;
+    // Propriedade p˙blica para outras classes lerem o index do slot
     public int SlotIndex => slotIndex;
 
     [Header("Imagens da UI")]
+    // Imagem mostrada quando a habilidade est· pronta para uso
     [SerializeField] private Sprite fotoPronta;
+    // Imagem escurecida mostrada enquanto est· em cooldown
     [SerializeField] private Sprite fotoRecarregando;
+    // Propriedade para a UI ler a foto pronta
     public Sprite FotoPronta => fotoPronta;
+    // Propriedade para a UI ler a foto descarregada
     public Sprite FotoRecarregando => fotoRecarregando;
 
     [Header("Tempo de Recarga para UI")]
+    // Vari·vel visual de tempo para a UI (parece duplicada com tempoCooldown, mas usada para interface)
+    [SerializeField] private float tempoDeRecarga = 4f;
+    // Vari·vel interna que guarda em que momento exato o cooldown acaba
     private float tempoProximouso = 0f;
+    // Propriedade p˙blica para a interface saber quando acaba o cooldown
     public float TempoProximouso => tempoProximouso;
 
+    // Guarda a referÍncia do script que gerencia os itens/armas do jogador
     private GerenciadorDeEquipamentos gerenciadorDeEquipamentos;
+    // Lista que guarda as paredes que este jogador j· colocou no mapa
     private List<GameObject> paredesAtivas = new List<GameObject>();
 
+    // Awake È chamado uma ˙nica vez quando o objeto nasce na cena
     private void Awake()
     {
+        // Busca o gerenciador de equipamentos no prÛprio personagem
         gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+
+        // MUDAN«A PRINCIPAL: Procura na cena automaticamente a c‚mera que possui a tag "MainCamera"
         cameraPrincipal = Camera.main;
 
+        // Aviso de seguranÁa para ajudar no Debug caso vocÍ esqueÁa de colocar a Tag na c‚mera
         if (cameraPrincipal == null)
         {
-            Debug.LogError("[Habilidade Parede] Nenhuma c√¢mera com a tag 'MainCamera' foi encontrada na cena!");
+            Debug.LogError("[Habilidade Parede] Nenhuma c‚mera com a tag 'MainCamera' foi encontrada na cena!");
         }
     }
 
+    // Update roda todos os frames do jogo
     void Update()
     {
+        // Trava de rede: Se o personagem n„o for do meu computador, n„o leio os inputs de parede dele
         if (photonView != null && !photonView.IsMine) return;
 
+        // Se o jogador ativou o holograma, atualiza a posiÁ„o dele acompanhando a mira
         if (modoPosicionamentoAtivo)
         {
             PosicionarECriarParede();
         }
     }
 
+    // Retorna verdadeiro se o tempo atual do jogo j· passou do tempo de cooldown
     public bool PodeUsar()
     {
         return Time.time >= tempoProximouso;
     }
 
+    // Mesmo que o PodeUsar, usado por outras interfaces para checar se est· pronta
     public bool EstaPronta()
     {
         return Time.time >= tempoProximouso;
     }
 
+    // MÈtodo chamado quando o jogador aperta o bot„o da habilidade
     public void AtivarHabilidade()
     {
+        // Garante que sÛ o dono do boneco pode ativar
         if (photonView != null && !photonView.IsMine) return;
 
+        // Se a habilidade estiver em cooldown
         if (!EstaPronta())
         {
+            // Volta para a arma principal (slot 0)
             if (gerenciadorDeEquipamentos != null)
             {
                 gerenciadorDeEquipamentos.TrocarEquipamento(0);
             }
-            return;
+            return; // Sai do mÈtodo e n„o faz mais nada
         }
 
+        // Inverte o estado do modo fantasma (liga se tava desligado, desliga se tava ligado)
         modoPosicionamentoAtivo = !modoPosicionamentoAtivo;
 
+        // Liga ou desliga o GameObject do holograma na cena
         if (prefabParedeFantasma != null)
         {
             prefabParedeFantasma.SetActive(modoPosicionamentoAtivo);
         }
     }
 
+    // ForÁa o cancelamento da habilidade (usado ao morrer ou trocar de arma)
     public void CancelarHabilidade()
     {
+        // Desliga a vari·vel do modo de posicionamento
         modoPosicionamentoAtivo = false;
 
+        // Desativa visualmente o holograma
         if (prefabParedeFantasma != null)
         {
             prefabParedeFantasma.SetActive(false);
         }
     }
 
+    // MÈtodo complexo que posiciona o holograma e constrÛi a parede
     private void PosicionarECriarParede()
     {
+        // Se a c‚mera ou o fantasma n„o existirem, aborta a execuÁ„o para n„o dar erro
         if (cameraPrincipal == null || prefabParedeFantasma == null) return;
 
+        // Cria um raio (laser) que sai exatamente do centro da tela (mira)
         Ray ray = cameraPrincipal.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        // Vari·vel para guardar informaÁıes sobre onde o raio bateu
         RaycastHit hit;
 
+        // Atira o raio e checa se bateu em algo que seja da camadaChao dentro da distanciaMaxima
         if (Physics.Raycast(ray, out hit, distanciaMaxima, camadaChao))
         {
+            // Se o holograma estava escondido, ativa-o
             if (!prefabParedeFantasma.activeSelf)
             {
                 prefabParedeFantasma.SetActive(true);
             }
 
+            // Chama a funÁ„o que estica ou encolhe o holograma baseado nos obst·culos prÛximos
             AjustarLarguraDaParede(prefabParedeFantasma.transform);
 
+            // Calcula metade da altura do holograma para n„o afundar no ch„o
             float metadeDaAltura = prefabParedeFantasma.transform.localScale.y / 2f;
+            // Define a posiÁ„o final somando o ponto que o raio bateu com a metade da altura
             Vector3 posicaoAjustadaNoChao = hit.point + Vector3.up * metadeDaAltura;
 
+            // Move o holograma para a posiÁ„o calculada
             prefabParedeFantasma.transform.position = posicaoAjustadaNoChao;
 
+            // Verifica se o bot„o direito do rato foi clicado neste frame
             if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             {
+                // Limpa a lista removendo paredes que j· sumiram sozinhas
                 paredesAtivas.RemoveAll(parede => parede == null);
 
+                // Se o jogador j· atingiu o limite m·ximo de paredes
                 if (paredesAtivas.Count >= limiteParedes)
                 {
+                    // Verifica se a parede mais antiga ainda existe
                     if (paredesAtivas[0] != null)
                     {
+                        // Tenta pegar o PhotonView da parede mais velha
                         PhotonView pvParedeAntiga = paredesAtivas[0].GetComponent<PhotonView>();
+                        // Se o view existe e È meu, destroi pela rede
                         if (pvParedeAntiga != null && pvParedeAntiga.IsMine)
                         {
                             PhotonNetwork.Destroy(paredesAtivas[0]);
                         }
+                        // Sen„o, destroi sÛ localmente (fallback de seguranÁa)
                         else
                         {
                             Destroy(paredesAtivas[0]);
                         }
                     }
+                    // Remove o registro da parede velha da lista
                     paredesAtivas.RemoveAt(0);
                 }
 
-                // Cria a parede s√≥lida definitiva na rede usando a pasta Resources
+                // Cria a parede sÛlida definitiva na rede usando a pasta Resources
                 GameObject paredeCriada = PhotonNetwork.Instantiate(nomePrefabRede, posicaoAjustadaNoChao, prefabParedeFantasma.transform.rotation);
 
+                // Se a parede foi criada com sucesso
                 if (paredeCriada != null)
                 {
-                    PhotonView pvParede = paredeCriada.GetComponent<PhotonView>();
-                    if (pvParede != null)
-                    {
-                        // üåê CORRE√á√ÉO DO BUG: Sincroniza a escala exata do holograma para todos os clientes na rede via RPC
-                        photonView.RPC(nameof(RPC_SincronizarEscalaParede), RpcTarget.AllBuffered, pvParede.ViewID, prefabParedeFantasma.transform.localScale);
-                    }
-
+                    // Copia o tamanho espremido/esticado do holograma para a parede real
+                    paredeCriada.transform.localScale = prefabParedeFantasma.transform.localScale;
+                    // Adiciona a parede nova na lista de controle
                     paredesAtivas.Add(paredeCriada);
+                    // Inicia o cronÙmetro para a parede se destruir sozinha apÛs o tempoDeVida
                     StartCoroutine(DestruirParedeAposTempo(paredeCriada, tempoDeVida));
                 }
 
+                // Define que o prÛximo uso sÛ ser· permitido no tempo atual + o cooldown
                 tempoProximouso = Time.time + tempoCooldown;
+                // Desativa o modo holograma
                 CancelarHabilidade();
 
+                // Puxa a arma principal de volta ‡ m„o
                 if (gerenciadorDeEquipamentos != null)
                 {
                     gerenciadorDeEquipamentos.TrocarEquipamento(0);
                 }
             }
         }
-        else
+        else // Se o raio da mira n„o estiver a bater no ch„o (ex: a olhar para o cÈu)
         {
+            // Esconde o holograma pois a posiÁ„o È inv·lida
             if (prefabParedeFantasma.activeSelf)
             {
                 prefabParedeFantasma.SetActive(false);
@@ -190,26 +256,18 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
         }
     }
 
-    // ==========================================
-    // üåê RPC PARA CORrigir A ESCALA DA PAREDE NA REDE
-    // ==========================================
-    [PunRPC]
-    public void RPC_SincronizarEscalaParede(int viewIDDaParede, Vector3 escalaCorreta)
-    {
-        PhotonView pvParede = PhotonView.Find(viewIDDaParede);
-        if (pvParede != null)
-        {
-            pvParede.transform.localScale = escalaCorreta;
-        }
-    }
-
+    // Rotina (Coroutine) que roda em paralelo esperando o tempo acabar
     private System.Collections.IEnumerator DestruirParedeAposTempo(GameObject parede, float tempo)
     {
+        // Espera os segundos definidos sem travar o jogo
         yield return new WaitForSeconds(tempo);
 
+        // Se a parede ainda existir depois do tempo
         if (parede != null)
         {
+            // Pega o componente de rede
             PhotonView pv = parede.GetComponent<PhotonView>();
+            // Se eu for o dono da parede, peÁo para o Photon destruÌ-la da sala para todos
             if (pv != null && pv.IsMine)
             {
                 PhotonNetwork.Destroy(parede);
@@ -217,35 +275,47 @@ public class HabilidadeParede : MonoBehaviourPun, IHabilidade, IasUI
         }
     }
 
+    // MÈtodo que recalcula o tamanho fÌsico da parede com base no ambiente ao redor
     private void AjustarLarguraDaParede(Transform parede)
     {
+        // Calcula qual o raio m·ximo de busca para os lados
         float raioBusca = larguraMaxima / 2f;
+        // Inicia a dist‚ncia do teto com o valor m·ximo possÌvel
         float distanciaTeto = alturaMaxima;
+        // Inicia as dist‚ncias laterais com o raio m·ximo
         float distanciaEsquerda = raioBusca;
         float distanciaDireita = raioBusca;
 
+        // Ponto de origem para atirar os raios, um pouco acima do ch„o
         Vector3 pontoOrigem = parede.position + Vector3.up * 0.5f;
 
+        // Dispara um raio para cima; se bater num teto baixo, guarda a dist‚ncia
         if (Physics.Raycast(parede.position, Vector3.up, out RaycastHit hitTeto, alturaMaxima, camadaParedesEObstaculos))
         {
             distanciaTeto = hitTeto.distance;
         }
 
+        // Garante que a altura n„o passe do m·ximo, nem seja menor que o mÌnimo
         float novaAltura = Mathf.Clamp(distanciaTeto, alturaMinima, alturaMaxima);
 
+        // Dispara um raio para a esquerda; se bater noutra parede, guarda a dist‚ncia
         if (Physics.Raycast(pontoOrigem, -parede.right, out RaycastHit hitEsquerda, raioBusca, camadaParedesEObstaculos))
         {
             distanciaEsquerda = hitEsquerda.distance;
         }
 
+        // Dispara um raio para a direita; se bater noutra parede, guarda a dist‚ncia
         if (Physics.Raycast(pontoOrigem, parede.right, out RaycastHit hitDireita, raioBusca, camadaParedesEObstaculos))
         {
             distanciaDireita = hitDireita.distance;
         }
 
+        // Soma o espaÁo livre da esquerda e direita, e trava nos limites mÌnimo/m·ximo da largura
         float novaLargura = Mathf.Clamp(distanciaEsquerda + distanciaDireita, larguraMinima, larguraMaxima);
 
+        // Guarda a escala atual do holograma
         Vector3 escalaAtual = parede.localScale;
+        // Aplica o novo tamanho calculado ao holograma sem mexer na profundidade (Z)
         parede.localScale = new Vector3(novaLargura, novaAltura, escalaAtual.z);
     }
 }
