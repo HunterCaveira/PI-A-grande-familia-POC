@@ -7,6 +7,7 @@ public class MovimentodoPlayer : MonoBehaviourPun
     private CharacterController characterController;
     private AcoesPlayer acoesPlay;
     private bool inputAtivo = false; // true só no dono do personagem
+    [SerializeField] Animator animator;
 
     [Header("Configurações de Movimento")]
     [SerializeField] private float velocidade;
@@ -122,6 +123,14 @@ public class MovimentodoPlayer : MonoBehaviourPun
         Vector3 movimentoFinal = new Vector3(movimentoHorizontal.x, velocidadeVertical, movimentoHorizontal.z);
 
         characterController.Move(movimentoFinal * Time.deltaTime);
+        
+        if (movimentoHorizontal != Vector3.zero)
+        {
+            animator.SetFloat("horizontal", 1);
+        }
+        else{
+            animator.SetFloat("horizontal", 0);
+        }
     }
 
     // ==========================================
