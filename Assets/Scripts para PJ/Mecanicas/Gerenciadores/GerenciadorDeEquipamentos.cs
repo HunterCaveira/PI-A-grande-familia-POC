@@ -84,50 +84,68 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     }
 
     // Função que processa a mudança do item atual
-    // Função que processa a mudança do item atual
     public void TrocarEquipamento(int novoIndice)
     {
+        // Segurança secundária: só o dono executa
         if (photonView != null && !photonView.IsMine) return;
 
-        // SE o mesh foi desativado ou se tentamos selecionar a mesma arma, forçamos a busca pela pistola (Slot 0)
+        // Se eu tentar puxar a arma que já está na minha mão, o sistema guarda e volta para a primária (Pistola = 0)
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
         }
 
+        // Se a habilidade escolhida estiver em Cooldown (carregando), a troca falha e o método acaba (return)
         if (novoIndice != 0 && !PodeTrocarParaHabilidade(novoIndice))
         {
             return;
         }
 
+        // Se a troca for permitida, manda cancelar qualquer fantasma de parede ou mira ativada
         CancelarTodasAsHabilidades();
 
-        // Força a atualização do índice local ANTES do RPC
+        // Atualiza a memória interna do equipamento
         indiceEquipamentoAtual = novoIndice;
 
-        // RPC avisa todos os PCs da sala para ativarem o filho correto
+        // RPC avisa todos os PCs da sala para mudarem o modelo 3D da sua mão
         photonView.RPC("RPC_SincronizarMaos", RpcTarget.AllBuffered, novoIndice);
 
+        // Dá a ordem para a habilidade nova começar a funcionar
         AtivarHabilidadePorSlot(novoIndice);
 
+        // Tranca o sistema de troca por uns milissegundos para evitar falhas ou spam visual
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
     }
 
-    // 🌐 [PunRPC]: Garante que o mesh do filho correto seja reativado perfeitamente na rede
+    // 🌐 [PunRPC]: Esta função viaja pela internet e é executada no jogo de toda a gente
     [PunRPC]
     private void RPC_SincronizarMaos(int novoIndice)
     {
+        // Garante que o Ponto das mãos existe
         if (pontoMaos != null)
         {
+            // Faz um Loop por todos os filhos guardados dentro das Mãos (Pistola, Cinto, etc)
             for (int i = 0; i < pontoMaos.childCount; i++)
             {
-                // Liga apenas o objeto do slot atual e desliga os outros
-                pontoMaos.GetChild(i).gameObject.SetActive(i == novoIndice);
+                GameObject objFilho = pontoMaos.GetChild(i).gameObject;
+                bool deveAtivar = (i == novoIndice);
+
+                // Liga o filho ativo e desliga os inativos
+                objFilho.SetActive(deveAtivar);
+
+                // 🔧 CORREÇÃO DO MESH: Força a reativação de todos os Renderers visuais no objeto ativado
+                if (deveAtivar)
+                {
+                    foreach (Renderer r in objFilho.GetComponentsInChildren<Renderer>(true))
+                    {
+                        r.enabled = true;
+                    }
+                }
             }
         }
     }
 
-    // 🌐 [PunRPC]: Chamado pelo Sistemadevida ao morrer/renascer
+    // 🌐 [PunRPC]: Chamado pelo Sistemadevida ao morrer/renascer para ocultar ou exibir todos os itens da mão na rede
     [PunRPC]
     public void RPC_AlternarMaos(bool estado)
     {
@@ -137,16 +155,17 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
         {
             if (!estado)
             {
-                // Esconde todas as mãos ao morrer e reseta o memória do índice
+                // Se morreu, esconde todos os equipamentos/armas da mão
                 for (int i = 0; i < pontoMaos.childCount; i++)
                 {
                     pontoMaos.GetChild(i).gameObject.SetActive(false);
                 }
-                indiceEquipamentoAtual = -1; // 👈 CRÍTICO: Reseta a memória para liberar a pistola ao renascer
+                // 🔧 CORREÇÃO DO RESPAWN: Reseta a memória para forçar a reativação da pistola ao renascer
+                indiceEquipamentoAtual = -1;
             }
             else
             {
-                // Ao renascer, força o reequipamento do Slot 0 (Pistola)
+                // Se renasceu, força o reequipamento da pistola (Slot 0)
                 indiceEquipamentoAtual = 0;
                 RPC_SincronizarMaos(0);
             }
