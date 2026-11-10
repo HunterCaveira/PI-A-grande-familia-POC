@@ -56,6 +56,8 @@ MonoBehaviour:
   - RPC_DesativarJogadorParaRespawn
   - RPC_AlternarEstadoJogador
   - RPC_AvisarVitima
+  - RPC_SincronizarEscalaParede
+  - RPC_AlternarMaos
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
