@@ -10,7 +10,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
 {
     [Header("Configurações Visuais das Mãos")]
     [Tooltip("Arraste o objeto 'arma' ou 'Ponto_Maos' que contém as habilidades como filhos.")]
-    // Ponto onde as armas e itens ficam anexados. A ORDEM DOS FILHOS NA HIERARQUIA IMPORTA MUITO AQUI!
+    // Ponto onde as armas e itens ficam anexados.
     // Ex: Filho 0 (Pistola), Filho 1 (Parede), Filho 2 (Cinto), Filho 3 (Tonico)
     [SerializeField] private Transform pontoMaos;
 
@@ -39,8 +39,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Start roda na primeira frame em que o boneco existe
     void Start()
     {
-        // MUDANÇA CRÍTICA: Força o boneco a segurar a arma primária (0) ao dar respawn.
-        // O AllBuffered garante que todos (mesmo quem entrar na sala depois) vejam a sua pistola.
+        // Força o boneco a segurar a arma primária (0) ao dar spawn.
         if (photonView != null && photonView.IsMine)
         {
             photonView.RPC("RPC_SincronizarMaos", RpcTarget.AllBuffered, 0);
@@ -50,8 +49,9 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Update roda a todos os frames
     void Update()
     {
-        // Trava de rede: Se o personagem for de outro jogador, o teclado do MEU PC não o pode controlar
+        // 🔒 Trava de Rede e Morte: Se o personagem for de outro jogador OU se este script estiver desativado por morte, ignora os inputs
         if (photonView != null && !photonView.IsMine) return;
+        if (!enabled) return;
 
         // Verifica se o teclado não está desconectado
         if (Keyboard.current != null)
@@ -84,51 +84,71 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     }
 
     // Função que processa a mudança do item atual
+    // Função que processa a mudança do item atual
     public void TrocarEquipamento(int novoIndice)
     {
-        // Segurança secundária: só o dono executa
         if (photonView != null && !photonView.IsMine) return;
 
-        // Se eu tentar puxar a arma que já está na minha mão, o sistema guarda e volta para a primária (Pistola = 0)
+        // SE o mesh foi desativado ou se tentamos selecionar a mesma arma, forçamos a busca pela pistola (Slot 0)
         if (novoIndice == indiceEquipamentoAtual)
         {
             novoIndice = 0;
         }
 
-        // Se a habilidade escolhida estiver em Cooldown (carregando), a troca falha e o método acaba (return)
         if (novoIndice != 0 && !PodeTrocarParaHabilidade(novoIndice))
         {
             return;
         }
 
-        // Se a troca for permitida, manda cancelar qualquer fantasma de parede ou mira ativada
         CancelarTodasAsHabilidades();
 
-        // MUDANÇA CRÍTICA: O RPC avisa todos os PCs da sala para mudarem o modelo 3D da sua mão
-        // AllBuffered faz a mensagem ficar na memória do servidor para os "Late Joiners"
+        // Força a atualização do índice local ANTES do RPC
+        indiceEquipamentoAtual = novoIndice;
+
+        // RPC avisa todos os PCs da sala para ativarem o filho correto
         photonView.RPC("RPC_SincronizarMaos", RpcTarget.AllBuffered, novoIndice);
 
-        // Dá a ordem para a habilidade nova começar a funcionar
         AtivarHabilidadePorSlot(novoIndice);
 
-        // Atualiza a memória para sabermos o que está na mão agora
-        indiceEquipamentoAtual = novoIndice;
-        // Tranca o sistema de troca por uns milissegundos para evitar falhas ou spam visual
         tempoLiberadoParaTrocar = Time.time + tempoAnimacaoTroca;
     }
 
-    // 🌐 [PunRPC]: Esta função viaja pela internet e é executada no jogo de toda a gente
+    // 🌐 [PunRPC]: Garante que o mesh do filho correto seja reativado perfeitamente na rede
     [PunRPC]
     private void RPC_SincronizarMaos(int novoIndice)
     {
-        // Garante que o Ponto das mãos existe
         if (pontoMaos != null)
         {
-            // Faz um Loop por todos os filhos guardados dentro das Mãos (Pistola, Cinto, etc)
             for (int i = 0; i < pontoMaos.childCount; i++)
             {
-                // Se o número do filho (i) for o mesmo do novoIndice, liga-o. Caso contrário, desliga-o.
+                // Liga apenas o objeto do slot atual e desliga os outros
                 pontoMaos.GetChild(i).gameObject.SetActive(i == novoIndice);
+            }
+        }
+    }
+
+    // 🌐 [PunRPC]: Chamado pelo Sistemadevida ao morrer/renascer
+    [PunRPC]
+    public void RPC_AlternarMaos(bool estado)
+    {
+        CancelarTodasAsHabilidades();
+
+        if (pontoMaos != null)
+        {
+            if (!estado)
+            {
+                // Esconde todas as mãos ao morrer e reseta o memória do índice
+                for (int i = 0; i < pontoMaos.childCount; i++)
+                {
+                    pontoMaos.GetChild(i).gameObject.SetActive(false);
+                }
+                indiceEquipamentoAtual = -1; // 👈 CRÍTICO: Reseta a memória para liberar a pistola ao renascer
+            }
+            else
+            {
+                // Ao renascer, força o reequipamento do Slot 0 (Pistola)
+                indiceEquipamentoAtual = 0;
+                RPC_SincronizarMaos(0);
             }
         }
     }
@@ -136,24 +156,20 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
     // Procura na lista de habilidades para ver se a que o jogador clicou está pronta para uso
     private bool PodeTrocarParaHabilidade(int slotIndex)
     {
-        // Prevenção de erro caso a lista esteja vazia
         if (habilidadesDoPersonagem == null) return true;
 
-        // Varre script por script de habilidade anexado no boneco
         foreach (var hab in habilidadesDoPersonagem)
         {
-            // Se encontrou o script que tem o número certo (ex: Slot 2)
             if (hab.SlotIndex == slotIndex)
             {
-                // Devolve a resposta (True se estiver pronto, False se estiver em recarga)
                 return hab.PodeUsar();
             }
         }
         return true;
     }
 
-    // Varre todas as habilidades forçando-as a guardarem-se (usado antes de puxar uma arma nova)
-    private void CancelarTodasAsHabilidades()
+    // Varre todas as habilidades forçando-as a guardarem-se (usado antes de puxar uma arma nova ou morrer)
+    public void CancelarTodasAsHabilidades()
     {
         if (habilidadesDoPersonagem == null) return;
 
@@ -173,7 +189,7 @@ public class GerenciadorDeEquipamentos : MonoBehaviourPun
             if (hab.SlotIndex == slotIndex)
             {
                 hab.AtivarHabilidade();
-                break; // Sai da busca imediatamente após encontrar, poupando CPU
+                break;
             }
         }
     }

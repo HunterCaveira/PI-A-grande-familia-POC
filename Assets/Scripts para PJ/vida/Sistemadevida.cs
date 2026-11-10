@@ -41,26 +41,21 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
 
     private void Awake()
     {
-        // Se a ficha de atributos estiver preenchida, define a vida inicial como a vida máxima
         if (dadosDoHeroi != null)
             vidaAtual = dadosDoHeroi.vidaMaxima;
     }
 
     private void Start()
     {
-        // Notifica a UI logo no início para a barra não começar vazia
         NotificarMudancaDeVida();
     }
 
-    // Chamado em TODOS os clientes quando o personagem chega pela rede via PhotonNetwork.Instantiate
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        // Lê os dados extras enviados no momento do spawn (ex: ID do time)
         object[] dados = info.photonView.InstantiationData;
         if (dados != null && dados.Length > 0)
             timeID = (int)dados[0];
 
-        // Exibe logs de depuração se ativado
         if (logsDeRede)
             Debug.Log($"[SPAWN REDE] viewID={info.photonView.ViewID} dono={info.photonView.Owner?.NickName} souEu={info.photonView.IsMine} time={timeID}");
     }
@@ -93,7 +88,7 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     {
         if (vidaAtual <= 0) return;
 
-        // Filtro de Fogo Amigo: Impede que você cause dano a aliados do mesmo time
+        // 🛡️ Filtro de Fogo Amigo (Objeto atacante direto)
         if (dano.atacante != null && dano.atacante.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
         {
             if (atacanteVida.TimeID == timeID && dano.atacante != gameObject)
@@ -110,6 +105,14 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     public void ReceberDanoRPC(float quantidadeDano, int viewIDAtirador)
     {
         if (vidaAtual <= 0) return;
+
+        // 🛡️ Filtro de Fogo Amigo (via ViewID do Atirador na rede)
+        PhotonView pvAtirador = PhotonView.Find(viewIDAtirador);
+        if (pvAtirador != null && pvAtirador.TryGetComponent<Sistemadevida>(out Sistemadevida atacanteVida))
+        {
+            if (atacanteVida.TimeID == timeID && pvAtirador.gameObject != gameObject)
+                return;
+        }
 
         if (photonView.IsMine)
         {
@@ -145,7 +148,7 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     }
 
     // ==========================================
-    // 5. RESPRAWN E RENASCER (OPÇÃO 1)
+    // 5. RESPAWN E RENASCER
     // ==========================================
 
     private void Morrer()
@@ -154,17 +157,16 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
 
         Debug.Log($"[MORTE] {gameObject.name} viewID={photonView.ViewID} time={timeID}");
 
-        // 1. Oculta o modelo 3D e desativa colisões em toda a rede via RPC
+        // 1. Oculta modelo 3D, desativa colisões, movimentação, armas e habilidades via RPC
         photonView.RPC(nameof(RPC_AlternarEstadoJogador), RpcTarget.All, false);
 
-        // 2. Solicita ao GerenciadorDeSpawn que aguarde o tempo e reposicione este mesmo objeto
+        // 2. Solicita ao GerenciadorDeSpawn que aguarde o tempo de respawn
         if (GerenciadorDeSpawn.Instancia != null)
         {
             GerenciadorDeSpawn.Instancia.SolicitarRespawnReaproveitado(this, timeID, 3f);
         }
     }
 
-    // Método chamado pelo GerenciadorDeSpawn para renascer o jogador no ponto de spawn
     public void Renascer(Vector3 posicaoSpawn, Quaternion rotacaoSpawn)
     {
         if (dadosDoHeroi != null)
@@ -173,14 +175,12 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
         PorcentagemReducaoDano = 0f;
         NotificarMudancaDeVida();
 
-        // Reposiciona o jogador no ponto de nascimento
         transform.position = posicaoSpawn;
         transform.rotation = rotacaoSpawn;
 
-        // Reativa os visuais, colisores e controles em toda a rede
+        // Reativa os visuais, colisores, movimentação, equipamentos e habilidades em toda a rede
         photonView.RPC(nameof(RPC_AlternarEstadoJogador), RpcTarget.All, true);
 
-        // Sincroniza a vida cheia com os outros jogadores
         if (photonView.IsMine)
             photonView.RPC(nameof(RPC_SincronizarVida), RpcTarget.Others, vidaAtual);
     }
@@ -188,25 +188,68 @@ public class Sistemadevida : MonoBehaviourPun, IPunInstantiateMagicCallback
     [PunRPC]
     private void RPC_AlternarEstadoJogador(bool estado)
     {
-        // 1. Liga/Desliga os renderizadores visuais (modelo 3D do personagem)
+        // 1. Visuais (Renderers)
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
             r.enabled = estado;
         }
 
-        // 2. Liga/Desliga os colisores para evitar tomar dano ou bloquear tiros enquanto morto
+        // 2. Colisores
         foreach (Collider c in GetComponentsInChildren<Collider>())
         {
             c.enabled = estado;
         }
 
-        // 3. Liga/Desliga o CharacterController se o personagem utilizar
+        // 3. CharacterController
         if (TryGetComponent<CharacterController>(out CharacterController cc))
         {
             cc.enabled = estado;
         }
 
-        // 4. Liga/Desliga o script de disparo local durante a morte
+        // 4. Script de Movimento
+        if (TryGetComponent<MovimentodoPlayer>(out MovimentodoPlayer mov))
+        {
+            mov.enabled = estado;
+        }
+
+        // 5. Câmera e Rotação do Personagem
+        if (TryGetComponent<CorrecaoCameraPersonagem>(out CorrecaoCameraPersonagem camRot))
+        {
+            camRot.enabled = estado;
+        }
+
+        // 6. Gerenciador de Equipamentos (Armas/Mãos)
+        GerenciadorDeEquipamentos gerEq = GetComponent<GerenciadorDeEquipamentos>();
+        if (gerEq != null)
+        {
+            gerEq.enabled = estado;
+            gerEq.photonView.RPC("RPC_AlternarMaos", RpcTarget.All, estado);
+        }
+
+        // 7. Habilidade do Cinto
+        HabilidadeCinto cinto = GetComponent<HabilidadeCinto>();
+        if (cinto != null)
+        {
+            if (!estado) cinto.CancelarHabilidade();
+            cinto.enabled = estado;
+        }
+
+        // 8. Habilidade da Parede
+        HabilidadeParede parede = GetComponent<HabilidadeParede>();
+        if (parede != null)
+        {
+            if (!estado) parede.CancelarHabilidade();
+            parede.enabled = estado;
+        }
+
+        // 9. Habilidade do Tónico
+        HabilidadeTonico tonico = GetComponent<HabilidadeTonico>();
+        if (tonico != null)
+        {
+            tonico.enabled = estado;
+        }
+
+        // 10. Script de Disparo (Pistola / Armas)
         tiroPistola scriptTiro = GetComponentInChildren<tiroPistola>();
         if (scriptTiro != null)
         {

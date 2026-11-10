@@ -31,7 +31,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [SerializeField] private Transform pontoFivelaPontos;
     [SerializeField] private Transform pontoDestinoPuxao;
 
-    // 🌐 FILTRAGEM DINÂMICA DE EQUIPA (Resolve o bug do cinto funcionar apenas para um time)
+    // 🌐 FILTRAGEM DINÂMICA DE EQUIPA
     public int IdDoTime
     {
         get
@@ -121,13 +121,25 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
         foreach (var col in hits)
         {
+            // 1. Ignora o meu próprio personagem e objetos filhos dele
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
+
+            // 🛑 2. TRAVA DE PAREDE E OBSTÁCULOS: Se for a parede ou obstáculo do mapa, o cinto bate e volta vazio
+            if (col.gameObject.name.Contains("Parede") || col.CompareTag("Parede") || col.GetComponent<HabilidadeParede>() != null)
+            {
+                estadoAtual = EstadoCinto.RecolhendoVazio;
+                return false;
+            }
+
+            // 3. Procura o CharacterController para garantir que o alvo é um PERSONAGEM e NÃO a parede
+            CharacterController CCAlvo = col.GetComponentInParent<CharacterController>();
+            if (CCAlvo == null) continue; // 👈 Ignora objetos com Sistemadevida que não são jogadores (como a Parede)
 
             Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
             int timeAlvo = -1;
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
 
-            // Compara de forma dinâmica a equipa atual com a equipa do alvo detetado
+            // 4. Se encontrou um jogador válido de outro time
             if (timeAlvo != -1 && timeAlvo != this.IdDoTime)
             {
                 inimigoCapturado = col.transform;
@@ -142,8 +154,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
                     pvInimigo.RequestOwnership();
                 }
 
-                controllerInimigo = col.GetComponentInParent<CharacterController>();
-                if (controllerInimigo != null) controllerInimigo.enabled = false;
+                controllerInimigo = CCAlvo;
+                controllerInimigo.enabled = false;
 
                 estadoAtual = EstadoCinto.PuxandoInimigo;
                 return true;
