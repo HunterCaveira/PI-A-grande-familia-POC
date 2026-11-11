@@ -208,13 +208,13 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     private IEnumerator TrocarDeCenaAposEspera()
     {
         yield return new WaitForSeconds(tempoDeEsperaTrocaCena);
-
+        UnityEngine.Cursor.visible = true;
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
         // Apenas o Master Client chama a troca de cena no Photon para evitar requisições redundantes
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.LoadLevel("HUD Server");
-            UnityEngine.Cursor.visible = true;
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            
         }
     }
 }
