@@ -1072,16 +1072,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
---- !u!4 &1013040127 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6884576643899175104, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
-  m_PrefabInstance: {fileID: 1013040126}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1013040128 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4365384142314376460, guid: dd6c022edc05e30479bea6bb62a804a6, type: 3}
-  m_PrefabInstance: {fileID: 1013040126}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1047941036
 GameObject:
   m_ObjectHideFlags: 0
@@ -2743,6 +2733,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 5404094061490150023, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
+      propertyPath: sceneViewId
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6220591073685751629, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -190.31473
@@ -2817,9 +2811,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2546835917218624309}
-    - targetCorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2546835917218624311}
   m_SourcePrefab: {fileID: 100100000, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
 --- !u!1 &2546835917218624308 stripped
@@ -2827,22 +2818,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4136945313930268639, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
   m_PrefabInstance: {fileID: 2546835917218624307}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2546835917218624309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2546835917218624308}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed03dd7332f2ba45999f887b800f55d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GerenciadorDeSpawn
-  pontosSpawnTime1:
-  - {fileID: 1013040128}
-  pontosSpawnTime2:
-  - {fileID: 1013040127}
 --- !u!114 &2546835917218624310 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7643895223355425182, guid: 2f7cb87ecc64d27418e342fe41c3823d, type: 3}
