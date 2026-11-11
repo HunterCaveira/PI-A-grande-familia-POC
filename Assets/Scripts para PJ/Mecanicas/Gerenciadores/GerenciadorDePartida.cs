@@ -212,7 +212,9 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
         // Apenas o Master Client chama a troca de cena no Photon para evitar requisições redundantes
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("HUD Menu");
+            PhotonNetwork.LoadLevel("HUD Server");
+            UnityEngine.Cursor.visible = true;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
         }
     }
 }
