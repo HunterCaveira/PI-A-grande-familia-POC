@@ -1,7 +1,8 @@
-// Importa bibliotecas básicas da Unity, TextMeshPro e do Photon para multiplayer
+// Importa bibliotecas básicas da Unity, TextMeshPro, Photon para multiplayer e Collections para Corrotinas
 using UnityEngine;
 using TMPro;
 using Photon.Pun;
+using System.Collections;
 
 // A classe herda de MonoBehaviourPun e implementa IPunObservable para sincronizar dados em tempo real pela rede
 public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
@@ -21,6 +22,12 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     public GameObject imagemVitoriaTime2;
     [Tooltip("Tela exibida em caso de empate")]
     public GameObject imagemEmpate;
+
+    [Header("Troca de Cena")]
+    [Tooltip("Nome exato da cena que será carregada (deve estar adicionada em Build Settings)")]
+    public string nomeDaProximaCena = "MenuInicial";
+    [Tooltip("Tempo em segundos de espera com a tela de vitória visível antes de mudar de cena")]
+    public float tempoDeEsperaTrocaCena = 5f;
 
     [Header("Configurações da Partida")]
     [Tooltip("Duração total da partida em segundos (ex: 300s = 5 minutos)")]
@@ -191,6 +198,21 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
         else
         {
             if (imagemEmpate != null) imagemEmpate.SetActive(true);
+        }
+
+        // Inicia a contagem regressiva para a troca de cena em todas as instâncias
+        StartCoroutine(TrocarDeCenaAposEspera());
+    }
+
+    // Corrotina responsável por aguardar o tempo de exibição do resultado e trocar de cena
+    private IEnumerator TrocarDeCenaAposEspera()
+    {
+        yield return new WaitForSeconds(tempoDeEsperaTrocaCena);
+
+        // Apenas o Master Client chama a troca de cena no Photon para evitar requisições redundantes
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("HUD Menu");
         }
     }
 }

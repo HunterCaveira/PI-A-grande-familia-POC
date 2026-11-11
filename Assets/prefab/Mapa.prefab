@@ -5143,8 +5143,6 @@ GameObject:
   - component: {fileID: 1587662268140165224}
   - component: {fileID: 5225655972443952589}
   - component: {fileID: 4729419529911471109}
-  - component: {fileID: 1978787448368404740}
-  - component: {fileID: 3258439023437935664}
   m_Layer: 6
   m_Name: "domina\xE7\xE3o"
   m_TagString: Untagged
@@ -5202,6 +5200,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeDonoDoTerritorio: 0
   tempoNecessario: 0
+  zerarProgressoAoSair: 1
+  ocultarUIAoFicarVazio: 0
   uiTime1: {fileID: 0}
   uiTime2: {fileID: 0}
   uiConflito: {fileID: 0}
@@ -5209,52 +5209,6 @@ MonoBehaviour:
   progressoTime2: 0
   timeTentandoDominar: 0
   emDisputa: 0
---- !u!114 &1978787448368404740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7398495503520863053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4729419529911471109}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &3258439023437935664
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7398495503520863053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4729419529911471109}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &7496268815979072045
 GameObject:
   m_ObjectHideFlags: 0
