@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime; // Necessário para gerir jogadores reais e autoridade (Player)
+using Photon.Realtime;
 
 public class HabilidadeCinto : MonoBehaviourPun, IasUI
 {
@@ -31,9 +31,15 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [SerializeField] private Transform pontoFivelaPontos;
     [SerializeField] private Transform pontoDestinoPuxao;
 
-    [Header("Filtragem de Time")]
-    [SerializeField] private int idDoTime = 1;
-    public int IdDoTime => idDoTime;
+    // 🌐 CORREÇÃO PRINCIPAL: Lê dynamicamente o TimeID direto do Sistemadevida do próprio personagem
+    public int IdDoTime
+    {
+        get
+        {
+            Sistemadevida meuVida = GetComponentInParent<Sistemadevida>();
+            return meuVida != null ? meuVida.TimeID : 1;
+        }
+    }
 
     private enum EstadoCinto { Inativo, Avancando, PuxandoInimigo, RecolhendoVazio }
     private EstadoCinto estadoAtual = EstadoCinto.Inativo;
@@ -42,7 +48,6 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     private CharacterController controllerInimigo;
     private PhotonView pvInimigo;
 
-    // NOVAS VARIÁVEIS PARA FEEDBACK DE REDE SEGURO
     private int donoOriginalActorNr;
     private int viewIDVitima;
 
@@ -118,30 +123,38 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         {
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
-            Sistemadevida vidaAlvo = col.GetComponent<Sistemadevida>();
+            // 🛑 TRAVA DE PAREDE: Se for parede ou obstáculo, o cinto rebate e volta vazio
+            if (col.gameObject.name.Contains("Parede") || col.CompareTag("Parede") || col.GetComponent<HabilidadeParede>() != null)
+            {
+                estadoAtual = EstadoCinto.RecolhendoVazio;
+                return false;
+            }
+
+            // 🛑 TRAVA DE JOGADOR: Garante que só vai tentar puxar se o objeto for um jogador (com CharacterController)
+            CharacterController CCAlvo = col.GetComponentInParent<CharacterController>();
+            if (CCAlvo == null) continue;
+
+            Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
             int timeAlvo = -1;
             if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
 
-            if (timeAlvo != -1 && timeAlvo != this.idDoTime)
+            // Compara dinamicamente o time da vítima com o time do usuário do cinto
+            if (timeAlvo != -1 && timeAlvo != this.IdDoTime)
             {
                 inimigoCapturado = col.transform;
-                pvInimigo = col.GetComponent<PhotonView>();
+                pvInimigo = col.GetComponentInParent<PhotonView>();
 
                 if (pvInimigo != null)
                 {
-                    // 1. Salva os IDs exatos da vítima ANTES de roubar a posse
                     donoOriginalActorNr = pvInimigo.OwnerActorNr;
                     viewIDVitima = pvInimigo.ViewID;
 
-                    // 2. Manda o aviso pelo NOSSO PhotonView (Garante a entrega 100%)
                     photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, true);
-
-                    // 3. Rouba o corpo para o arrastar
                     pvInimigo.RequestOwnership();
                 }
 
-                controllerInimigo = col.GetComponent<CharacterController>();
-                if (controllerInimigo != null) controllerInimigo.enabled = false;
+                controllerInimigo = CCAlvo;
+                controllerInimigo.enabled = false;
 
                 estadoAtual = EstadoCinto.PuxandoInimigo;
                 return true;
@@ -179,10 +192,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         {
             if (pvInimigo != null)
             {
-                // Avisa pelo nosso PhotonView que a vítima foi solta
                 photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, false);
 
-                // Devolve a posse para o jogador verdadeiro
                 Player donoAntigo = PhotonNetwork.CurrentRoom.GetPlayer(donoOriginalActorNr);
                 if (donoAntigo != null) pvInimigo.TransferOwnership(donoAntigo);
             }
@@ -207,7 +218,6 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         estadoAtual = EstadoCinto.Inativo;
         distanciaAtualVoo = 0f;
 
-        // Limpeza de segurança extra
         if (pvInimigo != null)
         {
             photonView.RPC("RPC_AvisarVitima", RpcTarget.All, viewIDVitima, donoOriginalActorNr, false);
@@ -259,13 +269,9 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         estadoAtual = EstadoCinto.Avancando;
     }
 
-    // ==========================================
-    // 🌐 RPC À PROVA DE BALAS (Mandado pelo Caçador)
-    // ==========================================
     [PunRPC]
     public void RPC_AvisarVitima(int idObjetoVitima, int idDonoOriginal, bool sendoPuxado)
     {
-        // Se eu sou o jogador que sofreu o ataque, verificando pelo ID do jogador, não da posse!
         if (PhotonNetwork.LocalPlayer.ActorNumber == idDonoOriginal)
         {
             PhotonView pvVitima = PhotonView.Find(idObjetoVitima);
