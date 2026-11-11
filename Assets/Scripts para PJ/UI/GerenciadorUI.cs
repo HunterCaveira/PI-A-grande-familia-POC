@@ -156,7 +156,7 @@ public class GerenciadorUI : MonoBehaviour
         }
         else
         {
-            meuTexto.color = Color.white; // Se ainda tem bala, pinta de branco
+            meuTexto.color = Color.red; // Se ainda tem bala, pinta de branco
         }
     }
 }
