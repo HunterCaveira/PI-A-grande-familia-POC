@@ -7,6 +7,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [Header("Configurações da Câmera e Alcance")]
     private Camera cameraPrincipal;
     [SerializeField] private float distanciaMaxima = 15f;
+    [Tooltip("Ponto de onde o cinto sai (ex: altura do peito ou mão). Se vazio, usa a altura do peito automaticamente.")]
+    [SerializeField] private Transform pontoOrigemDisparo;
 
     [Header("Controle de Tempo e Velocidades")]
     [SerializeField] private float tempoCooldown = 3.0f;
@@ -31,13 +33,17 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     [SerializeField] private Transform pontoFivelaPontos;
     [SerializeField] private Transform pontoDestinoPuxao;
 
+    private Sistemadevida meuSistemaDeVida;
+
     // 🌐 FILTRAGEM DINÂMICA DE EQUIPA
     public int IdDoTime
     {
         get
         {
-            Sistemadevida meuVida = GetComponentInParent<Sistemadevida>();
-            return meuVida != null ? meuVida.TimeID : 1;
+            if (meuSistemaDeVida == null)
+                meuSistemaDeVida = GetComponentInParent<Sistemadevida>();
+
+            return meuSistemaDeVida != null ? meuSistemaDeVida.TimeID : 1;
         }
     }
 
@@ -52,23 +58,29 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
     private int viewIDVitima;
 
     private Vector3 posicaoInicialLocal;
+    private Quaternion rotacaoInicialLocal;
     private float distanciaAtualVoo = 0f;
 
     private void Awake()
     {
         if (gerenciadorDeEquipamentos == null) gerenciadorDeEquipamentos = GetComponent<GerenciadorDeEquipamentos>();
+        meuSistemaDeVida = GetComponentInParent<Sistemadevida>();
         cameraPrincipal = Camera.main;
 
         if (prefabCinto != null)
         {
             posicaoInicialLocal = prefabCinto.transform.localPosition;
+            rotacaoInicialLocal = prefabCinto.transform.localRotation;
         }
     }
 
-    private void Update()
+    // Usamos LateUpdate para a fivela acompanhar perfeitamente a câmera sem tremer
+    private void LateUpdate()
     {
         if (photonView != null && !photonView.IsMine) return;
         if (estadoAtual == EstadoCinto.Inativo) return;
+
+        if (cameraPrincipal == null) cameraPrincipal = Camera.main;
 
         switch (estadoAtual)
         {
@@ -84,12 +96,23 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         }
     }
 
+    private void AtualizarTrajetoriaComCamera()
+    {
+        if (prefabCinto == null || cameraPrincipal == null) return;
+
+        Vector3 origem = pontoOrigemDisparo != null ? pontoOrigemDisparo.position : transform.position + (Vector3.up * 1.2f);
+        Vector3 direcaoMira = cameraPrincipal.transform.forward;
+
+        prefabCinto.transform.position = origem + (direcaoMira * distanciaAtualVoo);
+        prefabCinto.transform.rotation = Quaternion.LookRotation(direcaoMira);
+    }
+
     private void ProcessarAvanco()
     {
         if (prefabCinto == null || cameraPrincipal == null) return;
 
         distanciaAtualVoo += velocidadeAvanco * Time.deltaTime;
-        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
+        AtualizarTrajetoriaComCamera();
 
         if (ChecarEPrenderInimigo()) return;
 
@@ -104,7 +127,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         if (prefabCinto == null) return;
 
         distanciaAtualVoo -= velocidadeAvanco * Time.deltaTime;
-        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
+        AtualizarTrajetoriaComCamera();
 
         if (ChecarEPrenderInimigo()) return;
 
@@ -121,29 +144,30 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
         foreach (var col in hits)
         {
-            // 1. Ignora o meu próprio personagem e objetos filhos dele
+            // 1. Ignora a si mesmo
             if (col.transform == transform || col.transform.IsChildOf(transform)) continue;
 
-            // 🛑 2. TRAVA DE PAREDE E OBSTÁCULOS: Se for a parede ou obstáculo do mapa, o cinto bate e volta vazio
-            if (col.gameObject.name.Contains("Parede") || col.CompareTag("Parede") || col.GetComponent<HabilidadeParede>() != null)
+            // 2. Busca o Sistemadevida. Se o objeto tocado não tem vida (chão, obstáculos normais do cenário), ignora e passa reto.
+            Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
+            if (vidaAlvo == null) continue;
+
+            // 🛑 3. A CORREÇÃO: É um jogador ou uma parede?
+            // Como a parede também tem Sistemadevida, checamos se o alvo consegue andar (MovimentodoPlayer)
+            MovimentodoPlayer movAlvo = col.GetComponentInParent<MovimentodoPlayer>();
+
+            if (movAlvo == null)
             {
+                // Se tem vida mas NÃO tem script de movimento, é a Parede! O cinto bate nela e recolhe vazio sem tentar puxar.
                 estadoAtual = EstadoCinto.RecolhendoVazio;
                 return false;
             }
 
-            // 3. Procura o CharacterController para garantir que o alvo é um PERSONAGEM e NÃO a parede
-            CharacterController CCAlvo = col.GetComponentInParent<CharacterController>();
-            if (CCAlvo == null) continue; // 👈 Ignora objetos com Sistemadevida que não são jogadores (como a Parede)
-
-            Sistemadevida vidaAlvo = col.GetComponentInParent<Sistemadevida>();
-            int timeAlvo = -1;
-            if (vidaAlvo != null) timeAlvo = vidaAlvo.TimeID;
-
-            // 4. Se encontrou um jogador válido de outro time
+            // 4. É um jogador válido e que se move! Vamos verificar a equipa.
+            int timeAlvo = vidaAlvo.TimeID;
             if (timeAlvo != -1 && timeAlvo != this.IdDoTime)
             {
-                inimigoCapturado = col.transform;
-                pvInimigo = col.GetComponentInParent<PhotonView>();
+                inimigoCapturado = vidaAlvo.transform;
+                pvInimigo = vidaAlvo.GetComponent<PhotonView>();
 
                 if (pvInimigo != null)
                 {
@@ -154,8 +178,8 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
                     pvInimigo.RequestOwnership();
                 }
 
-                controllerInimigo = CCAlvo;
-                controllerInimigo.enabled = false;
+                controllerInimigo = vidaAlvo.GetComponent<CharacterController>();
+                if (controllerInimigo != null) controllerInimigo.enabled = false;
 
                 estadoAtual = EstadoCinto.PuxandoInimigo;
                 return true;
@@ -170,7 +194,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
 
         distanciaAtualVoo -= velocidadeRetorno * Time.deltaTime;
         distanciaAtualVoo = Mathf.Max(0, distanciaAtualVoo);
-        prefabCinto.transform.position = transform.position + (cameraPrincipal.transform.forward * distanciaAtualVoo);
+        AtualizarTrajetoriaComCamera();
 
         if (inimigoCapturado != null)
         {
@@ -238,7 +262,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         if (prefabCinto != null)
         {
             prefabCinto.transform.localPosition = posicaoInicialLocal;
-            prefabCinto.transform.localRotation = Quaternion.identity;
+            prefabCinto.transform.localRotation = rotacaoInicialLocal;
             prefabCinto.SetActive(false);
         }
     }
@@ -262,6 +286,7 @@ public class HabilidadeCinto : MonoBehaviourPun, IasUI
         if (prefabCinto != null)
         {
             prefabCinto.transform.localPosition = posicaoInicialLocal;
+            prefabCinto.transform.localRotation = rotacaoInicialLocal;
             prefabCinto.SetActive(true);
         }
 
