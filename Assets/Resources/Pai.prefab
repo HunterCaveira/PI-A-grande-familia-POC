@@ -852,20 +852,20 @@ MonoBehaviour:
   camadaParedesEObstaculos:
     serializedVersion: 2
     m_Bits: 128
-  larguraMaxima: 10
-  larguraMinima: 1
-  alturaMaxima: 3
+  larguraMaxima: 10.5
+  larguraMinima: 1.5
+  alturaMaxima: 7
   alturaMinima: 0.5
   prefabParedeFantasma: {fileID: 2485864650445342171}
   prefabParedeReal: {fileID: 1628621382219814619, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
   nomePrefabRede: PrefabParedeReal
-  tempoDeVida: 5
+  tempoDeVida: 20
   limiteParedes: 2
-  tempoCooldown: 2.5
+  tempoCooldown: 5
   slotIndex: 1
   fotoPronta: {fileID: 21300000, guid: dd8dea172a804ef48ab78f6b8ae3b3a7, type: 3}
   fotoRecarregando: {fileID: 21300000, guid: c4b4bdabdf5192444b344d046a928c62, type: 3}
-  tempoDeRecarga: 4
+  tempoDeRecarga: 20
 --- !u!114 &376925669326752263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1833,7 +1833,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6425147269689270399, guid: c41b4af3f2fc3b344b045594a4590ae2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1904,7 +1905,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7683754624597386802, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
