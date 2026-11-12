@@ -1,4 +1,4 @@
-// Importa bibliotecas b·sicas da Unity, TextMeshPro, Photon para multiplayer e Collections para Corrotinas
+// Importa bibliotecas b√°sicas da Unity, TextMeshPro, Photon para multiplayer e Collections para Corrotinas
 using UnityEngine;
 using TMPro;
 using Photon.Pun;
@@ -8,12 +8,12 @@ using System.Collections;
 public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 {
     [Header("Interface (UI)")]
-    [Tooltip("Arraste o objeto de Texto (TextMeshPro) do cronÙmetro da partida aqui")]
+    [Tooltip("Arraste o objeto de Texto (TextMeshPro) do cron√¥metro da partida aqui")]
     public TextMeshProUGUI textoCronometro;
     [Tooltip("Texto da UI que exibe a porcentagem do Time Roxo")]
-    public TextMeshProUGUI dominaÁ„oRoxo;
+    public TextMeshProUGUI dominacaoRoxo;
     [Tooltip("Texto da UI que exibe a porcentagem do Time Amarelo")]
-    public TextMeshProUGUI dominaÁ„oAmarelo;
+    public TextMeshProUGUI dominacaoAmarelo;
 
     [Header("Telas de Fim de Jogo")]
     [Tooltip("Tela exibida se o Time 1 vencer")]
@@ -24,34 +24,34 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     public GameObject imagemEmpate;
 
     [Header("Troca de Cena")]
-    [Tooltip("Nome exato da cena que ser· carregada (deve estar adicionada em Build Settings)")]
+    [Tooltip("Nome exato da cena que ser√° carregada (deve estar adicionada em Build Settings)")]
     public string nomeDaProximaCena = "MenuInicial";
-    [Tooltip("Tempo em segundos de espera com a tela de vitÛria visÌvel antes de mudar de cena")]
+    [Tooltip("Tempo em segundos de espera com a tela de vit√≥ria vis√≠vel antes de mudar de cena")]
     public float tempoDeEsperaTrocaCena = 5f;
 
-    [Header("ConfiguraÁıes da Partida")]
-    [Tooltip("DuraÁ„o total da partida em segundos (ex: 300s = 5 minutos)")]
+    [Header("Configura√ß√µes da Partida")]
+    [Tooltip("Dura√ß√£o total da partida em segundos (ex: 300s = 5 minutos)")]
     public float tempoDePartida = 300f;
     private float tempoRestante;
     private bool partidaAcabou = false;
 
-    [Header("PontuaÁ„o Acumulada")]
+    [Header("Pontua√ß√£o Acumulada")]
     public float tempoTotalTime1 = 0f;
     public float tempoTotalTime2 = 0f;
 
-    [Header("Conex„o com a ¡rea")]
-    [Tooltip("ReferÍncia ao script de DominaÁ„o do mapa (Pode ser deixado vazio para busca autom·tica)")]
+    [Header("Conex√£o com a √Årea")]
+    [Tooltip("Refer√™ncia ao script de Domina√ß√£o do mapa (Pode ser deixado vazio para busca autom√°tica)")]
     public Dominacao areaDeDominacao;
 
-    // Start È chamado no primeiro frame da cena
+    // Start √© chamado no primeiro frame da cena
     private void Start()
     {
-        // Garante que todas as imagens de vitÛria/derrota comecem desativadas (invisÌveis)
+        // Garante que todas as imagens de vit√≥ria/derrota comecem desativadas (invis√≠veis)
         if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(false);
         if (imagemVitoriaTime2 != null) imagemVitoriaTime2.SetActive(false);
         if (imagemEmpate != null) imagemEmpate.SetActive(false);
 
-        // MUDAN«A DE MELHORIA: Se esqueceu de arrastar no Inspector, procura o objeto de dominaÁ„o sozinho na cena
+        // Se esqueceu de arrastar no Inspector, procura o objeto de domina√ß√£o sozinho na cena
         if (areaDeDominacao == null)
         {
             areaDeDominacao = Object.FindFirstObjectByType<Dominacao>();
@@ -61,7 +61,7 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
             }
         }
 
-        // Apenas o lÌder da sala (Master Client) inicializa os valores oficiais do tempo e placar
+        // Apenas o l√≠der da sala (Master Client) inicializa os valores oficiais do tempo e placar
         if (PhotonNetwork.IsMasterClient)
         {
             tempoRestante = tempoDePartida;
@@ -73,20 +73,19 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
     // Update roda a cada frame do jogo
     private void Update()
     {
-        // Se a partida j· acabou, interrompe a execuÁ„o do Update
+        // Se a partida j√° acabou, interrompe a execu√ß√£o do Update
         if (partidaAcabou) return;
 
-        // 2. REGRA DE OURO DO MULTIPLAYER: APENAS O LÕDER DA SALA (Master Client) FAZ A MATEM¡TICA E CONTAGEM
-        // Isso evita conflitos de relÛgio e lag desincronizado entre os jogadores.
+        // APENAS O L√çDER DA SALA (Master Client) FAZ A MATEM√ÅTICA E CONTAGEM
         if (PhotonNetwork.IsMasterClient)
         {
-            // O cronÙmetro regride baseando-se no tempo real do Unity
+            // O cron√¥metro regride baseando-se no tempo real do Unity
             tempoRestante -= Time.deltaTime;
 
-            // LÛgica de pontuaÁ„o do territÛrio de dominaÁ„o
+            // L√≥gica de pontua√ß√£o do territ√≥rio de domina√ß√£o
             if (areaDeDominacao != null)
             {
-                // Se a zona n„o estiver a ser disputada por dois inimigos ao mesmo tempo
+                // Se a zona n√£o estiver a ser disputada por dois inimigos ao mesmo tempo
                 if (!areaDeDominacao.emDisputa)
                 {
                     // Se o dono for o Time 1, acumula tempo para o Time 1
@@ -102,7 +101,7 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
                 }
             }
 
-            // CondiÁıes de tÈrmino: O tempo acabou OU algum dos times atingiu 100% de dominaÁ„o
+            // Condi√ß√µes de t√©rmino: O tempo acabou OU algum dos times atingiu 100% de domina√ß√£o
             if (tempoRestante <= 0 || tempoTotalTime1 >= 100f || tempoTotalTime2 >= 100f)
             {
                 // Manda uma ordem via RPC para todos os computadores da sala encerrarem a partida juntos
@@ -110,61 +109,60 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
             }
         }
 
-        // 3. TODOS os computadores atualizam as suas telas locais com base nos n˙meros sincronizados pelo LÌder
+        // TODOS os computadores atualizam as suas telas locais com base nos n√∫meros sincronizados pelo L√≠der
         AtualizarRelogiosNaTela();
     }
 
     // ==========================================
-    // M…TODO OBRIGAT”RIO PARA O IPunObservable
-    // Sincroniza as vari·veis de tempo e pontuaÁ„o de forma fluida pela rede
+    // M√âTODO OBRIGAT√ìRIO PARA O IPunObservable
+    // Sincroniza as vari√°veis de tempo e pontua√ß√£o de forma fluida pela rede
     // ==========================================
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            // O LÌder transmite os seus dados atuais para os clientes conectados
+            // O L√≠der transmite os seus dados atuais para os clientes conectados
             stream.SendNext(tempoRestante);
             stream.SendNext(tempoTotalTime1);
             stream.SendNext(tempoTotalTime2);
         }
         else
         {
-            // Os demais jogadores recebem e aplicam os valores enviados pelo LÌder
+            // Os demais jogadores recebem e aplicam os valores enviados pelo L√≠der
             tempoRestante = (float)stream.ReceiveNext();
             tempoTotalTime1 = (float)stream.ReceiveNext();
             tempoTotalTime2 = (float)stream.ReceiveNext();
         }
     }
 
-    // Gerencia a atualizaÁ„o visual de todos os textos na interface
+    // Gerencia a atualiza√ß√£o visual de todos os textos na interface
     private void AtualizarRelogiosNaTela()
     {
-        // Trava matem·tica para o relÛgio nunca exibir n˙meros negativos na tela
+        // Trava matem√°tica para o rel√≥gio nunca exibir n√∫meros negativos na tela
         float tempoVisual = Mathf.Max(0, tempoRestante);
 
-        // Atualiza o texto do cronÙmetro principal
+        // Atualiza o texto do cron√¥metro principal
         if (textoCronometro != null)
         {
             textoCronometro.text = FormatarTempo(tempoVisual);
         }
 
         // Atualiza a barragem de porcentagem do Time Roxo
-        if (dominaÁ„oRoxo != null)
+        if (dominacaoRoxo != null)
         {
-            // Arredonda o valor para cima e trava entre 0% e 100%
             float pctTime1 = Mathf.Clamp(Mathf.Round(tempoTotalTime1), 0f, 100f);
-            dominaÁ„oRoxo.text = string.Format($"{pctTime1} %");
+            dominacaoRoxo.text = $"{pctTime1} %";
         }
 
         // Atualiza a barragem de porcentagem do Time Amarelo
-        if (dominaÁ„oAmarelo != null)
+        if (dominacaoAmarelo != null)
         {
             float pctTime2 = Mathf.Clamp(Mathf.Round(tempoTotalTime2), 0f, 100f);
-            dominaÁ„oAmarelo.text = string.Format($"{pctTime2} %");
+            dominacaoAmarelo.text = $"{pctTime2} %";
         }
     }
 
-    // FunÁ„o utilit·ria que converte segundos crus em formato de cronÙmetro cl·ssico (Minutos:Segundos)
+    // Fun√ß√£o utilit√°ria que converte segundos crus em formato de cron√¥metro cl√°ssico (Minutos:Segundos)
     private string FormatarTempo(float tempoEmSegundos)
     {
         int minutos = Mathf.FloorToInt(tempoEmSegundos / 60);
@@ -186,7 +184,7 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
 
         Debug.Log($"Fim de Partida! Time 1: {tempoTotalTime1:F1}s | Time 2: {tempoTotalTime2:F1}s");
 
-        // Compara os pontos acumulados e exibe o painel de vitÛria correspondente
+        // Compara os pontos acumulados e exibe o painel de vit√≥ria correspondente
         if (tempoTotalTime1 > tempoTotalTime2 || tempoTotalTime1 >= 100f)
         {
             if (imagemVitoriaTime1 != null) imagemVitoriaTime1.SetActive(true);
@@ -200,21 +198,21 @@ public class GerenciadorDePartida : MonoBehaviourPun, IPunObservable
             if (imagemEmpate != null) imagemEmpate.SetActive(true);
         }
 
-        // Inicia a contagem regressiva para a troca de cena em todas as inst‚ncias
+        // Inicia a contagem regressiva para a troca de cena em todas as inst√¢ncias
         StartCoroutine(TrocarDeCenaAposEspera());
     }
 
-    // Corrotina respons·vel por aguardar o tempo de exibiÁ„o do resultado e trocar de cena
+    // Corrotina respons√°vel por aguardar o tempo de exibi√ß√£o do resultado e trocar de cena
     private IEnumerator TrocarDeCenaAposEspera()
     {
         yield return new WaitForSeconds(tempoDeEsperaTrocaCena);
         UnityEngine.Cursor.visible = true;
         UnityEngine.Cursor.lockState = CursorLockMode.None;
-        // Apenas o Master Client chama a troca de cena no Photon para evitar requisiÁıes redundantes
+
+        // Apenas o Master Client chama a troca de cena no Photon para evitar requisi√ß√µes redundantes
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.LoadLevel("HUD Server");
-            
         }
     }
 }

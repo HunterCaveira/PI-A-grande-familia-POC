@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7643895223355425182}
   - component: {fileID: 2732845165014215290}
   - component: {fileID: 1072358468370454978}
+  - component: {fileID: 6082645440010282907}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -47,12 +48,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textoCronometro: {fileID: 0}
-  "domina\xE7\xE3oRoxo": {fileID: 0}
-  "domina\xE7\xE3oAmarelo": {fileID: 0}
+  dominacaoRoxo: {fileID: 0}
+  dominacaoAmarelo: {fileID: 0}
   imagemVitoriaTime1: {fileID: 0}
   imagemVitoriaTime2: {fileID: 0}
   imagemEmpate: {fileID: 0}
-  tempoDePartida: 150
+  nomeDaProximaCena: MenuInicial
+  tempoDeEsperaTrocaCena: 5
+  tempoDePartida: 300
   tempoTotalTime1: 0
   tempoTotalTime2: 0
   areaDeDominacao: {fileID: 0}
@@ -90,3 +93,26 @@ MonoBehaviour:
   - {fileID: 0}
   pontosSpawnTime2:
   - {fileID: 0}
+--- !u!114 &6082645440010282907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4136945313930268639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 2
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 7643895223355425182}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

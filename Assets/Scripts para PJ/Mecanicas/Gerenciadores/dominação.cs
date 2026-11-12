@@ -51,6 +51,7 @@ public class Dominacao : MonoBehaviourPun
             }
         }
     }
+
     private void OnTriggerExit(Collider quemSaiu)
     {
         if (!quemSaiu.CompareTag("Player")) return;
@@ -58,33 +59,30 @@ public class Dominacao : MonoBehaviourPun
         if (scriptDoJogador != null)
         {
             jogadoresNaArea.Remove(scriptDoJogador);
-            timeDonoDoTerritorio = 0; // Reseta o dono do território quando um jogador sai
         }
     }
 
     private void Update()
     {
-        // Apenas o Master Client calcula a lógica matemática da zona no multiplayer
-        if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+        // Removida a restrição do Master Client: agora qualquer cliente processa a captura localmente
+        if (jogadoresNaArea.Count > 0)
         {
-            if (jogadoresNaArea.Count > 0)
-            {
-                ProcessarCaptura();
-            }
-            else
-            {
-                timeTentandoDominar = 0;
-                emDisputa = false;
+            ProcessarCaptura();
+        }
+        else
+        {
+            timeTentandoDominar = 0;
+            timeDonoDoTerritorio = 0;
+            emDisputa = false;
 
-                if (zerarProgressoAoSair)
-                {
-                    progressoTime1 = 0f;
-                    progressoTime2 = 0f;
-                }
+            if (zerarProgressoAoSair)
+            {
+                progressoTime1 = 0f;
+                progressoTime2 = 0f;
             }
         }
 
-        // Todos os clientes atualizam a UI localmente com base nos dados
+        // Todos os clientes atualizam a UI localmente com base nos dados processados
         AtualizarInterface();
     }
 
