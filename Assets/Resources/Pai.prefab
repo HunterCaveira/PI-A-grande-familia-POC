@@ -853,9 +853,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   larguraMaxima: 10.5
-  larguraMinima: 1.5
+  larguraMinima: 2
   alturaMaxima: 7
-  alturaMinima: 0.5
+  alturaMinima: 0.4
   prefabParedeFantasma: {fileID: 2485864650445342171}
   prefabParedeReal: {fileID: 1628621382219814619, guid: 07c855c12fcd1b74cbd474197c2e14d1, type: 3}
   nomePrefabRede: PrefabParedeReal
@@ -879,6 +879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HabilidadeCinto
   distanciaMaxima: 20
+  pontoOrigemDisparo: {fileID: 0}
   tempoCooldown: 10
   velocidadeAvanco: 30
   velocidadeRetorno: 20
@@ -889,7 +890,6 @@ MonoBehaviour:
   prefabCinto: {fileID: 5655468510688860589}
   pontoFivelaPontos: {fileID: 7780615101466668945}
   pontoDestinoPuxao: {fileID: 0}
-  idDoTimeInspector: 0
 --- !u!114 &8469832898379529611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -958,9 +958,10 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 1
-  observableSearch: 0
+  observableSearch: 1
   ObservedComponents:
   - {fileID: 6667235756849144756}
+  - {fileID: 3439815239778553}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
