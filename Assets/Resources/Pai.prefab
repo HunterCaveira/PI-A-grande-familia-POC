@@ -114,7 +114,7 @@ MonoBehaviour:
   lineRenderer: {fileID: 0}
   duracaoLinha: -0.03
   audioSource: {fileID: 0}
-  somTiro: {fileID: 8300000, guid: 4d9bee6b5bff1974ca173b0035c796c3, type: 3}
+  somTiro: {fileID: 8300000, guid: a4c198ca0d5577147969aa79bef8a85b, type: 3}
   somRecarga: {fileID: 8300000, guid: 1ee2862f17b812c4bac67dce7ac6d55f, type: 3}
   meuPoolDeBalas: {fileID: 0}
   danoPorTiro: 20
