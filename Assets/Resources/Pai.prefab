@@ -695,6 +695,7 @@ GameObject:
   - component: {fileID: 567622879855236882}
   - component: {fileID: 9047799671779093050}
   - component: {fileID: 6667235756849144756}
+  - component: {fileID: -5448463482575466597}
   m_Layer: 3
   m_Name: Pai
   m_TagString: Player
@@ -979,6 +980,20 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 1
   m_UseLocal: 1
+--- !u!114 &-5448463482575466597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3317283540011002145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22d0d9e90d2316b44a1c56a3b345a310, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConfigurarTexturaJogador
+  materialTime1: {fileID: 2100000, guid: 0096be40fc4358e4d8cc13eff7cad165, type: 2}
+  materialTime2: {fileID: 2100000, guid: b6ed8d3fde03400479d0f9952729ab5b, type: 2}
 --- !u!1 &3985524919501369782
 GameObject:
   m_ObjectHideFlags: 0
